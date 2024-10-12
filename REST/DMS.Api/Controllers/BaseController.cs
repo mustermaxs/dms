@@ -1,66 +1,62 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Windows.Input;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 
-namespace DMS.REST.Api.Controllers;
-public abstract class BaseController : ControllerBase
+namespace DMS.REST.Api.Controllers
 {
-    private readonly IMediator Mediator;
-
-    public BaseController(IMediator mediator)
+    public abstract class BaseController : ControllerBase
     {
-        Mediator = mediator;
-    }
+        private readonly IMediator _mediator;
 
-    protected async Task<ActionResult<IResponse>> ResponseAsync(IRequest command)   // TODO refactor
-    {
-        try
+        public BaseController(IMediator mediator)
         {
-            Console.WriteLine(command.ToString());
-            dynamic responseObj = await Mediator.Send(command);
-            if (responseObj is null)
-            {
-                // Logger.Error($"Response for request {command.GetType().FullName} is null. {command.ToString()}");
-                return NotFound();
-            }
-
-            if (responseObj is JsonObject)
-            {
-                var jsonRes = JsonSerializer.Serialize(responseObj);
-                // Logger.Info($"Response for request {command.GetType().FullName} is {jsonRes}");
-                return Content(jsonRes, "application/json");
-            }
-
-            // if (command is ExportTourAsJsonCommand) // TODO eigene FileResponse Klasse um file name und file type angeben zu können?
-            // {
-            //     return File(responseObj as byte[], "application/json", "tourexport.json");
-            // }
-            
-            if (responseObj is byte[] pdfBytes) // TODO eigene FileResponse Klasse um file name und file type angeben zu können?
-            {
-                return File(pdfBytes, "application/pdf");
-            }
-
-            if (responseObj is FileContentResult)
-            {
-                return responseObj;
-            }
-
-            return Ok(responseObj);
+            _mediator = mediator;
         }
-        catch (ResourceNotFoundException rex)
+
+        // Refactored method to return ActionResult<object> to handle various response types
+        protected async Task<ActionResult<dynamic>> ResponseAsync<TResponse>(IRequest<TResponse> command)   // Refactor: Specify TResponse type
         {
-            Console.WriteLine(rex);
-            // Logger.Error($"Request {command.GetType().FullName} failed: {rex.Message}. {command.ToString()}");
-            return BadRequest(rex.Message);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            // Logger.Error($"Request {command.GetType().FullName} failed.  {command.ToString()}. {e.Message}");
-            return Problem($"Something went wrong :(");
+            try
+            {
+                Console.WriteLine(command.ToString());
+                dynamic responseObj = await _mediator.Send(command);  // Send the command to MediatR
+
+                if (responseObj is null)
+                {
+                    // Logger.Error($"Response for request {command.GetType().FullName} is null. {command.ToString()}");
+                    return NotFound();
+                }
+
+                // If the response is a JsonObject, return it as a JSON response
+                if (responseObj is JsonObject)
+                {
+                    var jsonRes = JsonSerializer.Serialize(responseObj);
+                    // Logger.Info($"Response for request {command.GetType().FullName} is {jsonRes}");
+                    return Content(jsonRes, "application/json");
+                }
+
+                // Handle file responses: PDF byte array
+                if (responseObj is byte[] pdfBytes)
+                {
+                    return File(pdfBytes, "application/pdf");
+                }
+
+                // Handle other file responses
+                if (responseObj is FileContentResult)
+                {
+                    return responseObj;
+                }
+
+                // For any other types of response, return it as a standard Ok response
+                return Ok(responseObj);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                // Logger.Error($"Request {command.GetType().FullName} failed.  {command.ToString()}. {e.Message}");
+                return Problem("Something went wrong :(");
+            }
         }
     }
 }
