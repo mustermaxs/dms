@@ -4,37 +4,34 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:80"
-    # networks:
-    #   - DMS-network
+      - "8000:80"
+    networks:
+      - DMS-network
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Host=postgres;Database=DMSdb;Username=myuser;Password=mypassword"
-    # depends_on:
-    #   - postgres
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=DMSDB;Username=dmsadmin;Password=dmsadmin"
+    depends_on:
+      - postgres
+  
+  postgres:
+    image: "postgres:13"
+    environment:
+      POSTGRES_USER: "dmsadmin"
+      POSTGRES_PASSWORD: "dmsadmin"
+      POSTGRES_DB: "DMSDB"
+      DB_DATABASE_NAME: "DMSDB"
+      DB_USERNAME: "dmsadmin"
+      DB_PASSWORD: "dmsadmin"
+      DB_DATA_LOCATION: "/var/lib/postgresql/data"
+      UPLOAD_LOCATION: "/var/lib/postgresql/data"
+    
+    volumes:
+      - ./psqldatabase:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - DMS-network
 
-  # frontend:
-  #   build:
-  #     context: ./DMS-frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:80"
-  #   networks:
-  #     - DMS-network
-  #   depends_on:
-  #     - api
-
-#   postgres:
-#     image: "postgres:13"
-#     environment:
-#       POSTGRES_USER: myuser
-#       POSTGRES_PASSWORD: mypassword
-#       POSTGRES_DB: DMSdb
-#     ports:
-#       - "5432:5432"
-#     networks:
-#       - DMS-network
-
-# networks:
-#   DMS-network:
-#     driver: bridge
+networks:
+  DMS-network:
+    driver: bridge

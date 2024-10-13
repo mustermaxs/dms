@@ -1,3 +1,4 @@
+using DMS.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 // using DMS.Domain.Repositories;
 // using DMS.Infrastructure.Repositories;
@@ -16,12 +17,14 @@ builder.Services.AddSwaggerGen();
 // Add PostgreSQL support with Entity Framework Core
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 //builder.Services.AddDbContext<DMSDbContext>(options =>
-    //options.UseNpgsql(connectionString));
+//options.UseNpgsql(connectionString));
 
 // Register repositories and services
 // builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // builder.Services.AddScoped<IProductService, ProductService>();
-
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<DmsDbContext>(options =>
+    options.UseNpgsql(connectionString));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,4 +37,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+Console.WriteLine("Starting REST API");
+
 app.Run();

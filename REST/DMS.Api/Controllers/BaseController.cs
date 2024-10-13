@@ -13,14 +13,12 @@ namespace DMS.REST.Api.Controllers
         {
             _mediator = mediator;
         }
-
-        // Refactored method to return ActionResult<object> to handle various response types
-        protected async Task<ActionResult<dynamic>> ResponseAsync<TResponse>(IRequest<TResponse> command)   // Refactor: Specify TResponse type
+        protected async Task<ActionResult<dynamic>> ResponseAsync<TResponse>(IRequest<TResponse> command)
         {
             try
             {
                 Console.WriteLine(command.ToString());
-                dynamic responseObj = await _mediator.Send(command);  // Send the command to MediatR
+                dynamic responseObj = await _mediator.Send(command); 
 
                 if (responseObj is null)
                 {
@@ -28,7 +26,6 @@ namespace DMS.REST.Api.Controllers
                     return NotFound();
                 }
 
-                // If the response is a JsonObject, return it as a JSON response
                 if (responseObj is JsonObject)
                 {
                     var jsonRes = JsonSerializer.Serialize(responseObj);
@@ -36,19 +33,16 @@ namespace DMS.REST.Api.Controllers
                     return Content(jsonRes, "application/json");
                 }
 
-                // Handle file responses: PDF byte array
                 if (responseObj is byte[] pdfBytes)
                 {
                     return File(pdfBytes, "application/pdf");
                 }
 
-                // Handle other file responses
                 if (responseObj is FileContentResult)
                 {
                     return responseObj;
                 }
 
-                // For any other types of response, return it as a standard Ok response
                 return Ok(responseObj);
             }
             catch (Exception e)
