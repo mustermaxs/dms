@@ -1,4 +1,7 @@
+using System.Reflection;
 using DMS.Infrastructure;
+using log4net;
+using log4net.Config;
 using Microsoft.EntityFrameworkCore;
 // using DMS.Domain.Repositories;
 // using DMS.Infrastructure.Repositories;
@@ -13,7 +16,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // use log4net for logging
+var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
+// Clear default logging providers and add log4net
+builder.Logging.ClearProviders();  // Remove other logging providers (optional)
+builder.Logging.AddLog4Net();  
 // Add PostgreSQL support with Entity Framework Core
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 //builder.Services.AddDbContext<DMSDbContext>(options =>
