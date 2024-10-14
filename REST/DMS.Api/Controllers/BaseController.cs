@@ -7,7 +7,7 @@ namespace DMS.REST.Api.Controllers
 {
     public abstract class BaseController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        protected readonly IMediator _mediator;
 
         public BaseController(IMediator mediator)
         {
