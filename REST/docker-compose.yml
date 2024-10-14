@@ -24,7 +24,7 @@ services:
       DB_PASSWORD: "dmsadmin"
       DB_DATA_LOCATION: "/var/lib/postgresql/data"
       UPLOAD_LOCATION: "/var/lib/postgresql/data"
-    
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - ./psqldatabase:/var/lib/postgresql/data
     ports:
