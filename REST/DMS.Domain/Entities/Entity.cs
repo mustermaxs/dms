@@ -4,6 +4,7 @@ public class Entity
 {
     protected List<object> _domainEvents = new List<object>();
     public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
+    public Guid Id { get; set; }
 
     protected void AddDomainEvent(object eventItem)
     {

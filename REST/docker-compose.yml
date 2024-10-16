@@ -32,6 +32,14 @@ services:
     networks:
       - DMS-network
 
+  admin:
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+
 networks:
   DMS-network:
     driver: bridge

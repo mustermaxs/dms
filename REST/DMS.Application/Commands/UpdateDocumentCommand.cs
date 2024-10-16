@@ -1,4 +1,3 @@
-
 using DMS.Application.DTOs;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
@@ -7,11 +6,11 @@ using MediatR;
 
 namespace DMS.Application.Commands
 {
-    public record UploadDocumentCommand(string Title, byte[] Content) : IRequest<DmsDocumentDto>;
-
-    public class UploadDocumentRequestHandler : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
+    public record UpdateDocumentCommand(Guid Id) : IRequest<DmsDocumentDto>;
+    
+    public class UpdateDocumentCommandHandler : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
     {
-        public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<DmsDocumentDto> Handle(UpdateDocumentCommand request, CancellationToken cancellationToken)
         {
             var document = new DmsDocumentDto
             {

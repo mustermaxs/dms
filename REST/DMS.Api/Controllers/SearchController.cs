@@ -1,17 +1,40 @@
+using DMS.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 using DMS.REST.Api.Controllers;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 [ApiController]
-[Route("/api/[controller]")]
-public class SearchController(IMediator mediator) : BaseController(mediator)
+[Route("api/[controller]")]
+public class SearchController : BaseController
 {
-    private ILogger<SearchController> _logger;
+    private readonly IMediator _mediator;
+    private readonly ILogger<SearchController> _logger;
 
-    // [HttpGet]
-    // public async Task<ActionResult<IResponse>> Search([FromBody] SearchQuery searchQuery)
-    // {
-    //     mediator.Send(searchQuery);
-    //     return await ResponseAsync(searchQuery);
-    // }
+    public SearchController(IMediator mediator, ILogger<SearchController> logger) : base(mediator)
+    {
+        _mediator = mediator;
+        _logger = logger;
+    }
+
+    [HttpGet("tags")]
+    public async Task<ActionResult> SearchByTag([FromQuery] string prefix)
+    {
+        var res = await _mediator.Send(new GetTagsQuery()); 
+        return Ok(res);
+    }
+
+    [HttpGet("documents")] 
+    public async Task<ActionResult> SearchByDocumentTitle([FromQuery] string title) 
+    {
+        var res = await _mediator.Send(new GetDocumentsQuery()); 
+        return Ok(res);
+    }
+    
+    [HttpGet("documents/content")] 
+    public async Task<ActionResult> SearchByDocumentContent([FromQuery] string content)
+    {
+        var res = await _mediator.Send(new GetDocumentsQuery()); 
+        return Ok(res);
+    }
 }

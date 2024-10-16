@@ -46,6 +46,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 // builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // builder.Services.AddScoped<IProductService, ProductService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
 var app = builder.Build();
