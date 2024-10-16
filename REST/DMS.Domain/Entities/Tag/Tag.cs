@@ -1,16 +1,37 @@
-namespace DMS.Domain.Entities;
+using DMS.Application.DTOs;
 
-public class Tag : Entity
+namespace DMS.Domain.Entities.Tag
 {
-    public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public List<DmsDocument> Documents { get; set; }
 
-    public Tag CreateTag(string name)
+    public class Tag : Entity
     {
-        return new Tag
+        public Guid Id { get; set; }
+        public required string Label { get; set; }
+        public string Value { get; set; }
+        public string Color { get; set; }
+
+        public Tag CreateTag(string label, string value, string color)
         {
-            Name = name
-        };
+            return new Tag
+            {
+                Id = Guid.NewGuid(),
+                Label = label,
+                Value = value,
+                Color = color
+            };
+        }
+    }
+    public static class DocumentTagExtensions
+    {
+        public static TagDto ToDto(this Tag tag)
+        {
+            return new TagDto
+            {
+                Id = tag.Id,
+                Label = tag.Label,
+                Color = tag.Color,
+                Value = tag.Value
+            };
+        }
     }
 }

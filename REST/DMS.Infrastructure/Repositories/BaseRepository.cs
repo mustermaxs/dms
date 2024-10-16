@@ -29,11 +29,13 @@ where TEntity : Entity
         return await DbSet.ToListAsync();
     }
 
-    public virtual async Task Create(TEntity entity)
+    public virtual async Task<TEntity> Create(TEntity entity)
     {
-        await DbSet.AddAsync(entity);
+        entity.Id = Guid.NewGuid();
+        var e = await DbSet.AddAsync(entity);
         await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        // await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        return e.Entity;
     }
 
     public virtual async Task Delete(TEntity entity)

@@ -1,5 +1,6 @@
 ﻿using System.Reflection.Metadata;
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Tag;
 using DMS.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace DMS.Infrastructure;
 public class DmsDbContext : DbContext
 {
     public DbSet<DmsDocument> Documents { get; set; }
+    public DbSet<DocumentTag> DocumentTags { get; set; }
     public DbSet<Tag> Tags { get; set; }
 
     public DmsDbContext(DbContextOptions<DmsDbContext> options) : base(options)
@@ -21,13 +23,19 @@ public class DmsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DmsDocument>()
-            .HasMany<Tag>(e => e.Tags)
-            .WithMany(t => t.Documents)
-            .UsingEntity(j => j.ToTable("DocumentTags"));
+        modelBuilder.Entity<DocumentTag>()
+            .HasKey(dt => new { dt.DocumentId, dt.TagId });
 
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<DocumentTag>()
+            .HasOne(dt => dt.Document)
+            .WithMany(d => d.Tags)
+            .HasForeignKey(dt => dt.DocumentId);
+
+        modelBuilder.Entity<DocumentTag>()
+            .HasOne(dt => dt.Tag)
+            .WithMany()
+            .HasForeignKey(dt => dt.TagId);
         
-        Console.WriteLine("Connected to db");
+        base.OnModelCreating(modelBuilder);
     }
 }

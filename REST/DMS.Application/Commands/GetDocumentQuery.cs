@@ -1,4 +1,3 @@
-
 using DMS.Application.DTOs;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
@@ -7,11 +6,11 @@ using MediatR;
 
 namespace DMS.Application.Commands
 {
-    public record UploadDocumentCommand(string Title, byte[] Content) : IRequest<DmsDocumentDto>;
+    public record GetDocumentQuery(Guid Id) : IRequest, IRequest<DmsDocumentDto>;
 
-    public class UploadDocumentRequestHandler : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
+    public class GetDocumentQueryHandler : IRequestHandler<GetDocumentQuery, DmsDocumentDto>
     {
-        public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<DmsDocumentDto> Handle(GetDocumentQuery request, CancellationToken cancellationToken)
         {
             var document = new DmsDocumentDto
             {
@@ -22,7 +21,7 @@ namespace DMS.Application.Commands
                 Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
                 DocumentType = new FileType { Name = "PDF" }
             };
-            
+
             return await Task.FromResult(document);
         }
     }
