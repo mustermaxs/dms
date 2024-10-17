@@ -28,10 +28,4 @@ public class DmsDocumentRepository(DmsDbContext dbContext, IDomainEventDispatche
             .ThenInclude(e => e.Tag)
             .ToListAsync();
     }
-
-
-    public override async Task<DmsDocument> Create(DmsDocument entity)
-    {
-        
-    }
 }

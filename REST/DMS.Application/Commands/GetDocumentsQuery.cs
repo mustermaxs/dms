@@ -21,7 +21,7 @@ namespace DMS.Application.Commands
                 ModificationDateTime = DateTime.Now,
                 Status = ProcessingStatus.Finished,
                 Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = new FileType { Name = "PDF" }
+                DocumentType = FileType.GetFileTypeFromExtension("blabla.pdf")
             });
             
             return Task.FromResult(documents);
