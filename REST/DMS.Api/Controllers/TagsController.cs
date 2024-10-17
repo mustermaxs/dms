@@ -1,5 +1,6 @@
 using DMS.Application.DTOs;
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Tag;
 
 namespace DMS.REST.Api.Controllers;
 
@@ -17,21 +18,21 @@ public class TagsController : BaseController
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<DocumentTag>>> GetTags()
+    public async Task<ActionResult<List<TagDto>>> GetTags()
     {
         var res = await _mediator.Send(new GetTagsQuery());
         return Ok(res);
     }
 
     [HttpGet("/search")]
-    public async Task<ActionResult<DocumentTag>> FindTagByPrefix([FromQuery] string tagPrefix)
+    public async Task<ActionResult<TagDto>> FindTagByPrefix([FromQuery] string tagPrefix)
     {
         var res = await _mediator.Send(new FindTagsByPrefixQuery(tagPrefix));
         return Ok(res);
     }
 
     [HttpPost]
-    public async Task<ActionResult<DocumentTag>> CreateTag([FromBody] CreateTagDto createTagDto)
+    public async Task<ActionResult<TagDto>> CreateTag([FromBody] CreateTagDto createTagDto)
     {
         var res = await _mediator.Send(new CreateTagCommand(createTagDto.Label, createTagDto.Value));
         return Ok(res);

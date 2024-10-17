@@ -3,7 +3,7 @@ using DMS.Infrastructure.Services;
 
 namespace DMS.Infrastructure.EventHandlers;
 
-public class DocumentCreatedEventHandler : IDomainEventHandler<DocumentUploadedEvent>
+public class DocumentCreatedEventHandler : IDomainEventHandler<DocumentSavedInDbEvent>
 {
     private readonly IMessageBrokerClient _messageBrokerClient;
 
@@ -11,7 +11,7 @@ public class DocumentCreatedEventHandler : IDomainEventHandler<DocumentUploadedE
     {
         _messageBrokerClient = messageBrokerClient;
     }
-    public Task HandleAsync(DocumentUploadedEvent domainEvent)
+    public Task HandleAsync(DocumentSavedInDbEvent domainEvent)
     {
         throw new NotImplementedException();
     }
