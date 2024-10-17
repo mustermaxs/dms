@@ -19,7 +19,9 @@ namespace DMS.Application.Commands
         IDocumentTagRepository documentTagRepository,
         IFileStorage fileStorage,
         IValidator<DmsDocument> documentValidator,
-        IUnitOfWork unitOfWork) : IRequestHandler<UploadDocumentCommand, Unit>
+        IUnitOfWork unitOfWork,
+        IDocumentTagService documentTagService
+        ) : IRequestHandler<UploadDocumentCommand, Unit>
     {
         public async Task<Unit> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
         {
@@ -27,22 +29,8 @@ namespace DMS.Application.Commands
             {
                 // TODO Refactor the creation of tags/documentTags to a separate service
                 await unitOfWork.BeginTransactionAsync();
-
-                IEnumerable<Tag>? tagsInDb = await tagRepository.GetAll();
-                var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
-
-                var newTags = request.Tags
-                    .Where(requestTag => !existingTagValues.Contains(requestTag.Value))
-                    .ToList();
-
-                var alreadyExistingTagDtos = request.Tags
-                    .Where(requestTag => existingTagValues.Contains(requestTag.Value));
-
-                var alreadyExistingTags = await Task.WhenAll(
-                    alreadyExistingTagDtos.Select(t =>
-                            tagRepository.Get(t.Id))
-                        .ToList());
-
+                var tagsAssociatedWithDocument = await documentTagService.CreateOrGetDocumentTagsFromTagsDtos(request.Tags, unitOfWork);
+                
                 var document = new DmsDocument(
                     Guid.NewGuid(),
                     request.Title,
@@ -56,14 +44,9 @@ namespace DMS.Application.Commands
 
                 var isValidDocument = (await documentValidator.ValidateAsync(document)).IsValid;
 
-                var newTagsInDb =
-                    await Task.WhenAll(
-                        newTags.Select(t =>
-                            unitOfWork.TagRepository.Create(new Tag(t.Label, t.Value, t.Color))));
 
-                var allTagsAssociatedWithDocument = newTagsInDb.Concat(alreadyExistingTags);
                 await unitOfWork.DmsDocumentRepository.Create(document);
-                await Task.WhenAll(allTagsAssociatedWithDocument.Select(t =>
+                await Task.WhenAll(tagsAssociatedWithDocument.Select(t =>
                     unitOfWork.DocumentTagRepository.Create(
                         new DocumentTag
                         {

@@ -37,6 +37,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddLog4Net();  
 
 // SERVICES
+builder.Services.AddScoped<IDocumentTagService, DocumentTagService>();
 builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 builder.Services.AddScoped<IDomainEventHandler<DocumentSavedInDbEvent>, DocumentSavedInDbEventHandler>();
 builder.Services.AddScoped<IMessageBrokerClient, RabbitMqClient>();
