@@ -12,8 +12,8 @@ public class FindTagsByPrefixQueryHandler : IRequestHandler<FindTagsByPrefixQuer
     {
         var tags = new List<Tag>
         {
-            new Tag { Label = "contract", Color = "#FF0000", Value = "contract" },
-            new Tag { Label = "project", Color = "#FF0031", Value = "project" }
+            new Tag("project", "project", "#F7839"),
+            new Tag("project", "project", "#F7839")
         };
         
         return Task.FromResult(tags);

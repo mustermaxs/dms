@@ -13,13 +13,14 @@ where TEntity : Entity
     protected DbSet<TEntity> DbSet;
     protected readonly IDomainEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IDomainEventDispatcher _eventDispatcher)
+    public BaseRepository(DmsDbContext dbContext, IDomainEventDispatcher eventDispatcher)
     {
         Context = dbContext;
         DbSet = Context.Set<TEntity>();
+        _eventDispatcher = eventDispatcher;
     }
     
-    public virtual async Task<TEntity?> Get(int id)
+    public virtual async Task<TEntity?> Get(Guid id)
     {
         return await DbSet.FindAsync(id);
     }
@@ -34,7 +35,7 @@ where TEntity : Entity
         entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
         await SaveAsync();
-        // await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
         return e.Entity;
     }
 
@@ -50,7 +51,7 @@ where TEntity : Entity
         await Context.SaveChangesAsync();
     }
 
-    public virtual async Task DeleteById(int id)
+    public virtual async Task DeleteById(Guid id)
     {
         var entity = await DbSet.FindAsync(id);
         if (entity == null)
