@@ -35,7 +35,6 @@ where TEntity : Entity
         entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
         await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
         return e.Entity;
     }
 
@@ -43,7 +42,6 @@ where TEntity : Entity
     {
         DbSet.Remove(entity);
         await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
     }
 
     public async Task SaveAsync()
@@ -60,14 +58,12 @@ where TEntity : Entity
         }
         DbSet.Remove(entity);
         await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
     }
 
     public virtual async Task UpdateAsync(TEntity entity)
     {
         DbSet.Update(entity);
         await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
     }
 
     public void Dispose()

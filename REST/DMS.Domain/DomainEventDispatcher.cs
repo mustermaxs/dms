@@ -5,9 +5,9 @@ namespace DMS.Domain
 {
     public interface IDomainEventDispatcher
     {
-        Task DispatchEventsAsync(List<object> domainEvents);
+        Task DispatchEventsAsync(IReadOnlyCollection<object> entitiesWithEvents);
     }
-    
+
     public class DomainEventDispatcher : IDomainEventDispatcher
     {
         private readonly IServiceProvider _serviceProvider;
@@ -17,9 +17,9 @@ namespace DMS.Domain
             _serviceProvider = serviceProvider;
         }
 
-        public async Task DispatchEventsAsync(List<object> domainEvents)
+        public async Task DispatchEventsAsync(IReadOnlyCollection<object> entitiesWithEvents)
         {
-            foreach (var domainEvent in domainEvents)
+            foreach (var domainEvent in entitiesWithEvents)
             {
                 var eventType = domainEvent.GetType();
                 var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);

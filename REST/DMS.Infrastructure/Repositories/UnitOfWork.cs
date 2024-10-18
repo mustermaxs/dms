@@ -1,5 +1,9 @@
+using System.Collections.ObjectModel;
 using DMS.Domain;
+using DMS.Domain.DomainEvents;
+using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DMS.Infrastructure.Repositories;
@@ -24,6 +28,13 @@ namespace DMS.Infrastructure.Repositories;
         public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context, _eventDispatcher);
         public IDocumentTagRepository DocumentTagRepository => _documentTagRepository ??= new DocumentTagRepository(_context, _eventDispatcher);
 
+        private IReadOnlyCollection<object> GetDomainEventsFromEntities()
+        {
+            var entitiesWithEvents = _context.ChangeTracker.Entries<Entity>().ToList();
+            var domainEvents = entitiesWithEvents.SelectMany(e => e.Entity.DomainEvents).ToList();
+            return new ReadOnlyCollection<object>(domainEvents);
+        }
+
         public async Task BeginTransactionAsync()
         {
             _transaction ??= await _context.Database.BeginTransactionAsync();
@@ -38,6 +49,7 @@ namespace DMS.Infrastructure.Repositories;
             try
             {
                 await _context.SaveChangesAsync();
+                await _eventDispatcher.DispatchEventsAsync(GetDomainEventsFromEntities());
                 await _transaction.CommitAsync();
             }
             catch (Exception)

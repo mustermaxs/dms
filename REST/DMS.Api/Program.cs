@@ -22,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // COMMANDS & QUERIES
 builder.Services.AddMediatR(
+    typeof(CreateTagCommand).Assembly,
     typeof(UploadDocumentCommand).Assembly
     );
 
@@ -37,6 +38,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddLog4Net();  
 
 // SERVICES
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDocumentTagService, DocumentTagService>();
 builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 builder.Services.AddScoped<IDomainEventHandler<DocumentSavedInDbEvent>, DocumentSavedInDbEventHandler>();
@@ -45,6 +47,7 @@ builder.Services.AddScoped<IFileStorage, FileStorage>();
 
 // REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
+builder.Services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
