@@ -18,9 +18,7 @@ public class DocumentsController : BaseController
     {
         try
         {
-            // byte[] pdfBytes = Convert.FromBase64String(documentDto.Content);
-            byte[] pdfBytes = Convert.FromBase64String("S0lXVli/wEqGWM9JXpabFQ==");
-            object res = await _mediator.Send(new UploadDocumentCommand(documentDto.Title, pdfBytes));
+            object res = await _mediator.Send(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
             return Ok(res);
         }
         catch (Exception e)

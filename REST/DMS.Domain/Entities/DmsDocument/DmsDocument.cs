@@ -8,30 +8,25 @@ namespace DMS.Domain.Entities
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
-        public string? Content { get; set; }
         public DateTime UploadDateTime { get; set; }
         public DateTime? ModificationDateTime { get; set; }
         public string? Path { get; set; }
-        public List<DocumentTag> Tags { get; set; } = new List<DocumentTag>();
+        public List<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
         public FileType DocumentType { get; set; }
         public ProcessingStatus Status { get; set; }
-
-        public DmsDocument CreateDocument(string title)
+        public DmsDocument() {}
+        public DmsDocument(Guid id, string title, string content, DateTime uploadDateTime,
+            DateTime modificationDateTime, string path, List<DocumentTag> tags, FileType documentType,
+            ProcessingStatus status)
         {
-            var document = new DmsDocument
-            {
-                Id = Guid.NewGuid(),
-                UploadDateTime = DateTime.Now,
-                ModificationDateTime = null,
-                Path = String.Empty,
-                Content = String.Empty,
-                Title = title,
-                Status = ProcessingStatus.Pending
-            };
-
-            AddDomainEvent(new DocumentUploadedEvent(document.Id, document.Title));
-
-            return document;
+            Id = id;
+            Title = title;
+            UploadDateTime = uploadDateTime;
+            ModificationDateTime = modificationDateTime;
+            Path = path;
+            Tags = tags;
+            DocumentType = documentType;
+            Status = status;
         }
 
         public void AddTag(DocumentTag documentTag)
@@ -40,7 +35,6 @@ namespace DMS.Domain.Entities
             {
                 return;
             }
-
             Tags.Add(documentTag);
         }
 
@@ -56,12 +50,12 @@ namespace DMS.Domain.Entities
         {
             return new DmsDocumentDto
             {
-                Id = Guid.NewGuid(), Title = "Document 1",
+                Id = Guid.NewGuid(), Title = "Document 1.pdf",
                 UploadDateTime = DateTime.Now,
                 ModificationDateTime = DateTime.Now,
                 Status = ProcessingStatus.Finished,
                 Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = new FileType { Name = "PDF" }
+                DocumentType = new FileType(name: document.Title)
             };
         }
     }

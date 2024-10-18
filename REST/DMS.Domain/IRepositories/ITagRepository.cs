@@ -5,5 +5,4 @@ namespace DMS.Domain.IRepositories;
 
 public interface ITagRepository : IRepository<Tag>
 {
-    
 }

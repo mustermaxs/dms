@@ -16,12 +16,12 @@ namespace DMS.Application.Commands
             var documents = new List<DmsDocumentDto>();
             documents.Add(new DmsDocumentDto
             {
-                Id = Guid.NewGuid(), Title = "Document 1",
+                Id = Guid.NewGuid(), Title = "Document 1.pdf",
                 UploadDateTime = DateTime.Now,
                 ModificationDateTime = DateTime.Now,
                 Status = ProcessingStatus.Finished,
                 Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = new FileType { Name = "PDF" }
+                DocumentType = FileType.GetFileTypeFromExtension("blabla.pdf")
             });
             
             return Task.FromResult(documents);

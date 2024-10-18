@@ -27,7 +27,9 @@ builder.Services.AddCors(options =>
         });
 });
 builder.Services.AddMediatR(
-    typeof(UploadDocumentCommand).Assembly
+    typeof(CreateTagCommand).Assembly,
+    typeof(UploadDocumentCommand).Assembly,
+    typeof(DocumentSavedInFileStorageEvent).Assembly
     );
 
 builder.Services.AddControllers();
@@ -39,36 +41,40 @@ builder.Services.AddSwaggerGen();
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-// Clear default logging providers and add log4net
-builder.Logging.ClearProviders();  // Remove other logging providers (optional)
+// LOGGING
+builder.Logging.ClearProviders(); 
 builder.Logging.AddLog4Net();  
-// Add PostgreSQL support with Entity Framework Core
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//builder.Services.AddDbContext<DMSDbContext>(options =>
-//options.UseNpgsql(connectionString));
 
-// Register repositories and services
-builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-builder.Services.AddScoped<IDomainEventHandler<DocumentUploadedEvent>, DocumentCreatedEventHandler>();
+// SERVICES
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDocumentTagService, DocumentTagService>();
+builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
+builder.Services.AddSingleton<IIntegrationEventDispatcher, IntegrationEventDispatcher>();
+// builder.Services.AddScoped<IIntegrationEventHandler<DocumentSavedInFileStorageEvent>, DocumentSavedInFileStorageEventHandler>();
 builder.Services.AddScoped<IMessageBrokerClient, RabbitMqClient>();
+builder.Services.AddScoped<IFileStorage, FileStorage>();
+
+// REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
+builder.Services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 // builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // builder.Services.AddScoped<IProductService, ProductService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// VALIDATORS
+builder.Services.AddScoped<IValidator<DmsDocument>, DmsDocumentValidator>();
+
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
