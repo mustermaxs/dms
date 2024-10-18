@@ -1,15 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "rizzui";
 import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import { useModal } from "../../hooks/useModal";
 import { MultiValue, ActionMeta } from 'react-select';
 import { UploadModal } from "../ui/UploadModal";
+import { HttpService } from "../../services/httpService";
+import { Tag } from "../../types/Tag";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<MultiValue<{ label: string; value: string }>>([]);  // For multi-select
+  const [tags, setTags] = useState<Tag[]>([]);  // For multi-select
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+     let http: HttpService = new HttpService();
+     http.get<Tag[]>('Tags').then((data) => {
+      console.log(data);  
+
+      if(!data) {
+        setTags([]);
+        return;
+      }
+
+       setTags(data);
+       return;
+     })
+    }
+    else {
+      setTags([]);
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,10 +42,6 @@ export default function Header() {
     resetForm();
   };
 
-  const handleCloseModal = () => {
-    closeModal();
-    resetForm();
-  };
 
   const resetForm = () => {
     setTitle("");
@@ -30,8 +49,8 @@ export default function Header() {
     setFile(null);
   };
 
-  const handleTagChange = (newValue: MultiValue<{ label: string; value: string }>, actionMeta: ActionMeta<{ label: string; value: string }>) => {
-    setTags(newValue);
+  const handleTagChange = (newValue: Tag[]) => {
+    setSelectedTags(newValue);
   };
 
 
@@ -45,7 +64,7 @@ export default function Header() {
         </Button>
       </div>
 
-      <UploadModal isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
+      <UploadModal isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} selectedTags={selectedTags} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
     </>
   );
 }

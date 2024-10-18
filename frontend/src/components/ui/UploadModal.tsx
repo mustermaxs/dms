@@ -3,7 +3,7 @@ import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import CreatableSelect from "react-select/creatable";
 
-export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, file, setFile }) => {
+export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
 
   const customStyles = {
     multiValue: (styles: any) => ({
@@ -65,9 +65,9 @@ export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, set
         <div>
           <Label title="Tags" />
           <CreatableSelect
-            options={[{ label: "Personal", value: "Personal" }, { label: "Work", value: "Work" }, { label: "In Progress", value: "In Progress" }]}
+            options={tags}
             isMulti
-            value={tags}
+            value={selectedTags}
             onChange={handleTagChange}
             placeholder="Add or create tags..."
             className="mt-1 "

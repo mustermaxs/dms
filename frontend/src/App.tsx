@@ -3,6 +3,7 @@ import SearchInput from "./components/ui/searchInput";
 import Container from "./components/shared/container";
 import DocumentTable from './components/ui/DocumentTable';
 import { useState } from "react";
+import { Tag } from "./types/Tag";
 
 
 function App() {
