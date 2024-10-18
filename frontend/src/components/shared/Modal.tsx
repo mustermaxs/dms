@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal 
     >
       <div
         className="bg-white rounded-lg shadow-lg w-full max-w-md hover:cursor-default"
-        onClick={(e) => e.stopPropagation()}  // Prevent close when clicking inside modal
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center border-b p-4">
           <h2 className="text-lg font-semibold">{title}</h2>

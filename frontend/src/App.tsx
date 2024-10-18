@@ -1,6 +1,6 @@
-import Header from "./components/ui/header";
+import Header from "./components/shared/header";
 import SearchInput from "./components/ui/searchInput";
-import Container from "./components/ui/container";
+import Container from "./components/shared/container";
 import DocumentTable from './components/ui/DocumentTable';
 import { useState } from "react";
 

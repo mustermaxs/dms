@@ -4,10 +4,10 @@ import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
 
 import Document from "../../types/Document";
-import Label from "./Label";
+import { DocumentModal } from "./DocumentModal";
 
 export default function DocumentTable() {
-  const { Modal, isOpen, openModal, closeModal } = useModal();
+  const { isOpen, openModal, closeModal } = useModal();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const documents = [
@@ -87,20 +87,8 @@ export default function DocumentTable() {
       </table>
 
       {/* Modal */}
-      {selectedDocument && (
-        <Modal isOpen={isOpen} closeModal={closeModal} title={`${selectedDocument.title} Details`}>
-          <Label title="Tags" />
-          <ul className="mb-4">
-            {selectedDocument.tags.map((tag, index) => (
-              <li key={index} className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-                {tag}
-              </li>
-            ))}
-          </ul>
-          <Label title="Match" />
-          <p className="my-2">{selectedDocument.content}</p>
-        </Modal>
-      )}
+      {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={selectedDocument} />}
+      
     </div>
   );
 }
