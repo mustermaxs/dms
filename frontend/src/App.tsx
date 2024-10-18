@@ -1,37 +1,29 @@
-import { useState } from 'react';
 import Header from "./components/ui/header";
-import BasicTable from "./components/ui/table";
 import SearchInput from "./components/ui/searchInput";
 import Container from "./components/ui/container";
-import DocumentModal from "./components/ui/DocumentModal";
-import { useModal } from "./hooks/useModal";
-
-import Document from './types/Document';
+import DocumentTable from './components/ui/DocumentTable';
+import { useState } from "react";
 
 
 function App() {
-  const { isOpen, openModal, closeModal } = useModal();
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
-  const handleOpenModal = (document: Document) => {
-    console.log(document);
-    setSelectedDocument(document);
-    openModal();
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+
+  const handleSearch = (searchData: { tags: string[], content: string }) => {
+
+    setTimeout(() => {
+      console.log("searchData");
+      console.table(searchData);
+      setIsSearching(false);
+    }, 500);
   };
 
   return (
     <Container>
-      {selectedDocument && (
-        <DocumentModal 
-          isOpen={isOpen} 
-          onClose={closeModal}
-          title={selectedDocument.title}
-          content={selectedDocument.content}
-        />
-      )}
       <Header />
-      <SearchInput handleSearch={() => {}} />
-      <BasicTable openDocumentModal={handleOpenModal} />
+      <SearchInput handleSearch={handleSearch} isSearching={isSearching} setIsSearching={setIsSearching} />
+      <DocumentTable />
     </Container>
   );
 }
