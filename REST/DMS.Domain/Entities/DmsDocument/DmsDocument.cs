@@ -14,7 +14,7 @@ namespace DMS.Domain.Entities
         public List<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
         public FileType DocumentType { get; set; }
         public ProcessingStatus Status { get; set; }
-        // constructor
+        public DmsDocument() {}
         public DmsDocument(Guid id, string title, string content, DateTime uploadDateTime,
             DateTime modificationDateTime, string path, List<DocumentTag> tags, FileType documentType,
             ProcessingStatus status)
@@ -35,7 +35,6 @@ namespace DMS.Domain.Entities
             {
                 return;
             }
-
             Tags.Add(documentTag);
         }
 

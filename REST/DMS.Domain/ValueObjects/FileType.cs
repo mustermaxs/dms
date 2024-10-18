@@ -1,16 +1,23 @@
 namespace DMS.Domain.ValueObjects;
 
-public class FileType
+public class FileType : ValueObject
 {
-    public string Name { get; set; }
+    private string _name;
+    public string Name
+    {
+        get => _name;
+        set => _name = GetExtensionFromName(value);
+    }
+    public FileType() {}
 
     public FileType(string name)
     {
-        Name = name;
+        _name = GetExtensionFromName(name);
     }
 
-    public static FileType GetFileTypeFromExtension(string extension)
+    public static FileType GetFileTypeFromExtension(string name)
     {
+        var extension = Path.GetExtension(name);
         return extension switch
         {
             ".pdf" => new FileType("pdf"),
@@ -18,5 +25,23 @@ public class FileType
             ".txt" => new FileType("txt"),
             _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
         };
+    }
+
+    public static string GetExtensionFromName(string name)
+    {
+        var extension = Path.GetExtension(name);
+        return extension switch
+        {
+            ".pdf" => "pdf",
+            ".docx" =>"docx",
+            ".txt" => "txt",
+            _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
+        };
+
+    }
+
+    protected override IEnumerable<object> GetAtomicValues()
+    {
+       yield return _name;
     }
 }

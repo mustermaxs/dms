@@ -10,6 +10,7 @@ namespace DMS.Domain.Entities.Tag
         public string Label { get; set; }
         public string Value { get; set; }
         public string Color { get; set; }
+        public Tag(){}
 
         public Tag(string label, string value, string color)
         {
@@ -17,7 +18,6 @@ namespace DMS.Domain.Entities.Tag
             Label = label;
             Value = value;
             Color = color;
-            AddDomainEvent(new DocumentSavedInDbEvent(new Guid(), "SOME TITLE"));
         }
     }
     public static class DocumentTagExtensions
