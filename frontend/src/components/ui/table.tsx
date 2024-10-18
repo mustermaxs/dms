@@ -29,7 +29,7 @@ function createData(
 }
 
 const rows = [
-  createData('1', 'Document 1', 'Lorem ipsum', ['tag1', 'tag2'], 'This is the content of Document 1'),
+  createData('1', 'Document 1.pdf', 'Lorem ipsum', ['tag1', 'tag2'], 'This is the content of Document 1.pdf'),
   createData('2', 'Document 2', 'Dolor sit amet', ['tag2', 'tag3'], 'This is the content of Document 2'),
   createData('3', 'Document 3', 'Consectetur adipiscing', ['tag1', 'tag3'], 'This is the content of Document 3'),
 ];

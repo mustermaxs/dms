@@ -14,7 +14,7 @@ namespace DMS.Application.Commands
         {
             var document = new DmsDocumentDto
             {
-                Id = Guid.NewGuid(), Title = "Document 1",
+                Id = Guid.NewGuid(), Title = "Document 1.pdf",
                 UploadDateTime = DateTime.Now,
                 ModificationDateTime = DateTime.Now,
                 Status = ProcessingStatus.Finished,

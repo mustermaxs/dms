@@ -29,15 +29,7 @@ public class FileType : ValueObject
 
     public static string GetExtensionFromName(string name)
     {
-        var extension = Path.GetExtension(name);
-        return extension switch
-        {
-            ".pdf" => "pdf",
-            ".docx" =>"docx",
-            ".txt" => "txt",
-            _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
-        };
-
+        return Path.GetExtension(name);
     }
 
     protected override IEnumerable<object> GetAtomicValues()
