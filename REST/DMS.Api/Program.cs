@@ -1,12 +1,15 @@
 using System.Reflection;
 using DMS.Application.Commands;
+using DMS.Application.Interfaces;
 using DMS.Domain;
+using DMS.Domain.Entities;
 using DMS.Domain.Entities.DomainEvents;
 using DMS.Domain.IRepositories;
 using DMS.Infrastructure;
 using DMS.Infrastructure.EventHandlers;
 using DMS.Infrastructure.Repositories;
 using DMS.Infrastructure.Services;
+using FluentValidation;
 using log4net;
 using log4net.Config;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +78,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
