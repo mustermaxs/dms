@@ -11,9 +11,9 @@ where TEntity : Entity
     protected DmsDbContext Context;
     private bool _disposed = false;
     protected DbSet<TEntity> DbSet;
-    protected readonly IDomainEventDispatcher _eventDispatcher;
+    protected readonly IEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IDomainEventDispatcher eventDispatcher)
+    public BaseRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
     {
         Context = dbContext;
         DbSet = Context.Set<TEntity>();

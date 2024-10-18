@@ -4,7 +4,7 @@ using DMS.Domain.IRepositories;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DocumentTagRepository(DmsDbContext dbContext, IDomainEventDispatcher eventDispatcher)
+public class DocumentTagRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
     : BaseRepository<DocumentTag>(dbContext, eventDispatcher),
         IDocumentTagRepository
 {

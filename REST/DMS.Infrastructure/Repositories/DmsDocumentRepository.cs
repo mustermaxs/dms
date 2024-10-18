@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DmsDocumentRepository(DmsDbContext dbContext, IDomainEventDispatcher eventDispatcher)
+public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
     : BaseRepository<DmsDocument>(dbContext, eventDispatcher), IDmsDocumentRepository
 {
     public async Task<DmsDocument> GetDocumentByIdAsync(Guid id)

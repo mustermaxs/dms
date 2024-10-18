@@ -7,19 +7,16 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DMS.Infrastructure.Repositories;
-
-
-
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DmsDbContext _context;
-        private IDomainEventDispatcher _eventDispatcher;
+        private IEventDispatcher _eventDispatcher;
         private IDmsDocumentRepository? _documentRepository;
         private ITagRepository? _tagRepository;
         private IDocumentTagRepository? _documentTagRepository;
         private IDbContextTransaction? _transaction = null;
 
-        public UnitOfWork(DmsDbContext context, IDomainEventDispatcher eventDispatcher)
+        public UnitOfWork(DmsDbContext context, IEventDispatcher eventDispatcher)
         {
             _context = context;
             _eventDispatcher = eventDispatcher;

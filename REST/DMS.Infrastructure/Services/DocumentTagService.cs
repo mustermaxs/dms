@@ -11,7 +11,7 @@ public class DocumentTagService(ITagRepository tagRepository, IDocumentTagReposi
     private readonly ITagRepository _tagRepository = tagRepository;
     private readonly IDocumentTagRepository _documentTagRepository = documentTagRepository;
 
-    public async Task<List<DocumentTag>> CreateOrGetDocumentTagsFromTagsDtos(List<TagDto> tagDtos, IUnitOfWork unitOfWork)
+    public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos, IUnitOfWork unitOfWork)
     {
         await unitOfWork.BeginTransactionAsync();
 
@@ -35,7 +35,6 @@ public class DocumentTagService(ITagRepository tagRepository, IDocumentTagReposi
                 newTags.Select(t =>
                     unitOfWork.TagRepository.Create(new Tag(t.Label, t.Value, t.Color))));
 
-        var allTagsAssociatedWithDocument = newTagsInDb.Concat(alreadyExistingTags);
-        
+        return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
 }

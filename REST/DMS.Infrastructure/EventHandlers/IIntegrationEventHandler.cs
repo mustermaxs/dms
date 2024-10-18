@@ -1,21 +1,22 @@
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.DomainEvents;
 using MediatR;
 
-namespace DMS.Domain
+namespace DMS.Infrastructure.EventHandlers
 {
-    public interface IDomainEvent : IRequest {}
-    
-    public interface IEventDispatcher
+    public interface IIntegrationEventHandler<in TDomainEvent>
+    {
+        Task HandleAsync(TDomainEvent domainEvent);
+    }
+
+    public interface IIntegrationEventDispatcher
     {
         Task DispatchEventsAsync(IReadOnlyCollection<object> entitiesWithEvents);
     }
 
-    public class EventDispatcher : IEventDispatcher
+    public class IntegrationEventDispatcher : IIntegrationEventDispatcher
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public EventDispatcher(IServiceProvider serviceProvider)
+        public IntegrationEventDispatcher(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -25,7 +26,7 @@ namespace DMS.Domain
             foreach (var domainEvent in entitiesWithEvents)
             {
                 var eventType = domainEvent.GetType();
-                var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
+                var handlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
                 var handler = _serviceProvider.GetService(handlerType);
 
                 if (handler != null)

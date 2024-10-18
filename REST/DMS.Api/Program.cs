@@ -23,7 +23,8 @@ var builder = WebApplication.CreateBuilder(args);
 // COMMANDS & QUERIES
 builder.Services.AddMediatR(
     typeof(CreateTagCommand).Assembly,
-    typeof(UploadDocumentCommand).Assembly
+    typeof(UploadDocumentCommand).Assembly,
+    typeof(DocumentSavedInFileStorageEvent).Assembly
     );
 
 builder.Services.AddControllers();
@@ -40,8 +41,9 @@ builder.Logging.AddLog4Net();
 // SERVICES
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDocumentTagService, DocumentTagService>();
-builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-builder.Services.AddScoped<IDomainEventHandler<DocumentSavedInDbEvent>, DocumentSavedInDbEventHandler>();
+builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
+builder.Services.AddSingleton<IIntegrationEventDispatcher, IntegrationEventDispatcher>();
+// builder.Services.AddScoped<IIntegrationEventHandler<DocumentSavedInFileStorageEvent>, DocumentSavedInFileStorageEventHandler>();
 builder.Services.AddScoped<IMessageBrokerClient, RabbitMqClient>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 

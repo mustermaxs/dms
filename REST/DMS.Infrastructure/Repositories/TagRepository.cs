@@ -5,5 +5,5 @@ using DMS.Domain.IRepositories;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class TagRepository(DmsDbContext dbContext, IDomainEventDispatcher eventDispatcher)
+public class TagRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
     : BaseRepository<Tag>(dbContext, eventDispatcher), ITagRepository;
