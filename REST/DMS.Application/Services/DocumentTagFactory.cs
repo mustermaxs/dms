@@ -1,16 +1,16 @@
+
+
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
-using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
+using DMS.Domain.Services;
 
 namespace DMS.Infrastructure.Services;
 
-public class DocumentTagService(ITagRepository tagRepository, IDocumentTagRepository documentTagRepository) : IDocumentTagService
+public class DocumentTagFactory(
+    ITagRepository tagRepository) : IDocumentTagFactory
 {
-    private readonly ITagRepository _tagRepository = tagRepository;
-    private readonly IDocumentTagRepository _documentTagRepository = documentTagRepository;
-
     public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos, IUnitOfWork unitOfWork)
     {
         await unitOfWork.BeginTransactionAsync();
@@ -37,4 +37,5 @@ public class DocumentTagService(ITagRepository tagRepository, IDocumentTagReposi
 
         return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
+
 }

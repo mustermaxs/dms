@@ -1,4 +1,5 @@
-namespace DMS.Domain.IRepositories;
+namespace DMS.Application.Interfaces;
+using Domain.IRepositories;
 
     public interface IUnitOfWork : IDisposable
     {

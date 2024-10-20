@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Reflection;
+using AutoMapper;
 using DMS.Application.DTOs;
+using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
 using DMS.Domain.Exceptions;
 using DMS.Domain.IRepositories;
+using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
 using FluentValidation;
 using MediatR;
@@ -14,14 +14,16 @@ namespace DMS.Application.Commands
 {
     public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags) : IRequest<Unit>;
 
-    public class UploadDocumentRequestHandler(
+    public class UploadDocumentCommandHandler(
         IDmsDocumentRepository documentRepository,
         ITagRepository tagRepository,
         IDocumentTagRepository documentTagRepository,
         IFileStorage fileStorage,
         IValidator<DmsDocument> documentValidator,
         IUnitOfWork unitOfWork,
-        IDocumentTagService documentTagService
+        IDocumentTagFactory documentTagFactory,
+        IMediator mediator,
+        IMapper mapper
         ) : IRequestHandler<UploadDocumentCommand, Unit>
     {
         public async Task<Unit> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
@@ -47,7 +49,7 @@ namespace DMS.Application.Commands
                     throw new UploadDocumentException("Document is invalid");
                 }
 
-                var tagsAssociatedWithDocument = await documentTagService.CreateOrGetTagsFromTagDtos(request.Tags, unitOfWork);
+                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags, unitOfWork);
                 var documentTags = await Task.WhenAll(
                     tagsAssociatedWithDocument.Select(t =>
                         unitOfWork.DocumentTagRepository.Create(
@@ -59,12 +61,14 @@ namespace DMS.Application.Commands
                             })));
                 
                 document.Tags = [..documentTags];
-                await unitOfWork.DmsDocumentRepository.Create(document);
-                
                 // TODO Put conversion from Base64 to FileStream in a separate service
                 // or make the client send it as stream in JSON object if possible
-                await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));
+                // await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));
+                document = await unitOfWork.DmsDocumentRepository.Create(document);
+                
                 await unitOfWork.CommitAsync();
+                mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(document));
+                
                 // document.AddDomainEvent();
                 return Unit.Value;
             }

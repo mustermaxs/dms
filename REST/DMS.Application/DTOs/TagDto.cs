@@ -1,5 +1,4 @@
 namespace DMS.Application.DTOs;
-
 public class TagDto
 {
     public Guid Id { get; set; }

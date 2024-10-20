@@ -1,5 +1,3 @@
-using DMS.Application.DTOs;
-using DMS.Domain.Entities.DomainEvents;
 using DMS.Domain.ValueObjects;
 
 namespace DMS.Domain.Entities
@@ -41,22 +39,6 @@ namespace DMS.Domain.Entities
         public void RemoveTag(DocumentTag documentTag)
         {
             Tags.Remove(documentTag);
-        }
-    }
-
-    public static class DmsDocumentExtensions
-    {
-        public static DmsDocumentDto ToDto(this DmsDocument document)
-        {
-            return new DmsDocumentDto
-            {
-                Id = Guid.NewGuid(), Title = "Document 1.pdf",
-                UploadDateTime = DateTime.Now,
-                ModificationDateTime = DateTime.Now,
-                Status = ProcessingStatus.Finished,
-                Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = new FileType(name: document.Title)
-            };
         }
     }
 }
