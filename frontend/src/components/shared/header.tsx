@@ -6,8 +6,10 @@ import { MultiValue, ActionMeta } from 'react-select';
 import { UploadModal } from "../ui/UploadModal";
 import { HttpService } from "../../services/httpService";
 import { Tag } from "../../types/Tag";
-import { ServiceLocator } from "../../serviceProvider";
+import { ServiceLocator } from "../../serviceLocator";
 import { ITagService } from "../../services/tagService";
+import { IDocumentService } from "../../services/documentService";
+import { getEmptyGuid } from "../../services/guidGenerator";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
@@ -28,8 +30,19 @@ export default function Header() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+    console.log(title, tags);
+    documentService.uploadDocument(
+      {
+        id: getEmptyGuid(),
+        title: title,
+        tags: selectedTags,
+        content: "Document content goes here"
+      }
+    ).then((res) => {
+    })
+    console.log(selectedTags);
     const tagsArray = tags.map(tag => tag.value);
-    console.log("Uploading:", { title, tags: tagsArray, file });
     closeModal();
     resetForm();
   };
@@ -41,11 +54,31 @@ export default function Header() {
     setFile(null);
   };
 
+  useEffect(() => {
+    console.log("Selected tags updated: ", selectedTags);
+  }, [selectedTags]);
+
   const handleTagChange = (newValue: Tag[]) => {
-    setSelectedTags(newValue)
-    console.log("selected tags: ", selectedTags);
-    console.log("new value: ", newValue);
+    let tagsWithoutIds: Tag[] = newValue.filter(t => t.id === "" || t.id === undefined);
+
+    let updatedTagsWithoutIds = tagsWithoutIds.map(t => ({
+      id: 'd290f1ee-6c54-4b01-90e6-d701748f0851',
+      label: t.label,
+      color: "red",
+      value: t.value,
+    }));
+
+    setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
+
+    console.log("Tags without ids", updatedTagsWithoutIds);
+
+    let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
+    newValue = [...validTags, ...updatedTagsWithoutIds];
+    console.log("Updated tags", newValue);
+
+    setSelectedTags(newValue);
   };
+
 
 
   return (

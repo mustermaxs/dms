@@ -10,6 +10,7 @@ using DMS.Domain.Entities.DomainEvents;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
+using DMS.Domain.ValueObjects;
 using DMS.Infrastructure;
 using DMS.Infrastructure.EventHandlers;
 using DMS.Infrastructure.Repositories;
@@ -47,17 +48,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // AUTOMAPPER
-var autoMapperConfig = new MapperConfiguration(cfg =>
-{
-    cfg.CreateMap<Tag, TagDto>();
-    cfg.CreateMap<Tag, CreateTagDto>();
-    cfg.CreateMap<DmsDocument, DmsDocumentDto>();
-    cfg.CreateMap<DmsDocument, UploadDocumentDto>();
-    cfg.CreateMap<DmsDocument, DocumentSearchResultDto>();
-    cfg.CreateMap<DmsDocument, CreateDocumentDto>();
-});
-var mapper = autoMapperConfig.CreateMapper();
-builder.Services.AddAutoMapper( typeof(Program).Assembly);
+builder.Services.AddAutoMapper( typeof(DmsMappingProfile));
 
 // LOGGING
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
@@ -71,15 +62,15 @@ builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 builder.Services.AddSingleton<IIntegrationEventDispatcher, IntegrationEventDispatcher>();
 builder.Services.AddScoped<IMessageBroker, RabbitMqClient>();
-builder.Services.AddScoped<IFileStorage, FileStorage>();
+// builder.Services.AddScoped<IFileStorage, FileStorage>();
 // builder.Services.AddScoped<IIntegrationEventHandler<DocumentSavedInFileStorageIntegrationEvent>, DocumentSavedInFileStorageEventHandler>();
 
 // MINIO
-var minioConfig = builder.Configuration.GetSection("MinIO").Get<MinioConfig>();
-builder.Services.AddMinio(cgf => cgf
-    .WithEndpoint(minioConfig.Endpoint)
-    .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
-    .Build());
+// var minioConfig = builder.Configuration.GetSection("MinIO").Get<MinioConfig>();
+// builder.Services.AddMinio(cgf => cgf
+//     .WithEndpoint(minioConfig.Endpoint)
+//     .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
+//     .Build());
 
 // REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
@@ -91,12 +82,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // VALIDATORS
 builder.Services.AddScoped<IValidator<DmsDocument>, DmsDocumentValidator>();
+builder.Services.AddScoped<IValidator<Tag>, TagValidator>();
+builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
 
 // CONFIGS
 
 // DATABASE
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

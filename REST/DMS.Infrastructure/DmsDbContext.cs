@@ -56,6 +56,7 @@ public class DmsDbContext : DbContext
             .IsUnique();
 
         modelBuilder.Entity<DocumentTag>()
+            .ToTable("DocumentTags")
             .HasKey(dt => new { dt.DocumentId, dt.TagId });
 
         modelBuilder.Entity<DocumentTag>()

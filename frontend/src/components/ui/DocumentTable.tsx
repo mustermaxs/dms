@@ -1,37 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
 
 import Document from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
+import { IDocumentService } from "../../services/documentService";
+import { ServiceLocator } from "../../serviceLocator";
 
 export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
 
-  const documents = [
-    {
-      title: "Document 1",
-      content: "Lorem ipsum",
-      tags: ["Important", "Work"],
-    },
-    {
-      title: "Document 2",
-      content: "Dolor sit amet",
-      tags: ["Personal", "Urgent"],
-    },
-    {
-      title: "Document 3",
-      content: "Consectetur adipiscing",
-      tags: ["Archived"],
-    },
-    {
-      title: "Document 4",
-      content: "Aliquam at",
-      tags: ["Work", "In Progress"],
-    },
-  ] as Document[];
+  useEffect(() => {
+    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+    documentService.getAllDocuments().then(documents => {
+      setDocuments(documents);
+    });
+  }, []);
 
   const showModal = (document: Document) => {
     setSelectedDocument(document);
@@ -69,7 +56,7 @@ export default function DocumentTable() {
                     key={idx}
                     className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
                   >
-                    {tag}
+                    {tag.label}
                   </span>
                 ))}
               </td>

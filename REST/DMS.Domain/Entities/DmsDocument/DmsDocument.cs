@@ -14,7 +14,7 @@ namespace DMS.Domain.Entities
         public ProcessingStatus Status { get; set; }
         public DmsDocument() {}
         public DmsDocument(Guid id, string title, string content, DateTime uploadDateTime,
-            DateTime modificationDateTime, string path, List<DocumentTag> tags, FileType documentType,
+            DateTime modificationDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
             Id = id;
@@ -25,6 +25,24 @@ namespace DMS.Domain.Entities
             Tags = tags;
             DocumentType = documentType;
             Status = status;
+        }
+
+        public static DmsDocument Create(string title, string content, DateTime uploadDateTime,
+            DateTime modificationDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+            ProcessingStatus status)
+        {
+            return new DmsDocument(
+                Guid.NewGuid(),
+                title,
+                content,
+                uploadDateTime,
+                modificationDateTime,
+                path,
+                tags,
+                documentType,
+                status
+            );
+
         }
 
         public void AddTag(DocumentTag documentTag)

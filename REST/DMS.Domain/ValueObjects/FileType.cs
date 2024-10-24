@@ -1,39 +1,41 @@
-namespace DMS.Domain.ValueObjects;
-
-public class FileType : ValueObject
+namespace DMS.Domain.ValueObjects
 {
-    private string _name;
-    public string Name
+    public class FileType(string name) : ValueObject
     {
-        get => _name;
-        set => _name = GetExtensionFromName(value);
-    }
-    public FileType() {}
+        public string Name { get; } = GetExtensionFromName(name) ?? throw new ArgumentException("Invalid file extension.", nameof(name));
 
-    public FileType(string name)
-    {
-        _name = GetExtensionFromName(name);
-    }
-
-    public static FileType GetFileTypeFromExtension(string name)
-    {
-        var extension = Path.GetExtension(name);
-        return extension switch
+        public static FileType GetFileTypeFromExtension(string fileName)
         {
-            ".pdf" => new FileType("pdf"),
-            ".docx" => new FileType("docx"),
-            ".txt" => new FileType("txt"),
-            _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
-        };
-    }
+            var extension = GetExtensionFromName(fileName);
+            return extension switch
+            {
+                ".pdf" => new FileType("pdf"),
+                ".docx" => new FileType("docx"),
+                ".txt" => new FileType("txt"),
+                _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
+            };
+        }
 
-    public static string GetExtensionFromName(string name)
-    {
-        return Path.GetExtension(name);
-    }
+        private static string GetExtensionFromName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("File name cannot be null or empty", nameof(fileName));
 
-    protected override IEnumerable<object> GetAtomicValues()
-    {
-       yield return _name;
+            var extension = Path.GetExtension(fileName)?.ToLower();
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("File must have a valid extension.", nameof(fileName));
+
+            return extension;
+        }
+
+        protected override IEnumerable<object> GetAtomicValues()
+        {
+            yield return Name;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

@@ -1,9 +1,9 @@
 using AutoMapper;
 using DMS.Application.DTOs;
+using DMS.Application.Exceptions;
 using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;
 using DMS.Domain.Entities;
-using DMS.Domain.Exceptions;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
@@ -18,7 +18,7 @@ namespace DMS.Application.Commands
         IDmsDocumentRepository documentRepository,
         ITagRepository tagRepository,
         IDocumentTagRepository documentTagRepository,
-        IFileStorage fileStorage,
+        // IFileStorage fileStorage,
         IValidator<DmsDocument> documentValidator,
         IUnitOfWork unitOfWork,
         IDocumentTagFactory documentTagFactory,
@@ -33,32 +33,28 @@ namespace DMS.Application.Commands
                 // TODO Refactor the creation of tags/documentTags to a separate service
                 await unitOfWork.BeginTransactionAsync();
                 
-                var document = new DmsDocument(
-                    Guid.NewGuid(),
+                var document =  DmsDocument.Create(
                     request.Title,
                     request.Content,
-                    DateTime.Now,
-                    DateTime.Now,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow,
                     null,
                     new List<DocumentTag>(),
-                    FileType.GetFileTypeFromExtension(request.Title),
+                    new FileType(request.Title),
                     ProcessingStatus.NotStarted);
+                
+                var documentIsValid = await documentValidator.ValidateAsync(document);
 
-                if (!(await documentValidator.ValidateAsync(document)).IsValid)
+                if (!documentIsValid.IsValid)
                 {
-                    throw new UploadDocumentException("Document is invalid");
+                    throw new ValidationException(documentIsValid.Errors);
                 }
 
                 var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags, unitOfWork);
                 var documentTags = await Task.WhenAll(
                     tagsAssociatedWithDocument.Select(t =>
                         unitOfWork.DocumentTagRepository.Create(
-                            new DocumentTag
-                            {
-                                DocumentId = document.Id,
-                                TagId = t.Id,
-                                Tag = t
-                            })));
+                            DocumentTag.Create(t, document))));
                 
                 document.Tags = [..documentTags];
                 // TODO Put conversion from Base64 to FileStream in a separate service
@@ -67,15 +63,15 @@ namespace DMS.Application.Commands
                 document = await unitOfWork.DmsDocumentRepository.Create(document);
                 
                 await unitOfWork.CommitAsync();
-                mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(document));
+                mediator.Send(new DocumentSavedInFileStorageIntegrationEvent(document));
                 
-                // document.AddDomainEvent();
                 return Unit.Value;
             }
             catch (Exception e)
             {
                 await unitOfWork.RollbackAsync();
-                throw new UploadDocumentException("Failed to upload document", e);
+                Console.WriteLine(e.Message);
+                throw new UploadDocumentException($"Failed to upload document.");
             }
         }
     }

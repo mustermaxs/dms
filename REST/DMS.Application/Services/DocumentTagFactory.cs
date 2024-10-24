@@ -15,9 +15,11 @@ public class DocumentTagFactory(
     {
         await unitOfWork.BeginTransactionAsync();
 
+        // Get all tags from the database
         IEnumerable<Tag>? tagsInDb = await tagRepository.GetAll();
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
 
+        // Separate new tags from existing tags
         var newTags = tagDtos
             .Where(requestTag => !existingTagValues.Contains(requestTag.Value))
             .ToList();
@@ -25,17 +27,24 @@ public class DocumentTagFactory(
         var alreadyExistingTagDtos = tagDtos
             .Where(requestTag => existingTagValues.Contains(requestTag.Value));
 
-        var alreadyExistingTags = await Task.WhenAll(
-            alreadyExistingTagDtos.Select(t =>
-                    tagRepository.Get(t.Id))
-                .ToList());
+        // Process existing tags one by one (sequentially)
+        var alreadyExistingTags = new List<Tag>();
+        foreach (var tagDto in alreadyExistingTagDtos)
+        {
+            var tag = await tagRepository.GetByValue(tagDto.Value);
+            alreadyExistingTags.Add(tag);
+        }
 
-        var newTagsInDb =
-            await Task.WhenAll(
-                newTags.Select(t =>
-                    unitOfWork.TagRepository.Create(new Tag(t.Label, t.Value, t.Color))));
+        // Process new tags one by one (sequentially)
+        var newTagsInDb = new List<Tag>();
+        foreach (var tagDto in newTags)
+        {
+            var newTag = new Tag(tagDto.Label, tagDto.Value, tagDto.Color);
+            var createdTag = await unitOfWork.TagRepository.Create(newTag);  // Awaiting each call
+            newTagsInDb.Add(createdTag);
+        }
 
+        // Return the combined result of new and existing tags
         return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
-
 }

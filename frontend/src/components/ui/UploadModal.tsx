@@ -2,6 +2,7 @@ import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import CreatableSelect from "react-select/creatable";
+import { useEffect } from "react";
 
 export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
 
@@ -45,8 +46,8 @@ export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, set
       ...styles,
       fontSize: '0.9rem',
     }),
-
   };
+
 
   return (
     <Modal isOpen={isOpen} closeModal={closeModal} title="Upload Document">
