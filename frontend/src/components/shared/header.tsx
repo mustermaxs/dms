@@ -6,6 +6,8 @@ import { MultiValue, ActionMeta } from 'react-select';
 import { UploadModal } from "../ui/UploadModal";
 import { HttpService } from "../../services/httpService";
 import { Tag } from "../../types/Tag";
+import { ServiceLocator } from "../../serviceProvider";
+import { ITagService } from "../../services/tagService";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
@@ -16,21 +18,11 @@ export default function Header() {
 
   useEffect(() => {
     if (isOpen) {
-     let http: HttpService = new HttpService();
-     http.get<Tag[]>('Tags').then((data) => {
-      console.log(data);  
+      const tagService = ServiceLocator.resolve<ITagService>('ITagService');
+      tagService.getTags().then(tags => {
+        setTags(tags);
+      });
 
-      if(!data) {
-        setTags([]);
-        return;
-      }
-
-       setTags(data);
-       return;
-     })
-    }
-    else {
-      setTags([]);
     }
   }, [isOpen]);
 
@@ -50,7 +42,9 @@ export default function Header() {
   };
 
   const handleTagChange = (newValue: Tag[]) => {
-    setSelectedTags(newValue);
+    setSelectedTags(newValue)
+    console.log("selected tags: ", selectedTags);
+    console.log("new value: ", newValue);
   };
 
 
@@ -59,7 +53,7 @@ export default function Header() {
       <div className="my-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Document Management System</h1>
         <Button variant="outline" className="ml-2" onClick={openModal}>
-          <ArrowUpTrayIcon className="w-4 h-4 mr-1" /> 
+          <ArrowUpTrayIcon className="w-4 h-4 mr-1" />
           Upload
         </Button>
       </div>
