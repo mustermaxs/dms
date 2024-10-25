@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
-
 import Document from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
 import { IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";
+import "./DocumentTable.css";
 
 export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -32,7 +32,7 @@ export default function DocumentTable() {
   return (
     <div className="overflow-x-auto">
       {/* Table */}
-      <table className="min-w-full text-sm text-left text-gray-500">
+      <table className="dms-table min-w-full text-sm text-left text-gray-500">
         <thead className="text-sm text-gray-700 bg-gray-100">
           <tr>
             <th scope="col" className="px-6 py-3">Document</th>
@@ -48,9 +48,11 @@ export default function DocumentTable() {
               className="bg-white border-b hover:bg-gray-50 cursor-pointer"
               onClick={() => showModal(doc as Document)}
             >
-              <td className="px-6 py-4 font-semibold">{doc.title}</td>
+              <td
+               style={{paddingRight: '5rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+               className="dms-doctitle-col px-6 py-4 font-semibold" title={doc.title}>{doc.title}</td>
               <td className="px-6 py-4 font-semibold">{doc.content}</td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-4" title={doc.tags.map((tag) => `#${tag.label}`).join(' ')}>
                 {doc.tags.map((tag, idx) => (
                   <span
                     key={idx}
@@ -60,7 +62,7 @@ export default function DocumentTable() {
                   </span>
                 ))}
               </td>
-              <td className="px-6 py-4 text-right">
+              <td className="px-6 py-4 text-right" title="Download">
                 <ActionIcon variant="outline" rounded="md" onClick={(e) => {
                   e.stopPropagation();
                   handleDownload(doc.title)
@@ -74,7 +76,7 @@ export default function DocumentTable() {
       </table>
 
       {/* Modal */}
-      {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={selectedDocument} />}
+      {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={{selectedDocument}} />}
       
     </div>
   );

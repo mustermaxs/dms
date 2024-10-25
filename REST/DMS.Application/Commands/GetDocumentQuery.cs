@@ -18,15 +18,6 @@ namespace DMS.Application.Commands
     {
         public async Task<DmsDocumentDto> Handle(GetDocumentQuery request, CancellationToken cancellationToken)
         {
-            // var document = new DmsDocumentDto
-            // {
-            //     Id = Guid.NewGuid(), Title = "Document 1.pdf",
-            //     UploadDateTime = DateTime.Now,
-            //     ModificationDateTime = DateTime.Now,
-            //     Status = ProcessingStatus.Finished,
-            //     Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-            //     DocumentType = FileType.GetFileTypeFromExtension("blabla.pdf")
-            // };
             var document = await documentRepository.Get(request.Id);
             return mapper.Map<DmsDocumentDto>(document);
         }

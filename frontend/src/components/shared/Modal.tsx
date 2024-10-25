@@ -39,11 +39,17 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal 
       tabIndex={-1}
     >
       <div
+      style={{width: '30rem'}}
         className="bg-white rounded-lg shadow-lg w-full max-w-md hover:cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center border-b p-4">
-          <h2 className="text-lg font-semibold">{title}</h2>
+        <div 
+        style={{maxHeight: '4rem'}}
+        className="flex justify-between items-center border-b p-4">
+          <h2
+          style={{paddingRight: '5rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+          title={title}
+          className="text-lg font-semibold">{title}</h2>
           <ActionIcon
             variant="outline"
             size="sm"
