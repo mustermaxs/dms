@@ -1,26 +1,26 @@
+using DMS.Domain.DomainEvents;
 using DMS.Domain.ValueObjects;
 
 namespace DMS.Domain.Entities
 {
     public class DmsDocument : AggregateRoot
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public DateTime UploadDateTime { get; set; }
-        public DateTime? ModificationDateTime { get; set; }
-        public string? Path { get; set; }
+        public Guid Id { get; init; }
+        public string Title { get; private set; }
+        public DateTime UploadDateTime { get; init; }
+        public DateTime? ModificationDateTime { get; private set; } = null;
+        public string? Path { get; private set; }
         public List<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
-        public FileType DocumentType { get; set; }
-        public ProcessingStatus Status { get; set; }
+        public FileType DocumentType { get; private set; }
+        public ProcessingStatus Status { get; private set; }
         public DmsDocument() {}
-        public DmsDocument(Guid id, string title, string content, DateTime uploadDateTime,
-            DateTime modificationDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+
+        private DmsDocument(Guid id, string title, string content, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
             Id = id;
             Title = title;
             UploadDateTime = uploadDateTime;
-            ModificationDateTime = modificationDateTime;
             Path = path;
             Tags = tags;
             DocumentType = documentType;
@@ -28,7 +28,7 @@ namespace DMS.Domain.Entities
         }
 
         public static DmsDocument Create(string title, string content, DateTime uploadDateTime,
-            DateTime modificationDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+            string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
             return new DmsDocument(
@@ -36,13 +36,11 @@ namespace DMS.Domain.Entities
                 title,
                 content,
                 uploadDateTime,
-                modificationDateTime,
                 path,
                 tags,
                 documentType,
                 status
             );
-
         }
 
         public void AddTag(DocumentTag documentTag)
@@ -52,6 +50,13 @@ namespace DMS.Domain.Entities
                 return;
             }
             Tags.Add(documentTag);
+        }
+        
+        public void UpdateTags(List<DocumentTag> tags)
+        {
+            Tags = tags;
+            this.ModificationDateTime = DateTime.UtcNow;
+            AddDomainEvent(new DocumentTagsUpdatedDomainEvent(this));
         }
 
         public void RemoveTag(DocumentTag documentTag)

@@ -1,18 +1,20 @@
 using DMS.Application.DTOs;
+using DMS.Application.EventHandlers;
 using DMS.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.IntegrationEvents
 {
-    public record DocumentSavedInFileStorageIntegrationEvent(DmsDocument document) : IRequest<Unit>;
+    public record DocumentSavedInFileStorageIntegrationEvent(DmsDocument document) : INotification;
     
     public class DocumentSavedInFileStorageIntegrationEventHandler(
-        ) : IRequestHandler<DocumentSavedInFileStorageIntegrationEvent, Unit>
+        ILogger<DocumentSavedInFileStorageIntegrationEvent> logger
+        ) : IntegrationEventHandler<DocumentSavedInFileStorageIntegrationEvent>(logger)
     {
-        public async Task<Unit> Handle(DocumentSavedInFileStorageIntegrationEvent request, CancellationToken cancellationToken)
+        public override async Task HandleEvent(DocumentSavedInFileStorageIntegrationEvent notification, CancellationToken cancellationToken)
         {
-            Console.WriteLine("DocumentSavedInFileStorageEventHandler");
-            return await Task.FromResult(Unit.Value);
+            await Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,6 @@
 using AutoMapper;
 using DMS.Application.DTOs;
+using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
@@ -13,7 +14,8 @@ namespace DMS.Application.Commands
     
     public class GetDocumentsQueryHandler(
         IDmsDocumentRepository documentRepository,
-        IMapper mapper) : IRequestHandler<GetDocumentsQuery, List<DmsDocumentDto>>
+        IMapper mapper,
+        IMediator mediator) : IRequestHandler<GetDocumentsQuery, List<DmsDocumentDto>>
     {
         public async Task<List<DmsDocumentDto>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
         {

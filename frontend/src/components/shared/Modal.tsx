@@ -44,10 +44,10 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal 
         onClick={(e) => e.stopPropagation()}
       >
         <div 
-        style={{maxHeight: '4rem'}}
+        style={{maxHeight: '6rem'}}
         className="flex justify-between items-center border-b p-4">
           <h2
-          style={{paddingRight: '5rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+          style={{paddingRight: '3rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
           title={title}
           className="text-lg font-semibold">{title}</h2>
           <ActionIcon

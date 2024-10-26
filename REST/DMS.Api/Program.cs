@@ -1,10 +1,12 @@
 using System.Reflection;
 using AutoMapper;
+using DMS.Application;
 using DMS.Application.Commands;
 using DMS.Application.DTOs;
 using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;
 using DMS.Domain;
+using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.DomainEvents;
 using DMS.Domain.Entities.Tag;
@@ -12,7 +14,6 @@ using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
 using DMS.Infrastructure;
-using DMS.Infrastructure.EventHandlers;
 using DMS.Infrastructure.Repositories;
 using DMS.Infrastructure.Services;
 using FluentValidation;
@@ -40,7 +41,8 @@ builder.Services.AddMediatR(
     typeof(CreateTagCommand).Assembly,
     typeof(UploadDocumentCommand).Assembly,
     typeof(UpdateDocumentCommand).Assembly,
-    typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly
+    typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly,
+    typeof(DocumentTagsUpdatedDomainEvent).Assembly
     );
 
 builder.Services.AddControllers();
@@ -60,7 +62,6 @@ builder.Logging.AddLog4Net();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
-builder.Services.AddSingleton<IIntegrationEventDispatcher, IntegrationEventDispatcher>();
 builder.Services.AddScoped<IMessageBroker, RabbitMqClient>();
 // builder.Services.AddScoped<IFileStorage, FileStorage>();
 // builder.Services.AddScoped<IIntegrationEventHandler<DocumentSavedInFileStorageIntegrationEvent>, DocumentSavedInFileStorageEventHandler>();

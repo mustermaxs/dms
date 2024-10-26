@@ -37,7 +37,6 @@ namespace DMS.Application.Commands
                     request.Title,
                     request.Content,
                     DateTime.UtcNow,
-                    DateTime.UtcNow,
                     null,
                     new List<DocumentTag>(),
                     new FileType(request.Title),
@@ -63,7 +62,7 @@ namespace DMS.Application.Commands
                 document = await unitOfWork.DmsDocumentRepository.Create(document);
                 
                 await unitOfWork.CommitAsync();
-                mediator.Send(new DocumentSavedInFileStorageIntegrationEvent(document));
+                mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(document));
                 
                 return Unit.Value;
             }

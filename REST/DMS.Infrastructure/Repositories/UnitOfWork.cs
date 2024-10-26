@@ -1,16 +1,19 @@
 using System.Collections.ObjectModel;
+using DMS.Application;
 using DMS.Application.Interfaces;
 using DMS.Domain;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DMS.Infrastructure.Repositories;
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DmsDbContext _context;
+        private readonly IMediator _mediator;
         private IEventDispatcher _eventDispatcher;
         private readonly IValidator<Tag> _tagValidator;
         private readonly IValidator<DmsDocument> _documentValidator;
@@ -22,12 +25,14 @@ namespace DMS.Infrastructure.Repositories;
 
         public UnitOfWork(
             DmsDbContext context,
+            IMediator mediator,
             IEventDispatcher eventDispatcher,
             IValidator<Tag> tagValidator,
             IValidator<DmsDocument> documentValidator,
             IValidator<DocumentTag> documentTagValidator)
         {
             _context = context;
+            _mediator = mediator;
             _eventDispatcher = eventDispatcher;
             _tagValidator = tagValidator;
             _documentValidator = documentValidator;
@@ -58,7 +63,10 @@ namespace DMS.Infrastructure.Repositories;
             try
             {
                 await _context.SaveChangesAsync();
-                await _eventDispatcher.DispatchEventsAsync(GetDomainEventsFromEntities());
+                await Task.WhenAll(GetDomainEventsFromEntities()
+                    .Select(domainEvent => 
+                        _mediator.Publish(domainEvent))
+                    .ToList());
                 await _transaction.CommitAsync();
             }
             catch (Exception)
