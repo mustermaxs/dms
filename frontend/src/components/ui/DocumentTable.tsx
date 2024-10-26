@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
-import Document from "../../types/Document";
+import {Document} from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
 import { IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";
@@ -20,8 +20,10 @@ export default function DocumentTable() {
     });
   }, []);
 
-  const showModal = (document: Document) => {
-    setSelectedDocument(document);
+  const showModal = async (document: Document) => {
+    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+    let doc: Document = await documentService.getDocument(document.id);
+    setSelectedDocument(doc);
     openModal();
   };
 
@@ -46,7 +48,7 @@ export default function DocumentTable() {
             <tr
               key={index}
               className="bg-white border-b hover:bg-gray-50 cursor-pointer"
-              onClick={() => showModal(doc as Document)}
+              onClick={async () => await showModal(doc as Document)}
             >
               <td
                style={{paddingRight: '5rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}

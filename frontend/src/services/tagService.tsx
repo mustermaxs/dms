@@ -16,7 +16,7 @@ export class MockTagService implements ITagService {
         console.log("MockTagService constructor called");
     }
 
-    getTags(): Promise<Tag[]> {
+    async getTags(): Promise<Tag[]> {
         let tags: Tag[] = [
             {
                 id: '1',
@@ -37,7 +37,7 @@ export class MockTagService implements ITagService {
                 value: 'family'
             }
         ];
-        return Promise.resolve(tags);
+        return await Promise.resolve(tags);
     }
 }
 
@@ -48,7 +48,7 @@ export class TagService implements ITagService {
         this.httpService = new HttpService();
     }
 
-    getTags(): Promise<Tag[]> {
-        return this.httpService.get<Tag[]>('Tags');
+    public async getTags(): Promise<Tag[]> {
+        return await this.httpService.get<Tag[]>('Tags');
     }
 }

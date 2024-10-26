@@ -1,10 +1,10 @@
-import Document from "../types/Document";
+import {Document, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
     getAllDocuments(): Promise<Document[]>;
-    uploadDocument(document: Document): Promise<void>;
+    uploadDocument(document: UploadDocumentDto): Promise<void>;
 }
 
 export class MockDocumentService implements IDocumentService {
@@ -72,7 +72,7 @@ export class MockDocumentService implements IDocumentService {
                 ],
             } as Document);
     }
-    uploadDocument(document: Document): Promise<void> {
+    uploadDocument(document: UploadDocumentDto): Promise<void> {
         return Promise.resolve();
     }
 }
@@ -83,15 +83,14 @@ export class DocumentService implements IDocumentService {
     constructor() {
         this.httpService = new HttpService();
     }
-    getAllDocuments(): Promise<Document[]> {
-        return this.httpService.get<Document[]>('Documents');
+    public async getAllDocuments(): Promise<Document[]> {
+        return await this.httpService.get<Document[]>('Documents');
     }
-    uploadDocument(document: Document): Promise<void> {
+    public async uploadDocument(document: UploadDocumentDto): Promise<void> {
         console.log("DOCUMENT: ", document);
-        return this.httpService.post<void>('Documents', document);
+        return await this.httpService.post<void>('Documents', document);
     }
-    getDocument(id: string): Promise<Document> {
-        this.httpService.get<Document>(`Documents/${id}`);
-        return Promise.resolve({} as Document);
+    public async getDocument(id: string): Promise<Document> {
+        return await this.httpService.get<Document>(`Documents/${id}`);
     }
 }
