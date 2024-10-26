@@ -60,9 +60,11 @@ namespace DMS.Application.Commands
                 // or make the client send it as stream in JSON object if possible
                 // await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));
                 document = await unitOfWork.DmsDocumentRepository.Create(document);
-                
+                // TODO fileStorage.Save()...
+                //          in fileStorage: dispatch Integration Event when done
+                // in Integration EventHandler use MessageBroker (RabbitMQ) to inform OCR Worker to process
+                // ...
                 await unitOfWork.CommitAsync();
-                mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(document));
                 
                 return Unit.Value;
             }

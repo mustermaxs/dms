@@ -25,6 +25,8 @@ namespace DMS.Domain.Entities
             Tags = tags;
             DocumentType = documentType;
             Status = status;
+            
+            // AddDomainEvent(new DocumentUploadedToDbDomainEvent(this));
         }
 
         public static DmsDocument Create(string title, string content, DateTime uploadDateTime,
