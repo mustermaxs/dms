@@ -1,26 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
 import { Document } from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
-import { IDocumentService } from "../../services/documentService";
+import { MockDocumentService as IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";
 import "./DocumentTable.css";
-import { ContentViewerModal } from "./ContentViewerModal";
+import AppContext from "../context/AppContext";
 
 export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const { documents } = useContext(AppContext);
 
-
-  useEffect(() => {
-    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-    documentService.getAllDocuments().then(documents => {
-      setDocuments(documents);
-    });
-  }, []);
 
   const showModal = async (document: Document) => {
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
@@ -89,7 +82,6 @@ export default function DocumentTable() {
           </tbody>
         </table>
 
-        {/* Modal */}
         {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={{ selectedDocument }} />}
 
       </div>

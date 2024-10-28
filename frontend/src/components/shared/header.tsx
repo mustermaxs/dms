@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import { Button } from "rizzui";
 import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import { useModal } from "../../hooks/useModal";
-import { MultiValue, ActionMeta } from 'react-select';
 import { UploadModal } from "../ui/UploadModal";
-import { HttpService } from "../../services/httpService";
 import { Tag } from "../../types/Tag";
 import { ServiceLocator } from "../../serviceLocator";
-import { ITagService } from "../../services/tagService";
 import { IDocumentService } from "../../services/documentService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { ModalSize } from "./Modal";
@@ -19,15 +16,6 @@ export default function Header() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [file, setFile] = useState<File | null>(null);
 
-  const fetchTags = async () => {
-    let tagService = ServiceLocator.resolve<ITagService>('ITagService');
-    let tags = await tagService.getTags();
-    setTags(tags);
-  };
-
-  useEffect(() => {
-    fetchTags();
-  }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +26,7 @@ export default function Header() {
         id: getEmptyGuid(),
         title: title,
         tags: selectedTags,
-        content: "Document content goes here"
+        content: "Document content goes here",
       }
     ).then((res) => {
     })
