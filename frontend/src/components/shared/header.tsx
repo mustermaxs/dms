@@ -18,14 +18,14 @@ export default function Header() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [file, setFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      const tagService = ServiceLocator.resolve<ITagService>('ITagService');
-      tagService.getTags().then(tags => {
-        setTags(tags);
-      });
+  const fetchTags = async () => {
+    let tagService = ServiceLocator.resolve<ITagService>('ITagService');
+    let tags = await tagService.getTags();
+    setTags(tags);
+  };
 
-    }
+  useEffect(() => {
+    fetchTags();
   }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {

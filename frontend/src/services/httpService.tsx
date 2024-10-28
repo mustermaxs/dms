@@ -12,7 +12,7 @@ export class HttpService {
         return this.baseUrl + url;
     }
 
-    public get<T>(url: string): Promise<T> {
+    public async get<T>(url: string): Promise<T> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -23,7 +23,7 @@ export class HttpService {
             .then(response => response.json())
             .then(data => data);
     }
-    public post<T>(url: string, data: any): Promise<T> {
+    public async post<T>(url: string, data: any): Promise<T> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -37,7 +37,7 @@ export class HttpService {
             .then(data => data);
     }
 
-    public put<T>(url: string, data: any): Promise<T> {
+    public async put<T>(url: string, data: any): Promise<T> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -51,7 +51,7 @@ export class HttpService {
             .then(data => data);
     }
 
-    public delete<T>(url: string): Promise<T> {
+    public async delete<T>(url: string): Promise<T> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {

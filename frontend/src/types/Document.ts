@@ -1,10 +1,17 @@
 import { Tag } from "./Tag";
 
-type Document = {
+export type UploadDocumentDto = {
     id: string;
     title: string;
     content: string;
     tags: Tag[];
   }
 
-export default Document;
+export type Document = {
+    id: string;
+    title: string;
+    content: string;
+    tags: Tag[];
+    modificationDateTime: string;
+    uploadDateTime: string;
+  }

@@ -1,3 +1,4 @@
+using DMS.Application;
 using DMS.Domain;
 using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
@@ -17,7 +18,6 @@ public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher even
     public override async Task<DmsDocument> Create(DmsDocument entity)
     {
         await validator.ValidateAndThrowAsync(entity);
-        entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
         return e.Entity;
     }
