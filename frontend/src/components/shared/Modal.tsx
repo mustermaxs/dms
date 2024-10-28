@@ -2,14 +2,22 @@ import React, { useEffect, useRef, memo } from 'react';
 import { FiX } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 
+export class ModalSize {
+  static SMALL = {width: '30rem', height: '21rem'};
+  static MEDIUM = {width: '50rem', height: '10rem'};
+  static LARGE = {width: '70rem', height: '90%'};
+}
+
+
 interface ModalProps {
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
   closeModal: () => void;
+  size?: typeof ModalSize.SMALL | typeof ModalSize.MEDIUM | typeof ModalSize.LARGE;
 }
 
-const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal }) => {
+const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal, size=ModalSize.SMALL }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,8 +47,8 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal 
       tabIndex={-1}
     >
       <div
-      style={{width: '30rem'}}
-        className="bg-white rounded-lg shadow-lg w-full max-w-md hover:cursor-default"
+      style={{maxWidth: size.width, minHeight: size.height}}
+        className={"bg-white rounded-lg shadow-lg w-full hover:cursor-default"}
         onClick={(e) => e.stopPropagation()}
       >
         <div 
@@ -59,7 +67,7 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal 
             <FiX />
           </ActionIcon>
         </div>
-        <div className="p-4">
+        <div style={{minHeight: '100%'}} className="p-4">
           {children}
         </div>
       </div>

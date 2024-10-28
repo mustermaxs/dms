@@ -4,7 +4,7 @@ import { Input, Button } from "rizzui";
 import CreatableSelect from "react-select/creatable";
 import { useEffect } from "react";
 
-export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
+export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
 
   const customStyles = {
     multiValue: (styles: any) => ({
@@ -50,7 +50,7 @@ export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, set
 
 
   return (
-    <Modal isOpen={isOpen} closeModal={closeModal} title="Upload Document">
+    <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label title="Title" />
