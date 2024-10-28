@@ -46,8 +46,17 @@ public class DmsDbContext : DbContext
         modelBuilder.Entity<Tag>()
             .Property(e => e.Color)
             .HasMaxLength(8);
+        
+        modelBuilder.Entity<Tag>()
+            .HasIndex(e => e.Value)
+            .IsUnique();
+        
+        modelBuilder.Entity<Tag>()
+            .HasIndex(e => e.Label)
+            .IsUnique();
 
         modelBuilder.Entity<DocumentTag>()
+            .ToTable("DocumentTags")
             .HasKey(dt => new { dt.DocumentId, dt.TagId });
 
         modelBuilder.Entity<DocumentTag>()

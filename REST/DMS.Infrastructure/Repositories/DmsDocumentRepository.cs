@@ -1,16 +1,25 @@
+using DMS.Application;
 using DMS.Domain;
 using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
-    : BaseRepository<DmsDocument>(dbContext, eventDispatcher), IDmsDocumentRepository
+public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<DmsDocument> validator)
+    : BaseRepository<DmsDocument>(dbContext, eventDispatcher, validator), IDmsDocumentRepository
 {
     public async Task<DmsDocument> GetDocumentByIdAsync(Guid id)
     {
         return await DbSet.FindAsync(id);
+    }
+
+    public override async Task<DmsDocument> Create(DmsDocument entity)
+    {
+        await validator.ValidateAndThrowAsync(entity);
+        var e = await DbSet.AddAsync(entity);
+        return e.Entity;
     }
 
     public async Task<DmsDocument?> Get(Guid id)

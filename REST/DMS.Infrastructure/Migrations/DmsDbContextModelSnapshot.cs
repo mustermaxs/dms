@@ -91,6 +91,12 @@ namespace DMS.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Label")
+                        .IsUnique();
+
+                    b.HasIndex("Value")
+                        .IsUnique();
+
                     b.ToTable("Tags");
                 });
 

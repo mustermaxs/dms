@@ -1,6 +1,8 @@
+using DMS.Application;
 using DMS.Domain;
 using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories
@@ -8,13 +10,15 @@ namespace DMS.Infrastructure.Repositories
 public abstract class BaseRepository<TEntity> : IDisposable, IRepository<TEntity>
 where TEntity : Entity
 {
+    public IValidator<TEntity> Validator { get; }
     protected DmsDbContext Context;
     private bool _disposed = false;
     protected DbSet<TEntity> DbSet;
     protected readonly IEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher)
+    public BaseRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<TEntity> validator)
     {
+        Validator = validator;
         Context = dbContext;
         DbSet = Context.Set<TEntity>();
         _eventDispatcher = eventDispatcher;
@@ -32,16 +36,17 @@ where TEntity : Entity
 
     public virtual async Task<TEntity> Create(TEntity entity)
     {
+        await Validator.ValidateAndThrowAsync(entity);
         entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
-        await SaveAsync();
+        
         return e.Entity;
     }
 
     public virtual async Task Delete(TEntity entity)
     {
         DbSet.Remove(entity);
-        await SaveAsync();
+        
     }
 
     public async Task SaveAsync()
@@ -57,13 +62,13 @@ where TEntity : Entity
             return;
         }
         DbSet.Remove(entity);
-        await SaveAsync();
+        
     }
 
     public virtual async Task UpdateAsync(TEntity entity)
     {
+        await Validator.ValidateAndThrowAsync(entity);
         DbSet.Update(entity);
-        await SaveAsync();
     }
 
     public void Dispose()

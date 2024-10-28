@@ -1,4 +1,3 @@
-using DMS.Application.DTOs;
 using DMS.Domain.Entities.DomainEvents;
 
 namespace DMS.Domain.Entities.Tag
@@ -18,19 +17,6 @@ namespace DMS.Domain.Entities.Tag
             Label = label;
             Value = value;
             Color = color;
-        }
-    }
-    public static class DocumentTagExtensions
-    {
-        public static TagDto ToDto(this Tag tag)
-        {
-            return new TagDto
-            {
-                Id = tag.Id,
-                Label = tag.Label,
-                Color = tag.Color,
-                Value = tag.Value
-            };
         }
     }
 }

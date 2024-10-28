@@ -1,22 +1,20 @@
+using DMS.Application.Exceptions;
+using DMS.Domain.Entities;
+using DMS.Domain.Entities.DomainEvents;
 using MediatR;
 
-namespace DMS.Infrastructure.EventHandlers
+namespace DMS.Application
 {
-    public interface IIntegrationEventHandler<in TDomainEvent>
-    {
-        Task HandleAsync(TDomainEvent domainEvent);
-    }
-
-    public interface IIntegrationEventDispatcher
+    public interface IEventDispatcher
     {
         Task DispatchEventsAsync(IReadOnlyCollection<object> entitiesWithEvents);
     }
 
-    public class IntegrationEventDispatcher : IIntegrationEventDispatcher
+    public class EventDispatcher : IEventDispatcher
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public IntegrationEventDispatcher(IServiceProvider serviceProvider)
+        public EventDispatcher(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -26,13 +24,15 @@ namespace DMS.Infrastructure.EventHandlers
             foreach (var domainEvent in entitiesWithEvents)
             {
                 var eventType = domainEvent.GetType();
-                var handlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
                 var handler = _serviceProvider.GetService(handlerType);
 
-                if (handler != null)
+                if (handler == null)
                 {
-                    await ((dynamic)handler).HandleAsync((dynamic)domainEvent);
+                    throw new UploadDocumentException($"No Eventhandler for Domain Event {eventType.FullName} was found.");
                 }
+                
+                await ((dynamic)handler).HandleAsync((dynamic)domainEvent);
             }
         }
     }

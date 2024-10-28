@@ -1,4 +1,4 @@
-namespace DMS.Domain.Exceptions;
+namespace DMS.Application.Exceptions;
 
 public class UploadDocumentException : Exception
 {

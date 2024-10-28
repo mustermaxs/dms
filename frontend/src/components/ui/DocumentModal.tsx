@@ -1,19 +1,43 @@
 import Modal from "../shared/Modal";
 import Label from "../shared/Label";
+import { DateFormatter } from "../../services/dateFormatter";
+import { Document } from "../../types/Document";
+import { Button } from "rizzui";
+import "../ui/DocumentModal.css";
+import { useModal } from "../../hooks/useModal";
+import { ContentViewerModal } from "./ContentViewerModal";
 
 export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
-    return (
-        <Modal isOpen={isOpen} closeModal={closeModal} title={`${selectedDocument.title} Details`}>
+  const document: Document = selectedDocument.selectedDocument;
+  const contentModal = useModal();
+
+  return (
+        <>
+        <Modal isOpen={isOpen} closeModal={closeModal} title={`${document.title}`}>
+          <Label title="Upload Datetime" />
+          <p className="my-2">{DateFormatter.toDateString(new Date(document.uploadDateTime))}</p>
+          {document.modificationDateTime != null && <><Label title="Modification Datetime" /><p className="my-2">{DateFormatter.toDateString(new Date(document.modificationDateTime))}</p></>}
           <Label title="Tags" />
           <ul className="mb-4">
-            {selectedDocument.tags.map((tag, index) => (
+            {document.tags.map((tag, index) => (
               <li key={index} className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-                {tag}
+                {tag.label}
               </li>
             ))}
           </ul>
-          <Label title="Match" />
-          <p className="my-2">{selectedDocument.content}</p>
+          <Label title="Content" />
+          <p className="dms-document-content my-2">{document.content}</p>
+          <div className="flex justify-end">
+            {/* TODO Implement Edit Mode */}
+          <Button type="button" onClick={() => {contentModal.openModal()}} className="mt-4"> 
+            View
+          </Button>
+          <Button type="button" className="mt-4 mx-1"> 
+            Edit
+          </Button>
+          </div>
         </Modal>
+        {document.title && <ContentViewerModal isOpen={contentModal.isOpen} closeModal={contentModal.closeModal} openModal={contentModal.openModal} document={document} />}
+        </>
     )
 }

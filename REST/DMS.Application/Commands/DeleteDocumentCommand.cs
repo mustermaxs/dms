@@ -7,7 +7,7 @@ namespace DMS.Application.Commands
 {
     public record DeleteDocumentCommand(Guid Id) : IRequest, IRequest<Unit>;
     
-    public class DeleteDocumentCommandHandler : IRequestHandler<DeleteDocumentCommand>
+    public class DeleteDocumentCommandHandler() : IRequestHandler<DeleteDocumentCommand>
     {
         public async Task<Unit> Handle(DeleteDocumentCommand request, CancellationToken cancellationToken)
         {

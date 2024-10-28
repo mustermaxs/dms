@@ -6,6 +6,11 @@ import { MultiValue, ActionMeta } from 'react-select';
 import { UploadModal } from "../ui/UploadModal";
 import { HttpService } from "../../services/httpService";
 import { Tag } from "../../types/Tag";
+import { ServiceLocator } from "../../serviceLocator";
+import { ITagService } from "../../services/tagService";
+import { IDocumentService } from "../../services/documentService";
+import { getEmptyGuid } from "../../services/guidGenerator";
+import { ModalSize } from "./Modal";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
@@ -14,30 +19,31 @@ export default function Header() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [file, setFile] = useState<File | null>(null);
 
+  const fetchTags = async () => {
+    let tagService = ServiceLocator.resolve<ITagService>('ITagService');
+    let tags = await tagService.getTags();
+    setTags(tags);
+  };
+
   useEffect(() => {
-    if (isOpen) {
-     let http: HttpService = new HttpService();
-     http.get<Tag[]>('Tags').then((data) => {
-      console.log(data);  
-
-      if(!data) {
-        setTags([]);
-        return;
-      }
-
-       setTags(data);
-       return;
-     })
-    }
-    else {
-      setTags([]);
-    }
+    fetchTags();
   }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+    console.log(title, tags);
+    documentService.uploadDocument(
+      {
+        id: getEmptyGuid(),
+        title: title,
+        tags: selectedTags,
+        content: "Document content goes here"
+      }
+    ).then((res) => {
+    })
+    console.log(selectedTags);
     const tagsArray = tags.map(tag => tag.value);
-    console.log("Uploading:", { title, tags: tagsArray, file });
     closeModal();
     resetForm();
   };
@@ -49,9 +55,31 @@ export default function Header() {
     setFile(null);
   };
 
+  useEffect(() => {
+    console.log("Selected tags updated: ", selectedTags);
+  }, [selectedTags]);
+
   const handleTagChange = (newValue: Tag[]) => {
+    let tagsWithoutIds: Tag[] = newValue.filter(t => t.id === "" || t.id === undefined);
+
+    let updatedTagsWithoutIds = tagsWithoutIds.map(t => ({
+      id: 'd290f1ee-6c54-4b01-90e6-d701748f0851',
+      label: t.label,
+      color: "red",
+      value: t.value,
+    }));
+
+    setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
+
+    console.log("Tags without ids", updatedTagsWithoutIds);
+
+    let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
+    newValue = [...validTags, ...updatedTagsWithoutIds];
+    console.log("Updated tags", newValue);
+
     setSelectedTags(newValue);
   };
+
 
 
   return (
@@ -59,12 +87,12 @@ export default function Header() {
       <div className="my-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Document Management System</h1>
         <Button variant="outline" className="ml-2" onClick={openModal}>
-          <ArrowUpTrayIcon className="w-4 h-4 mr-1" /> 
+          <ArrowUpTrayIcon className="w-4 h-4 mr-1" />
           Upload
         </Button>
       </div>
 
-      <UploadModal isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} selectedTags={selectedTags} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
+      <UploadModal size={ModalSize.SMALL} isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} selectedTags={selectedTags} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
     </>
   );
 }

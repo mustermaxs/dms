@@ -14,12 +14,12 @@ public class DocumentsController : BaseController
     }
 
     [HttpPost]
-    public async Task<ActionResult> UploadDocument([FromForm] UploadDocumentDto documentDto)
+    public async Task<ActionResult> UploadDocument([FromBody] UploadDocumentDto documentDto)
     {
         try
         {
-            object res = await _mediator.Send(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
-            return Ok(res);
+            // var res = await _mediator.Send();
+            return await ResponseAsync(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
         }
         catch (Exception e)
         {
