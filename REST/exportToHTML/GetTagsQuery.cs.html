@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>GetTagsQuery.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #85c46c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+GetTagsQuery.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">DTOs</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">IRepositories</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">MediatR</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">Commands</span>
+<span class="s2">{</span>
+<span class="s0">public </span><span class="s1">record GetTagsQuery</span><span class="s2">() </span><span class="s1">: IRequest</span><span class="s2">&lt;</span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">TagDto</span><span class="s2">&gt;&gt;;</span>
+
+<span class="s0">public class </span><span class="s1">GetTagsQueryHandler</span><span class="s2">(</span><span class="s1">ITagRepository tagRepository</span><span class="s2">) </span><span class="s1">: IRequestHandler</span><span class="s2">&lt;</span><span class="s1">GetTagsQuery</span><span class="s2">, </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">TagDto</span><span class="s2">&gt;&gt;</span>
+<span class="s2">{</span>
+    <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">TagDto</span><span class="s2">&gt;&gt; </span><span class="s1">Handle</span><span class="s2">(</span><span class="s1">GetTagsQuery request</span><span class="s2">, </span><span class="s1">CancellationToken cancellationToken</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">var tags </span><span class="s2">= </span><span class="s1">await tagRepository</span><span class="s2">.</span><span class="s1">GetAll</span><span class="s2">();</span>
+        <span class="s3">// tags.Add(new Tag { Label = &quot;project&quot;, Color = &quot;#FF0031&quot;, Value = &quot;project&quot; });</span>
+        <span class="s1">var tagDtos </span><span class="s2">= </span><span class="s1">tags</span><span class="s2">.</span><span class="s1">Select</span><span class="s2">(</span><span class="s1">t =&gt; t</span><span class="s2">.</span><span class="s1">ToDto</span><span class="s2">()).</span><span class="s1">ToList</span><span class="s2">();</span>
+        
+        <span class="s0">return </span><span class="s1">await Task</span><span class="s2">.</span><span class="s1">FromResult</span><span class="s2">(</span><span class="s1">tagDtos</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+<span class="s2">}</span>
+
+</pre>
+</body>
+</html>

@@ -1,12 +1,15 @@
 using System.Reflection;
 using DMS.Application.Commands;
+using DMS.Application.Interfaces;
 using DMS.Domain;
+using DMS.Domain.Entities;
 using DMS.Domain.Entities.DomainEvents;
 using DMS.Domain.IRepositories;
 using DMS.Infrastructure;
 using DMS.Infrastructure.EventHandlers;
 using DMS.Infrastructure.Repositories;
 using DMS.Infrastructure.Services;
+using FluentValidation;
 using log4net;
 using log4net.Config;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +43,8 @@ builder.Services.AddSwaggerGen();
 // use log4net for logging
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
 XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+builder.Logging.ClearProviders();
+builder.Logging.AddLog4Net();
 
 // LOGGING
 builder.Logging.ClearProviders(); 

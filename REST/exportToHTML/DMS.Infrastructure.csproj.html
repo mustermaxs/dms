@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>DMS.Infrastructure.csproj</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c191ff;}
+.s1 { color: #85c46c;}
+.s2 { color: #c9a26d;}
+.s3 { color: #d0d0d0;}
+.s4 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DMS.Infrastructure.csproj</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;Project </span><span class="s1">Sdk</span><span class="s2">=&quot;Microsoft.NET.Sdk&quot;</span><span class="s0">&gt;</span>
+
+  <span class="s0">&lt;PropertyGroup&gt;</span>
+    <span class="s0">&lt;TargetFramework&gt;</span><span class="s4">net8.0</span><span class="s0">&lt;/TargetFramework&gt;</span>
+    <span class="s0">&lt;ImplicitUsings&gt;</span><span class="s4">enable</span><span class="s0">&lt;/ImplicitUsings&gt;</span>
+    <span class="s0">&lt;Nullable&gt;</span><span class="s4">enable</span><span class="s0">&lt;/Nullable&gt;</span>
+  <span class="s0">&lt;/PropertyGroup&gt;</span>
+
+  <span class="s0">&lt;ItemGroup&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;log4net&quot; </span><span class="s1">Version</span><span class="s2">=&quot;3.0.1&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;MediatR.Extensions.Microsoft.DependencyInjection&quot; </span><span class="s1">Version</span><span class="s2">=&quot;11.1.0&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Microsoft.EntityFrameworkCore.Design&quot; </span><span class="s1">Version</span><span class="s2">=&quot;8.0.10&quot;</span><span class="s0">&gt;</span>
+      <span class="s0">&lt;IncludeAssets&gt;</span><span class="s4">runtime; build; native; contentfiles; analyzers; buildtransitive</span><span class="s0">&lt;/IncludeAssets&gt;</span>
+      <span class="s0">&lt;PrivateAssets&gt;</span><span class="s4">all</span><span class="s0">&lt;/PrivateAssets&gt;</span>
+    <span class="s0">&lt;/PackageReference&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Microsoft.EntityFrameworkCore.Tools&quot; </span><span class="s1">Version</span><span class="s2">=&quot;8.0.10&quot;</span><span class="s0">&gt;</span>
+      <span class="s0">&lt;IncludeAssets&gt;</span><span class="s4">runtime; build; native; contentfiles; analyzers; buildtransitive</span><span class="s0">&lt;/IncludeAssets&gt;</span>
+      <span class="s0">&lt;PrivateAssets&gt;</span><span class="s4">all</span><span class="s0">&lt;/PrivateAssets&gt;</span>
+    <span class="s0">&lt;/PackageReference&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Microsoft.Extensions.Logging.Log4Net.AspNetCore&quot; </span><span class="s1">Version</span><span class="s2">=&quot;8.0.0&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Npgsql.EntityFrameworkCore.PostgreSQL&quot; </span><span class="s1">Version</span><span class="s2">=&quot;8.0.8&quot; </span><span class="s0">/&gt;</span>
+  <span class="s0">&lt;/ItemGroup&gt;</span>
+
+  <span class="s0">&lt;ItemGroup&gt;</span>
+    <span class="s0">&lt;ProjectReference </span><span class="s1">Include</span><span class="s2">=&quot;..\DMS.Application\DMS.Application.csproj&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;ProjectReference </span><span class="s1">Include</span><span class="s2">=&quot;..\DMS.Domain\DMS.Domain.csproj&quot; </span><span class="s0">/&gt;</span>
+  <span class="s0">&lt;/ItemGroup&gt;</span>
+
+<span class="s0">&lt;/Project&gt;</span>
+</pre>
+</body>
+</html>

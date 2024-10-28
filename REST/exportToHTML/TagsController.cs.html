@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>TagsController.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #c9a26d;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+TagsController.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">DTOs</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">REST</span><span class="s2">.</span><span class="s1">Api</span><span class="s2">.</span><span class="s1">Controllers</span><span class="s2">;</span>
+
+<span class="s0">using </span><span class="s1">Microsoft</span><span class="s2">.</span><span class="s1">AspNetCore</span><span class="s2">.</span><span class="s1">Mvc</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">REST</span><span class="s2">.</span><span class="s1">Api</span><span class="s2">.</span><span class="s1">Controllers</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">MediatR</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">Commands</span><span class="s2">;</span>
+
+<span class="s2">[</span><span class="s1">ApiController</span><span class="s2">]</span>
+<span class="s2">[</span><span class="s1">Route</span><span class="s2">(</span><span class="s3">&quot;/api/[controller]&quot;</span><span class="s2">)]</span>
+<span class="s0">public class </span><span class="s1">TagsController : BaseController</span>
+<span class="s2">{</span>
+    <span class="s0">public </span><span class="s1">TagsController</span><span class="s2">(</span><span class="s1">IMediator mediator</span><span class="s2">) </span><span class="s1">: </span><span class="s0">base</span><span class="s2">(</span><span class="s1">mediator</span><span class="s2">)</span>
+    <span class="s2">{</span>
+    <span class="s2">}</span>
+
+    <span class="s2">[</span><span class="s1">HttpGet</span><span class="s2">]</span>
+    <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">ActionResult</span><span class="s2">&lt;</span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;&gt;&gt; </span><span class="s1">GetTags</span><span class="s2">()</span>
+    <span class="s2">{</span>
+        <span class="s1">var res </span><span class="s2">= </span><span class="s1">await _mediator</span><span class="s2">.</span><span class="s1">Send</span><span class="s2">(</span><span class="s0">new </span><span class="s1">GetTagsQuery</span><span class="s2">());</span>
+        <span class="s0">return </span><span class="s1">Ok</span><span class="s2">(</span><span class="s1">res</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s2">[</span><span class="s1">HttpGet</span><span class="s2">(</span><span class="s3">&quot;/search&quot;</span><span class="s2">)]</span>
+    <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">ActionResult</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;&gt; </span><span class="s1">FindTagByPrefix</span><span class="s2">([</span><span class="s1">FromQuery</span><span class="s2">] </span><span class="s0">string </span><span class="s1">tagPrefix</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">var res </span><span class="s2">= </span><span class="s1">await _mediator</span><span class="s2">.</span><span class="s1">Send</span><span class="s2">(</span><span class="s0">new </span><span class="s1">FindTagsByPrefixQuery</span><span class="s2">(</span><span class="s1">tagPrefix</span><span class="s2">));</span>
+        <span class="s0">return </span><span class="s1">Ok</span><span class="s2">(</span><span class="s1">res</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s2">[</span><span class="s1">HttpPost</span><span class="s2">]</span>
+    <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">ActionResult</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;&gt; </span><span class="s1">CreateTag</span><span class="s2">([</span><span class="s1">FromBody</span><span class="s2">] </span><span class="s1">CreateTagDto createTagDto</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">var res </span><span class="s2">= </span><span class="s1">await _mediator</span><span class="s2">.</span><span class="s1">Send</span><span class="s2">(</span><span class="s0">new </span><span class="s1">CreateTagCommand</span><span class="s2">(</span><span class="s1">createTagDto</span><span class="s2">.</span><span class="s1">Label</span><span class="s2">, </span><span class="s1">createTagDto</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">));</span>
+        <span class="s0">return </span><span class="s1">Ok</span><span class="s2">(</span><span class="s1">res</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

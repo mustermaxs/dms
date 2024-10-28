@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>DmsDbContext.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #c9a26d;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DmsDbContext.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">Metadata</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">ValueObjects</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">Microsoft</span><span class="s2">.</span><span class="s1">EntityFrameworkCore</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Infrastructure</span><span class="s2">;</span>
+
+
+<span class="s0">public class </span><span class="s1">DmsDbContext : DbContext</span>
+<span class="s2">{</span>
+    <span class="s0">public </span><span class="s1">DbSet</span><span class="s2">&lt;</span><span class="s1">DmsDocument</span><span class="s2">&gt; </span><span class="s1">Documents </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+    <span class="s0">public </span><span class="s1">DbSet</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt; </span><span class="s1">DocumentTags </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+    <span class="s0">public </span><span class="s1">DbSet</span><span class="s2">&lt;</span><span class="s1">Tag</span><span class="s2">&gt; </span><span class="s1">Tags </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+
+    <span class="s0">public </span><span class="s1">DmsDbContext</span><span class="s2">(</span><span class="s1">DbContextOptions</span><span class="s2">&lt;</span><span class="s1">DmsDbContext</span><span class="s2">&gt; </span><span class="s1">options</span><span class="s2">) </span><span class="s1">: </span><span class="s0">base</span><span class="s2">(</span><span class="s1">options</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">Console</span><span class="s2">.</span><span class="s1">WriteLine</span><span class="s2">(</span><span class="s3">&quot;DmsDbContext initialized.&quot;</span><span class="s2">);</span>
+        <span class="s1">Console</span><span class="s2">.</span><span class="s1">WriteLine</span><span class="s2">(</span><span class="s0">this</span><span class="s2">.</span><span class="s1">Database</span><span class="s2">.</span><span class="s1">CanConnect</span><span class="s2">()</span>
+            <span class="s1">? </span><span class="s3">&quot;Connected to the database successfully.&quot;</span>
+            <span class="s1">: </span><span class="s3">&quot;Failed to connect to the database.&quot;</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">protected override void </span><span class="s1">OnModelCreating</span><span class="s2">(</span><span class="s1">ModelBuilder modelBuilder</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">modelBuilder</span><span class="s2">.</span><span class="s1">Entity</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;()</span>
+            <span class="s2">.</span><span class="s1">HasKey</span><span class="s2">(</span><span class="s1">dt =&gt; </span><span class="s0">new </span><span class="s2">{ </span><span class="s1">dt</span><span class="s2">.</span><span class="s1">DocumentId</span><span class="s2">, </span><span class="s1">dt</span><span class="s2">.</span><span class="s1">TagId </span><span class="s2">});</span>
+
+        <span class="s1">modelBuilder</span><span class="s2">.</span><span class="s1">Entity</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;()</span>
+            <span class="s2">.</span><span class="s1">HasOne</span><span class="s2">(</span><span class="s1">dt =&gt; dt</span><span class="s2">.</span><span class="s1">Document</span><span class="s2">)</span>
+            <span class="s2">.</span><span class="s1">WithMany</span><span class="s2">(</span><span class="s1">d =&gt; d</span><span class="s2">.</span><span class="s1">Tags</span><span class="s2">)</span>
+            <span class="s2">.</span><span class="s1">HasForeignKey</span><span class="s2">(</span><span class="s1">dt =&gt; dt</span><span class="s2">.</span><span class="s1">DocumentId</span><span class="s2">);</span>
+
+        <span class="s1">modelBuilder</span><span class="s2">.</span><span class="s1">Entity</span><span class="s2">&lt;</span><span class="s1">DocumentTag</span><span class="s2">&gt;()</span>
+            <span class="s2">.</span><span class="s1">HasOne</span><span class="s2">(</span><span class="s1">dt =&gt; dt</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">)</span>
+            <span class="s2">.</span><span class="s1">WithMany</span><span class="s2">()</span>
+            <span class="s2">.</span><span class="s1">HasForeignKey</span><span class="s2">(</span><span class="s1">dt =&gt; dt</span><span class="s2">.</span><span class="s1">TagId</span><span class="s2">);</span>
+        
+        <span class="s0">base</span><span class="s2">.</span><span class="s1">OnModelCreating</span><span class="s2">(</span><span class="s1">modelBuilder</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

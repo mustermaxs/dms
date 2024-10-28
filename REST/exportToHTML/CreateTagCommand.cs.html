@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>CreateTagCommand.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #c9a26d;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CreateTagCommand.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">IRepositories</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">MediatR</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">Commands</span>
+<span class="s2">{</span>
+<span class="s0">public </span><span class="s1">record CreateTagCommand</span><span class="s2">(</span><span class="s0">string </span><span class="s1">Label</span><span class="s2">, </span><span class="s0">string </span><span class="s1">Value</span><span class="s2">) </span><span class="s1">: IRequest</span><span class="s2">&lt;</span><span class="s1">Tag</span><span class="s2">&gt;;</span>
+    
+<span class="s0">public class </span><span class="s1">CreateTagCommandHandler</span><span class="s2">(</span><span class="s1">ITagRepository tagRepository</span><span class="s2">) </span><span class="s1">: IRequestHandler</span><span class="s2">&lt;</span><span class="s1">CreateTagCommand</span><span class="s2">, </span><span class="s1">Tag</span><span class="s2">&gt;</span>
+<span class="s2">{</span>
+    <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">Tag</span><span class="s2">&gt; </span><span class="s1">Handle</span><span class="s2">(</span><span class="s1">CreateTagCommand request</span><span class="s2">, </span><span class="s1">CancellationToken cancellationToken</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">var tag </span><span class="s2">= </span><span class="s1">await tagRepository</span><span class="s2">.</span><span class="s1">Create</span><span class="s2">(</span>
+            <span class="s0">new </span><span class="s1">Tag</span>
+            <span class="s2">{</span>
+                <span class="s1">Id </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Guid</span><span class="s2">(),</span>
+                <span class="s1">Label </span><span class="s2">= </span><span class="s3">&quot;project&quot;</span><span class="s2">,</span>
+                <span class="s1">Color </span><span class="s2">= </span><span class="s3">&quot;#FF0031&quot;</span><span class="s2">,</span>
+                <span class="s1">Value </span><span class="s2">= </span><span class="s3">&quot;project&quot;</span>
+            <span class="s2">});</span>
+
+        <span class="s0">return </span><span class="s1">tag</span><span class="s2">;</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

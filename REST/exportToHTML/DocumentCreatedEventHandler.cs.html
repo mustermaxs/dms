@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>DocumentCreatedEventHandler.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DocumentCreatedEventHandler.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">.</span><span class="s1">DomainEvents</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Infrastructure</span><span class="s2">.</span><span class="s1">Services</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Infrastructure</span><span class="s2">.</span><span class="s1">EventHandlers</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">DocumentCreatedEventHandler : IDomainEventHandler</span><span class="s2">&lt;</span><span class="s1">DocumentUploadedEvent</span><span class="s2">&gt;</span>
+<span class="s2">{</span>
+    <span class="s0">private readonly </span><span class="s1">IMessageBrokerClient _messageBrokerClient</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">DocumentCreatedEventHandler</span><span class="s2">(</span><span class="s1">IMessageBrokerClient messageBrokerClient</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">_messageBrokerClient </span><span class="s2">= </span><span class="s1">messageBrokerClient</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s0">public </span><span class="s1">Task HandleAsync</span><span class="s2">(</span><span class="s1">DocumentUploadedEvent domainEvent</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s0">throw new </span><span class="s1">NotImplementedException</span><span class="s2">();</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+
+</pre>
+</body>
+</html>
