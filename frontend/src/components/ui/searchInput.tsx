@@ -27,8 +27,6 @@ const SearchInput = ({
   };
 
   return (
-    // <section className="flex flex-col items-center space-y-4">
-    // <section className="flex flex-col flex-grow space-y-2">
       <SearchField
         tags={tags}
         addTag={handleAddTag}
@@ -39,7 +37,6 @@ const SearchInput = ({
         isSearching={isSearching}
         setIsSearching={setIsSearching}
       />
-    // </section>
   );
 };
 

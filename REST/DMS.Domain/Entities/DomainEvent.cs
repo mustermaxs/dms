@@ -1,3 +1,9 @@
-namespace DMS.Domain.DomainEvents;
+using MediatR;
 
-public interface IDomainEvent {}
+namespace DMS.Domain.DomainEvents
+{
+    public abstract class DomainEvent : IRequest
+    {
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    }
+}

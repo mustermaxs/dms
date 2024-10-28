@@ -1,29 +1,78 @@
-
+using AutoMapper;
 using DMS.Application.DTOs;
+using DMS.Application.Exceptions;
+using DMS.Application.IntegrationEvents;
+using DMS.Application.Interfaces;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.IRepositories;
+using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
+using FluentValidation;
 using MediatR;
 
 namespace DMS.Application.Commands
 {
-    public record UploadDocumentCommand(string Title, byte[] Content) : IRequest<DmsDocumentDto>;
+    public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags) : IRequest<Unit>;
 
-    public class UploadDocumentRequestHandler : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
+    public class UploadDocumentCommandHandler(
+        IDmsDocumentRepository documentRepository,
+        ITagRepository tagRepository,
+        IDocumentTagRepository documentTagRepository,
+        // IFileStorage fileStorage,
+        IValidator<DmsDocument> documentValidator,
+        IUnitOfWork unitOfWork,
+        IDocumentTagFactory documentTagFactory,
+        IMediator mediator,
+        IMapper mapper
+        ) : IRequestHandler<UploadDocumentCommand, Unit>
     {
-        public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
         {
-            var document = new DmsDocumentDto
+            try
             {
-                Id = Guid.NewGuid(), Title = "Document 1",
-                UploadDateTime = DateTime.Now,
-                ModificationDateTime = DateTime.Now,
-                Status = ProcessingStatus.Finished,
-                Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = new FileType { Name = "PDF" }
-            };
-            
-            return await Task.FromResult(document);
+                // TODO Refactor the creation of tags/documentTags to a separate service
+                await unitOfWork.BeginTransactionAsync();
+                
+                var document =  DmsDocument.Create(
+                    request.Title,
+                    request.Content,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow,
+                    null,
+                    new List<DocumentTag>(),
+                    new FileType(request.Title),
+                    ProcessingStatus.NotStarted);
+                
+                var documentIsValid = await documentValidator.ValidateAsync(document);
+
+                if (!documentIsValid.IsValid)
+                {
+                    throw new ValidationException(documentIsValid.Errors);
+                }
+
+                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags, unitOfWork);
+                var documentTags = await Task.WhenAll(
+                    tagsAssociatedWithDocument.Select(t =>
+                        unitOfWork.DocumentTagRepository.Create(
+                            DocumentTag.Create(t, document))));
+                
+                document.Tags = [..documentTags];
+                // TODO Put conversion from Base64 to FileStream in a separate service
+                // or make the client send it as stream in JSON object if possible
+                // await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));
+                document = await unitOfWork.DmsDocumentRepository.Create(document);
+                
+                await unitOfWork.CommitAsync();
+                mediator.Send(new DocumentSavedInFileStorageIntegrationEvent(document));
+                
+                return Unit.Value;
+            }
+            catch (Exception e)
+            {
+                await unitOfWork.RollbackAsync();
+                Console.WriteLine(e.Message);
+                throw new UploadDocumentException($"Failed to upload document.");
+            }
         }
     }
 }

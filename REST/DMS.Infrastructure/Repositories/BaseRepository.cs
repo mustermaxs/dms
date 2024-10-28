@@ -1,6 +1,7 @@
 using DMS.Domain;
 using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories
@@ -8,18 +9,21 @@ namespace DMS.Infrastructure.Repositories
 public abstract class BaseRepository<TEntity> : IDisposable, IRepository<TEntity>
 where TEntity : Entity
 {
+    public IValidator<TEntity> Validator { get; }
     protected DmsDbContext Context;
     private bool _disposed = false;
     protected DbSet<TEntity> DbSet;
-    protected readonly IDomainEventDispatcher _eventDispatcher;
+    protected readonly IEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IDomainEventDispatcher _eventDispatcher)
+    public BaseRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<TEntity> validator)
     {
+        Validator = validator;
         Context = dbContext;
         DbSet = Context.Set<TEntity>();
+        _eventDispatcher = eventDispatcher;
     }
     
-    public virtual async Task<TEntity?> Get(int id)
+    public virtual async Task<TEntity?> Get(Guid id)
     {
         return await DbSet.FindAsync(id);
     }
@@ -31,18 +35,17 @@ where TEntity : Entity
 
     public virtual async Task<TEntity> Create(TEntity entity)
     {
+        await Validator.ValidateAndThrowAsync(entity);
         entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
-        await SaveAsync();
-        // await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        
         return e.Entity;
     }
 
     public virtual async Task Delete(TEntity entity)
     {
         DbSet.Remove(entity);
-        await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        
     }
 
     public async Task SaveAsync()
@@ -50,7 +53,7 @@ where TEntity : Entity
         await Context.SaveChangesAsync();
     }
 
-    public virtual async Task DeleteById(int id)
+    public virtual async Task DeleteById(Guid id)
     {
         var entity = await DbSet.FindAsync(id);
         if (entity == null)
@@ -58,15 +61,13 @@ where TEntity : Entity
             return;
         }
         DbSet.Remove(entity);
-        await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
+        
     }
 
     public virtual async Task UpdateAsync(TEntity entity)
     {
+        await Validator.ValidateAndThrowAsync(entity);
         DbSet.Update(entity);
-        await SaveAsync();
-        await _eventDispatcher.DispatchEventsAsync(entity.DomainEvents.ToList());
     }
 
     public void Dispose()

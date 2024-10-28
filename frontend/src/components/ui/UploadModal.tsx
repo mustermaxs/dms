@@ -2,8 +2,9 @@ import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import CreatableSelect from "react-select/creatable";
+import { useEffect } from "react";
 
-export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, file, setFile }) => {
+export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
 
   const customStyles = {
     multiValue: (styles: any) => ({
@@ -45,8 +46,8 @@ export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, set
       ...styles,
       fontSize: '0.9rem',
     }),
-
   };
+
 
   return (
     <Modal isOpen={isOpen} closeModal={closeModal} title="Upload Document">
@@ -65,9 +66,9 @@ export const UploadModal = ({ isOpen, closeModal, handleSubmit, title, tags, set
         <div>
           <Label title="Tags" />
           <CreatableSelect
-            options={[{ label: "Personal", value: "Personal" }, { label: "Work", value: "Work" }, { label: "In Progress", value: "In Progress" }]}
+            options={tags}
             isMulti
-            value={tags}
+            value={selectedTags}
             onChange={handleTagChange}
             placeholder="Add or create tags..."
             className="mt-1 "

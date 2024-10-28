@@ -23,19 +23,54 @@ public class DmsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<DmsDocument>()
+            .HasKey(e => e.Id);
+
+        modelBuilder.Entity<DmsDocument>()
+            .OwnsOne(e => e.DocumentType, dt =>
+            {
+                dt.Property(d => d.Name)
+                    .HasColumnName("DocumentType")
+                    .HasMaxLength(6);
+            })
+            .Property(e => e.Title).HasMaxLength(50);
+
+        modelBuilder.Entity<Tag>()
+            .Property(e => e.Label)
+            .HasMaxLength(20);
+
+        modelBuilder.Entity<Tag>()
+            .Property(e => e.Value)
+            .HasMaxLength(50);
+        
+        modelBuilder.Entity<Tag>()
+            .Property(e => e.Color)
+            .HasMaxLength(8);
+        
+        modelBuilder.Entity<Tag>()
+            .HasIndex(e => e.Value)
+            .IsUnique();
+        
+        modelBuilder.Entity<Tag>()
+            .HasIndex(e => e.Label)
+            .IsUnique();
+
         modelBuilder.Entity<DocumentTag>()
+            .ToTable("DocumentTags")
             .HasKey(dt => new { dt.DocumentId, dt.TagId });
 
         modelBuilder.Entity<DocumentTag>()
             .HasOne(dt => dt.Document)
             .WithMany(d => d.Tags)
-            .HasForeignKey(dt => dt.DocumentId);
+            .HasForeignKey(dt => dt.DocumentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<DocumentTag>()
             .HasOne(dt => dt.Tag)
             .WithMany()
-            .HasForeignKey(dt => dt.TagId);
-        
+            .HasForeignKey(dt => dt.TagId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         base.OnModelCreating(modelBuilder);
     }
 }

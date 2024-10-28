@@ -13,7 +13,7 @@ namespace DMS.REST.Api.Controllers
         {
             _mediator = mediator;
         }
-        protected async Task<ActionResult<dynamic>> ResponseAsync<TResponse>(IRequest<TResponse> command)
+        protected async Task<ActionResult> ResponseAsync<TResponse>(IRequest<TResponse> command)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace DMS.REST.Api.Controllers
             {
                 Console.WriteLine(e);
                 // Logger.Error($"Request {command.GetType().FullName} failed.  {command.ToString()}. {e.Message}");
-                return Problem("Something went wrong :(");
+                return BadRequest(e.Message);
             }
         }
     }

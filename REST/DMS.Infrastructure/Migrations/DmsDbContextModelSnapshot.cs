@@ -28,12 +28,6 @@ namespace DMS.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<int>("DocumentTypeId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("ModificationDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -45,14 +39,13 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UploadDateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DocumentTypeId");
 
                     b.ToTable("Documents");
                 });
@@ -63,6 +56,9 @@ namespace DMS.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.HasKey("DocumentId", "TagId");
@@ -80,47 +76,53 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<string>("Color")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Label")
+                        .IsUnique();
+
+                    b.HasIndex("Value")
+                        .IsUnique();
 
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("DMS.Domain.ValueObjects.FileType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FileType");
-                });
-
             modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
                 {
-                    b.HasOne("DMS.Domain.ValueObjects.FileType", "DocumentType")
-                        .WithMany()
-                        .HasForeignKey("DocumentTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("DMS.Domain.ValueObjects.FileType", "DocumentType", b1 =>
+                        {
+                            b1.Property<Guid>("DmsDocumentId")
+                                .HasColumnType("uuid");
 
-                    b.Navigation("DocumentType");
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(6)
+                                .HasColumnType("character varying(6)")
+                                .HasColumnName("DocumentType");
+
+                            b1.HasKey("DmsDocumentId");
+
+                            b1.ToTable("Documents");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DmsDocumentId");
+                        });
+
+                    b.Navigation("DocumentType")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DMS.Domain.Entities.DocumentTag", b =>
@@ -134,7 +136,7 @@ namespace DMS.Infrastructure.Migrations
                     b.HasOne("DMS.Domain.Entities.Tag.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Document");

@@ -75,6 +75,7 @@ _[Ss]cripts
 *.nupkg
 *.ncrunchsolution
 *.dot[Cc]over
-
+exportToHTML
+exportToHTML.zip
 
 semester-project.pdf
