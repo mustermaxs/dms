@@ -4,11 +4,15 @@ import { DateFormatter } from "../../services/dateFormatter";
 import { Document } from "../../types/Document";
 import { Button } from "rizzui";
 import "../ui/DocumentModal.css";
+import { useModal } from "../../hooks/useModal";
+import { ContentViewerModal } from "./ContentViewerModal";
 
 export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
   const document: Document = selectedDocument.selectedDocument;
+  const contentModal = useModal();
 
   return (
+        <>
         <Modal isOpen={isOpen} closeModal={closeModal} title={`${document.title}`}>
           <Label title="Upload Datetime" />
           <p className="my-2">{DateFormatter.toDateString(new Date(document.uploadDateTime))}</p>
@@ -25,10 +29,15 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
           <p className="dms-document-content my-2">{document.content}</p>
           <div className="flex justify-end">
             {/* TODO Implement Edit Mode */}
-          <Button type="button" className="mt-4"> 
+          <Button type="button" onClick={() => {contentModal.openModal()}} className="mt-4"> 
+            View
+          </Button>
+          <Button type="button" className="mt-4 mx-1"> 
             Edit
           </Button>
           </div>
         </Modal>
+        {document.title && <ContentViewerModal isOpen={contentModal.isOpen} closeModal={contentModal.closeModal} openModal={contentModal.openModal} document={document} />}
+        </>
     )
 }

@@ -10,6 +10,7 @@ import { ServiceLocator } from "../../serviceLocator";
 import { ITagService } from "../../services/tagService";
 import { IDocumentService } from "../../services/documentService";
 import { getEmptyGuid } from "../../services/guidGenerator";
+import { ModalSize } from "./Modal";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
@@ -91,7 +92,7 @@ export default function Header() {
         </Button>
       </div>
 
-      <UploadModal isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} selectedTags={selectedTags} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
+      <UploadModal size={ModalSize.SMALL} isOpen={isOpen} closeModal={closeModal} handleSubmit={handleSubmit} selectedTags={selectedTags} title={title} tags={tags} setTitle={setTitle} handleTagChange={handleTagChange} file={file} setFile={setFile} />
     </>
   );
 }
