@@ -3,12 +3,15 @@ using DMS.Application.DTOs;
 using DMS.Application.Exceptions;
 using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;
+using DMS.Application.Services;
+using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace DMS.Application.Commands
 {
@@ -18,7 +21,8 @@ namespace DMS.Application.Commands
         IDmsDocumentRepository documentRepository,
         ITagRepository tagRepository,
         IDocumentTagRepository documentTagRepository,
-        // IFileStorage fileStorage,
+        IFileStorage fileStorage,
+        FileHelper fileHelper,
         IValidator<DmsDocument> documentValidator,
         IUnitOfWork unitOfWork,
         IDocumentTagFactory documentTagFactory,
@@ -35,7 +39,6 @@ namespace DMS.Application.Commands
                 
                 var document =  DmsDocument.Create(
                     request.Title,
-                    request.Content,
                     DateTime.UtcNow,
                     null,
                     new List<DocumentTag>(),
@@ -59,7 +62,9 @@ namespace DMS.Application.Commands
                 // TODO Put conversion from Base64 to FileStream in a separate service
                 // or make the client send it as stream in JSON object if possible
                 // await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));
-                document = await unitOfWork.DmsDocumentRepository.Create(document);
+                
+                await unitOfWork.DmsDocumentRepository.Create(document);
+                document.AddDomainEvent(new DocumentUploadedToDbDomainEvent(document, request.Content));
                 // TODO fileStorage.Save()...
                 //          in fileStorage: dispatch Integration Event when done
                 // in Integration EventHandler use MessageBroker (RabbitMQ) to inform OCR Worker to process

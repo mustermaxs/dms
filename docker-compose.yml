@@ -3,7 +3,7 @@ version: '3.8'
 services:
   api:
     build:
-      context: .
+      context: ./REST
       dockerfile: Dockerfile
     ports:
       - "8000:80"
@@ -35,6 +35,19 @@ services:
     networks:
       - DMS-network
 
+  minio:
+    image: bitnami/minio:latest
+    ports:
+      - '9000:9000'
+      - '9090:9090'
+    networks:
+      - DMS-network
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_DEFAULT_BUCKETS=dmsbucket
 #  admin:
 #    image: adminer
 #    restart: always
@@ -47,3 +60,6 @@ networks:
   DMS-network:
     driver: bridge
 
+volumes:
+  minio_data:
+    driver: local

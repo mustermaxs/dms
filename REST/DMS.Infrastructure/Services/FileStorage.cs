@@ -9,15 +9,16 @@ namespace DMS.Infrastructure.Services;
 
 public class FileStorage : IFileStorage
 {
-    private readonly IMinioClient _minioClient;
-    private IMediator _mediator { get; set;} 
-    private MinioConfig _config { get; set; }
+    private  IMinioClient _minioClient;
+    private string BucketName { get; }
 
-    public FileStorage(IMediator mediator, IMinioClient minioClient, MinioConfig config)
+    public FileStorage(string accessKey, string secretKey, string endpoint, string bucketName)
     {
-        _minioClient = minioClient;
-        _mediator = mediator;
-        _config = config;
+        BucketName = bucketName;
+        _minioClient = new MinioClient()
+            .WithCredentials(accessKey, secretKey)
+            .WithEndpoint(endpoint)
+            .Build();
     }
 
     private async Task SetupMinioClient()
@@ -25,12 +26,12 @@ public class FileStorage : IFileStorage
         try
         {
             var beArgs = new BucketExistsArgs()
-                .WithBucket(_config.BucketName);
+                .WithBucket(BucketName);
             bool found = await _minioClient.BucketExistsAsync(beArgs).ConfigureAwait(false);
             if (!found)
             {
                 var mbArgs = new MakeBucketArgs()
-                    .WithBucket(_config.BucketName);
+                    .WithBucket(BucketName);
                 await _minioClient.MakeBucketAsync(mbArgs).ConfigureAwait(false);
             }
         }
@@ -45,14 +46,14 @@ public class FileStorage : IFileStorage
     {
         await SetupMinioClient();
         var args = new PutObjectArgs()
-            .WithBucket(_config.BucketName)
+            .WithBucket(BucketName)
             .WithObject(id.ToString())
-            .WithFileName(id.ToString())
-            .WithContentType("application/pdf")
-            .WithStreamData(fileStream);
+            .WithStreamData(fileStream)
+            .WithObjectSize(fileStream.Length)
+            .WithContentType("application/pdf");
         await _minioClient.PutObjectAsync(args).ConfigureAwait(false);
         
-        return $"{_config.BucketName}/{id.ToString()}";
+        return $"{BucketName}/{id.ToString()}";
     }
 
     public Task<Stream> GetFileAsync(Guid id)

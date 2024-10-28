@@ -18,7 +18,6 @@ public class DocumentsController : BaseController
     {
         try
         {
-            // var res = await _mediator.Send();
             return await ResponseAsync(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
         }
         catch (Exception e)
