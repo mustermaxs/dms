@@ -35,14 +35,14 @@ services:
     networks:
       - DMS-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    networks:
-      - DMS-network
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:80"
+  #   networks:
+  #     - DMS-network
 
   minio:
     image: bitnami/minio:latest

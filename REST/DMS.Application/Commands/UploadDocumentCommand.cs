@@ -52,7 +52,7 @@ namespace DMS.Application.Commands
                     throw new ValidationException(documentIsValid.Errors);
                 }
 
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags, unitOfWork);
+                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
                 var documentTags = await Task.WhenAll(
                     tagsAssociatedWithDocument.Select(t =>
                         unitOfWork.DocumentTagRepository.Create(

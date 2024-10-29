@@ -1,11 +1,12 @@
 import { upload } from "@testing-library/user-event/dist/upload";
-import {Document, UploadDocumentDto} from "../types/Document";
+import {Document, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
     getAllDocuments(): Promise<Document[]>;
     uploadDocument(document: UploadDocumentDto): Promise<void>;
+    updateDocument(document: UpdateDocumentDto): Promise<void>;
     getDocumentContent(id: string): Promise<string>;
 }
 
@@ -113,7 +114,7 @@ export class MockDocumentService implements IDocumentService {
     uploadDocument(document: UploadDocumentDto): Promise<void> {
         return Promise.resolve();
     }
-    updateDocument(document: Document): Promise<void> {
+    updateDocument(document: UpdateDocumentDto): Promise<void> {
         return Promise.resolve();
     }
 }
@@ -137,7 +138,7 @@ export class DocumentService implements IDocumentService {
     public async getDocument(id: string): Promise<Document> {
         return await this.httpService.get<Document>(`Documents/${id}`);
     }
-    public async updateDocument(document: Document): Promise<void> {
-        return await this.httpService.put<void>(`Documents/${document.id}`, document);
+    public async updateDocument(document: UpdateDocumentDto): Promise<void> {
+        return await this.httpService.put<void>(`Documents`, document);
     }
 }

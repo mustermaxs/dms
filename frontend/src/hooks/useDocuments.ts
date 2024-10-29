@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Document, UploadDocumentDto } from "../types/Document";
+import { Document, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
 import { MockDocumentService as IDocumentService } from "../services/documentService";
 
@@ -17,12 +17,12 @@ export const useDocuments = () => {
     return document;
   };
 
-  const updateDocument = async (document: Document) => {
+  const updateDocument = async (document: UpdateDocumentDto) => {
     const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     const updatedDocument = await documentService.updateDocument(document);
 
-    setDocuments(documents.map(doc => doc.id === document.id ? document : doc));
-    setSelectedDocument(document);
+    // setDocuments(documents.map(doc => doc.id === document.id ? document : doc));
+    // setSelectedDocument(document);
 
     return updatedDocument;
   };

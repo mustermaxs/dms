@@ -7,6 +7,12 @@ export type UploadDocumentDto = {
     tags: Tag[];
   }
 
+export type UpdateDocumentDto = {
+    id: string;
+    title: string;
+    tags: Tag[];
+}
+
 export type Document = {
     id: string;
     title: string;

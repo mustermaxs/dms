@@ -11,10 +11,8 @@ namespace DMS.Infrastructure.Services;
 public class DocumentTagFactory(
     ITagRepository tagRepository) : IDocumentTagFactory
 {
-    public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos, IUnitOfWork unitOfWork)
+    public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos)
     {
-        await unitOfWork.BeginTransactionAsync();
-
         // Get all tags from the database
         IEnumerable<Tag>? tagsInDb = await tagRepository.GetAll();
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
@@ -40,7 +38,7 @@ public class DocumentTagFactory(
         foreach (var tagDto in newTags)
         {
             var newTag = new Tag(tagDto.Label, tagDto.Value, tagDto.Color);
-            var createdTag = await unitOfWork.TagRepository.Create(newTag);  // Awaiting each call
+            var createdTag = await tagRepository.Create(newTag);  // Awaiting each call
             newTagsInDb.Add(createdTag);
         }
 
