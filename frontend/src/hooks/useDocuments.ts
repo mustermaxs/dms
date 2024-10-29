@@ -5,6 +5,7 @@ import { MockDocumentService as IDocumentService } from "../services/documentSer
 
 export const useDocuments = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const getDocuments = () => {
     return documents;
@@ -14,6 +15,16 @@ export const useDocuments = () => {
     const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     const document = await documentService.getDocument(id);
     return document;
+  };
+
+  const updateDocument = async (document: Document) => {
+    const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+    const updatedDocument = await documentService.updateDocument(document);
+
+    setDocuments(documents.map(doc => doc.id === document.id ? document : doc));
+    setSelectedDocument(document);
+
+    return updatedDocument;
   };
 
   const uploadDocument = async (document: UploadDocumentDto) => {
@@ -34,5 +45,5 @@ export const useDocuments = () => {
     fetchDocuments();
   }, []);
 
-  return { documents, getDocuments, setDocuments, getDocument };
+  return { documents, getDocuments, setDocuments, getDocument, updateDocument, selectedDocument, setSelectedDocument };
 };

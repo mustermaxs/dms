@@ -9,6 +9,8 @@ import { ContentViewerModal } from "./ContentViewerModal";
 import { useContext, useState, useEffect } from "react";
 import { TagInput } from "../shared/TagInput";
 import TagContext from "../context/AppContext";
+import { FaEye } from "react-icons/fa";
+import { useDocuments } from "../../hooks/useDocuments";
 
 export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
   const document: Document = selectedDocument.selectedDocument;
@@ -19,6 +21,8 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
     document.tags.map(tag => ({ value: tag.id, label: tag.label }))
   );
 
+  const { updateDocument } = useDocuments();
+
   const { availableTags } = useContext(TagContext);
 
   useEffect(() => {
@@ -28,6 +32,13 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
   }, [document]);
 
   const handleSave = () => {
+    const updatedDocument = {
+      ...document,
+      title: editedTitle,
+      tags: editedTags.map(tag => ({ id: tag.value, label: tag.label })),
+    };
+    updateDocument(updatedDocument as Document);
+
     setIsEditMode(false);
   };
 
@@ -105,18 +116,22 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
     <>
       <Modal isOpen={isOpen} closeModal={handleClose} title={isEditMode ? "Edit Document" : document.title}>
         {isEditMode ? <EditMode /> : <ViewMode />}
-        
-        <div className="flex justify-end">
-          <Button type="button" onClick={() => contentModal.openModal()} className="mt-4"> 
-            View
+        <div className="flex justify-between">
+          <div className="flex justify-start">
+            <Button variant="outline" type="button" onClick={() => contentModal.openModal()} className="mt-4"> 
+            <FaEye />
+
           </Button>
+        </div>
+        <div className="flex justify-end">
+
           {isEditMode ? (
             <>
-              <Button type="button" onClick={handleSave} className="mt-4 mx-1 bg-green-600"> 
-                Save
-              </Button>
               <Button type="button" onClick={handleCancel} className="mt-4 mx-1"> 
                 Cancel
+              </Button>
+              <Button type="button" onClick={handleSave} className="mt-4 mx-1 bg-green-600"> 
+                Save
               </Button>
             </>
           ) : (
@@ -124,6 +139,7 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
               Edit
             </Button>
           )}
+          </div>
         </div>
       </Modal>
       {document.title && <ContentViewerModal isOpen={contentModal.isOpen} closeModal={contentModal.closeModal} openModal={contentModal.openModal} document={document} />}
