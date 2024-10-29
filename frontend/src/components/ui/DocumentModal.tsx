@@ -11,9 +11,10 @@ import { TagInput } from "../shared/TagInput";
 import TagContext from "../context/AppContext";
 import { FaEye } from "react-icons/fa";
 import { useDocuments } from "../../hooks/useDocuments";
+import AppContext from "../context/AppContext";
 
-export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
-  const document: Document = selectedDocument.selectedDocument;
+export const DocumentModal = ({ isOpen, closeModal }) => {
+  const {selectedDocument: document, setSelectedDocument, setDocuments } = useContext(AppContext);
   const contentModal = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState(document.title);
@@ -35,14 +36,23 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
     console.log(editedTags);
   }, [editedTags]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const updatedDocument = {
       id: document.id,
       title: editedTitle,
       tags: editedTags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", label: tag.label, color: "#000000", value: tag.value })),
     } as UpdateDocumentDto;
 
-    updateDocument(updatedDocument as UpdateDocumentDto);
+    const updatedDoc = await updateDocument(updatedDocument);
+
+    setSelectedDocument(updatedDoc);
+    updateDocument(updatedDocument);
+
+    setDocuments((prevDocuments: Document[]) =>
+      prevDocuments.map((doc) =>
+        doc.id === updatedDoc.id ? { ...doc, ...updatedDoc } : doc
+      )
+    );
 
     setIsEditMode(false);
   };

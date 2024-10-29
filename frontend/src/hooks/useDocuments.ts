@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Document, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
-import { MockDocumentService as IDocumentService } from "../services/documentService";
-// import AppContext from "../components/context/AppContext";
+import { IDocumentService } from "../services/documentService";
 
 export const useDocuments = () => {
 
@@ -20,25 +19,30 @@ export const useDocuments = () => {
     return document;
   };
 
-  const updateDocument = async (document: UpdateDocumentDto) => {
+  const updateDocument = async (document: UpdateDocumentDto): Promise<Document> => {
     const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     const updatedDocument = await documentService.updateDocument(document);
+  
+    setDocuments((prevDocuments) =>
+      prevDocuments.map((doc) => 
+        doc.id === updatedDocument.id ? { ...doc, ...updatedDocument } : doc
+      )
+    );
 
 
-    // setDocuments([]);
-
-
-    setDocuments((prevDocuments) => {
-
-      prevDocuments.map((doc) => {
-        if (doc.id === updatedDocument.id) {
-          return updatedDocument;
-        }
-        return doc;
-      });
-    });
-
+    return updatedDocument as Document;
   };
+
+    // setDocuments((prevDocuments) => {
+
+    //   prevDocuments.map((doc) => {
+    //     if (doc.id === updatedDocument.id) {
+    //       return updatedDocument;
+    //     }
+    //     return doc;
+    //   });
+    // });
+
 
   const uploadDocument = async (document: UploadDocumentDto) => {
     //todo

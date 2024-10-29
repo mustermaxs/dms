@@ -1,26 +1,27 @@
-import { createContext } from 'react';
-import { Tag } from '../../types/Tag';
-import { Document } from '../../types/Document';
 
+import { createContext, Dispatch, SetStateAction } from "react";
+import { Document, UpdateDocumentDto } from "../../types/Document";
+import { Tag } from "../../types/Tag";
 
-interface AppContextType {
+interface AppContextProps {
   documents: Document[];
-  availableTags: Tag[];
-  setDocuments: (documents: Document[]) => void;
+  setDocuments: Dispatch<SetStateAction<Document[]>>;
   getDocument: (id: string) => Promise<Document>;
   getDocuments: () => Document[];
   selectedDocument: Document | null;
-  setSelectedDocument: (document: Document) => void;
-} 
+  availableTags: Tag[];
+  updateDocument: (document: UpdateDocumentDto) => Promise<Document>;
+  setSelectedDocument: Dispatch<SetStateAction<Document | null>>;
+}
 
-const AppContext = createContext<AppContextType>({
+const AppContext = createContext<AppContextProps>({
   documents: [],
-  getDocuments: () => [],
-  availableTags: [],
   setDocuments: () => {},
   getDocument: () => Promise.resolve({} as Document),
+  getDocuments: () => [],
   selectedDocument: null,
+  availableTags: [],
+  updateDocument: () => Promise.resolve({} as Document),
   setSelectedDocument: () => {},
 });
-
 export default AppContext;

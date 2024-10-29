@@ -16,8 +16,7 @@ export default function DocumentTable() {
   const { documents, selectedDocument, setSelectedDocument } = useContext(AppContext);
 
 useEffect(() => {
-    console.log("documents: ", documents); 
-    
+    console.log("documents in DocumentTable: ", documents); 
 },[documents]);
 
   const showModal = async (document: Document) => {
@@ -47,7 +46,7 @@ useEffect(() => {
           <tbody>
             {documents.map((doc, index) => (
               <tr
-                key={index}
+                key={doc.id}
                 className="bg-white border-b hover:bg-gray-50 cursor-pointer"
                 onClick={async () => await showModal(doc as Document)}
               >
@@ -87,7 +86,7 @@ useEffect(() => {
           </tbody>
         </table>
 
-        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={{ selectedDocument }} />}
+        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal}  />}
 
       </div>)}
     </>
