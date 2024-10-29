@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Entity.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Entity.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">Entity</span>
+<span class="s2">{</span>
+    <span class="s0">protected </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s0">object</span><span class="s2">&gt; </span><span class="s1">_domainEvents </span><span class="s2">= </span><span class="s0">new </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s0">object</span><span class="s2">&gt;();</span>
+    <span class="s0">public </span><span class="s1">IReadOnlyCollection</span><span class="s2">&lt;</span><span class="s0">object</span><span class="s2">&gt; </span><span class="s1">DomainEvents =&gt; _domainEvents</span><span class="s2">.</span><span class="s1">AsReadOnly</span><span class="s2">();</span>
+    <span class="s0">public </span><span class="s1">Guid Id </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+
+    <span class="s0">protected void </span><span class="s1">AddDomainEvent</span><span class="s2">(</span><span class="s0">object </span><span class="s1">eventItem</span><span class="s2">)</span>
+    <span class="s2">{</span>
+        <span class="s1">_domainEvents</span><span class="s2">.</span><span class="s1">Add</span><span class="s2">(</span><span class="s1">eventItem</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">ClearDomainEvents</span><span class="s2">()</span>
+    <span class="s2">{</span>
+        <span class="s1">_domainEvents</span><span class="s2">.</span><span class="s1">Clear</span><span class="s2">();</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

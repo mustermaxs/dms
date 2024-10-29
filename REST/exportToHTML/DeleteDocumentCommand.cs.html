@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>DeleteDocumentCommand.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DeleteDocumentCommand.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">ValueObjects</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">MediatR</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">Commands</span>
+<span class="s2">{</span>
+    <span class="s0">public </span><span class="s1">record DeleteDocumentCommand</span><span class="s2">(</span><span class="s1">Guid Id</span><span class="s2">) </span><span class="s1">: IRequest</span><span class="s2">, </span><span class="s1">IRequest</span><span class="s2">&lt;</span><span class="s1">Unit</span><span class="s2">&gt;;</span>
+    
+    <span class="s0">public class </span><span class="s1">DeleteDocumentCommandHandler : IRequestHandler</span><span class="s2">&lt;</span><span class="s1">DeleteDocumentCommand</span><span class="s2">&gt;</span>
+    <span class="s2">{</span>
+        <span class="s0">public </span><span class="s1">async Task</span><span class="s2">&lt;</span><span class="s1">Unit</span><span class="s2">&gt; </span><span class="s1">Handle</span><span class="s2">(</span><span class="s1">DeleteDocumentCommand request</span><span class="s2">, </span><span class="s1">CancellationToken cancellationToken</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">return </span><span class="s1">await Task</span><span class="s2">.</span><span class="s1">FromResult</span><span class="s2">(</span><span class="s1">Unit</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">);</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

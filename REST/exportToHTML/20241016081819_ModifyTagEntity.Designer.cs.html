@@ -1,0 +1,177 @@
+<html>
+<head>
+<title>20241016081819_ModifyTagEntity.Designer.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #85c46c; font-style: italic;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #6c95eb;}
+.s3 { color: #bdbdbd;}
+.s4 { color: #c9a26d;}
+.s5 { color: #ed94c0;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+20241016081819_ModifyTagEntity.Designer.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">// &lt;auto-generated /&gt;</span>
+<span class="s2">using </span><span class="s1">System</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">DMS</span><span class="s3">.</span><span class="s1">Infrastructure</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">Microsoft</span><span class="s3">.</span><span class="s1">EntityFrameworkCore</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">Microsoft</span><span class="s3">.</span><span class="s1">EntityFrameworkCore</span><span class="s3">.</span><span class="s1">Infrastructure</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">Microsoft</span><span class="s3">.</span><span class="s1">EntityFrameworkCore</span><span class="s3">.</span><span class="s1">Migrations</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">Microsoft</span><span class="s3">.</span><span class="s1">EntityFrameworkCore</span><span class="s3">.</span><span class="s1">Storage</span><span class="s3">.</span><span class="s1">ValueConversion</span><span class="s3">;</span>
+<span class="s2">using </span><span class="s1">Npgsql</span><span class="s3">.</span><span class="s1">EntityFrameworkCore</span><span class="s3">.</span><span class="s1">PostgreSQL</span><span class="s3">.</span><span class="s1">Metadata</span><span class="s3">;</span>
+
+<span class="s2">#nullable disable</span>
+
+<span class="s2">namespace </span><span class="s1">DMS</span><span class="s3">.</span><span class="s1">Infrastructure</span><span class="s3">.</span><span class="s1">Migrations</span>
+<span class="s3">{</span>
+    <span class="s3">[</span><span class="s1">DbContext</span><span class="s3">(</span><span class="s2">typeof</span><span class="s3">(</span><span class="s1">DmsDbContext</span><span class="s3">))]</span>
+    <span class="s3">[</span><span class="s1">Migration</span><span class="s3">(</span><span class="s4">&quot;20241016081819_ModifyTagEntity&quot;</span><span class="s3">)]</span>
+    <span class="s1">partial </span><span class="s2">class </span><span class="s1">ModifyTagEntity</span>
+    <span class="s3">{</span>
+        <span class="s0">/// &lt;inheritdoc /&gt;</span>
+        <span class="s2">protected override void </span><span class="s1">BuildTargetModel</span><span class="s3">(</span><span class="s1">ModelBuilder modelBuilder</span><span class="s3">)</span>
+        <span class="s3">{</span>
+<span class="s2">#pragma </span><span class="s1">warning disable 612, 618</span>
+            <span class="s1">modelBuilder</span>
+                <span class="s3">.</span><span class="s1">HasAnnotation</span><span class="s3">(</span><span class="s4">&quot;ProductVersion&quot;</span><span class="s3">, </span><span class="s4">&quot;8.0.10&quot;</span><span class="s3">)</span>
+                <span class="s3">.</span><span class="s1">HasAnnotation</span><span class="s3">(</span><span class="s4">&quot;Relational:MaxIdentifierLength&quot;</span><span class="s3">, </span><span class="s5">63</span><span class="s3">);</span>
+
+            <span class="s1">NpgsqlModelBuilderExtensions</span><span class="s3">.</span><span class="s1">UseIdentityByDefaultColumns</span><span class="s3">(</span><span class="s1">modelBuilder</span><span class="s3">);</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DmsDocument&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">Guid</span><span class="s3">&gt;(</span><span class="s4">&quot;Id&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">ValueGeneratedOnAdd</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;uuid&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Content&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">int</span><span class="s3">&gt;(</span><span class="s4">&quot;DocumentTypeId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;integer&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">DateTime?</span><span class="s3">&gt;(</span><span class="s4">&quot;ModificationDateTime&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;timestamp with time zone&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Path&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">int</span><span class="s3">&gt;(</span><span class="s4">&quot;Status&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;integer&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Title&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">DateTime</span><span class="s3">&gt;(</span><span class="s4">&quot;UploadDateTime&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;timestamp with time zone&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasKey</span><span class="s3">(</span><span class="s4">&quot;Id&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasIndex</span><span class="s3">(</span><span class="s4">&quot;DocumentTypeId&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">ToTable</span><span class="s3">(</span><span class="s4">&quot;Documents&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DocumentTag&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">Guid</span><span class="s3">&gt;(</span><span class="s4">&quot;DocumentId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;uuid&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">Guid</span><span class="s3">&gt;(</span><span class="s4">&quot;TagId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;uuid&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasKey</span><span class="s3">(</span><span class="s4">&quot;DocumentId&quot;</span><span class="s3">, </span><span class="s4">&quot;TagId&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasIndex</span><span class="s3">(</span><span class="s4">&quot;TagId&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">ToTable</span><span class="s3">(</span><span class="s4">&quot;DocumentTags&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.Tag.Tag&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s1">Guid</span><span class="s3">&gt;(</span><span class="s4">&quot;Id&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">ValueGeneratedOnAdd</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;uuid&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Color&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Label&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Value&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasKey</span><span class="s3">(</span><span class="s4">&quot;Id&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">ToTable</span><span class="s3">(</span><span class="s4">&quot;Tags&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.ValueObjects.FileType&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">int</span><span class="s3">&gt;(</span><span class="s4">&quot;Id&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">ValueGeneratedOnAdd</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;integer&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">NpgsqlPropertyBuilderExtensions</span><span class="s3">.</span><span class="s1">UseIdentityByDefaultColumn</span><span class="s3">(</span><span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">int</span><span class="s3">&gt;(</span><span class="s4">&quot;Id&quot;</span><span class="s3">));</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Property</span><span class="s3">&lt;</span><span class="s2">string</span><span class="s3">&gt;(</span><span class="s4">&quot;Name&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasColumnType</span><span class="s3">(</span><span class="s4">&quot;text&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasKey</span><span class="s3">(</span><span class="s4">&quot;Id&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">ToTable</span><span class="s3">(</span><span class="s4">&quot;FileType&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DmsDocument&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasOne</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.ValueObjects.FileType&quot;</span><span class="s3">, </span><span class="s4">&quot;DocumentType&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">WithMany</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasForeignKey</span><span class="s3">(</span><span class="s4">&quot;DocumentTypeId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">OnDelete</span><span class="s3">(</span><span class="s1">DeleteBehavior</span><span class="s3">.</span><span class="s1">Cascade</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">();</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Navigation</span><span class="s3">(</span><span class="s4">&quot;DocumentType&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DocumentTag&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasOne</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DmsDocument&quot;</span><span class="s3">, </span><span class="s4">&quot;Document&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">WithMany</span><span class="s3">(</span><span class="s4">&quot;Tags&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">HasForeignKey</span><span class="s3">(</span><span class="s4">&quot;DocumentId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">OnDelete</span><span class="s3">(</span><span class="s1">DeleteBehavior</span><span class="s3">.</span><span class="s1">Cascade</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">();</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">HasOne</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.Tag.Tag&quot;</span><span class="s3">, </span><span class="s4">&quot;Tag&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">WithMany</span><span class="s3">()</span>
+                        <span class="s3">.</span><span class="s1">HasForeignKey</span><span class="s3">(</span><span class="s4">&quot;TagId&quot;</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">OnDelete</span><span class="s3">(</span><span class="s1">DeleteBehavior</span><span class="s3">.</span><span class="s1">Cascade</span><span class="s3">)</span>
+                        <span class="s3">.</span><span class="s1">IsRequired</span><span class="s3">();</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Navigation</span><span class="s3">(</span><span class="s4">&quot;Document&quot;</span><span class="s3">);</span>
+
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Navigation</span><span class="s3">(</span><span class="s4">&quot;Tag&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+
+            <span class="s1">modelBuilder</span><span class="s3">.</span><span class="s1">Entity</span><span class="s3">(</span><span class="s4">&quot;DMS.Domain.Entities.DmsDocument&quot;</span><span class="s3">, </span><span class="s1">b =&gt;</span>
+                <span class="s3">{</span>
+                    <span class="s1">b</span><span class="s3">.</span><span class="s1">Navigation</span><span class="s3">(</span><span class="s4">&quot;Tags&quot;</span><span class="s3">);</span>
+                <span class="s3">});</span>
+<span class="s2">#pragma </span><span class="s1">warning restore 612, 618</span>
+        <span class="s3">}</span>
+    <span class="s3">}</span>
+<span class="s3">}</span>
+</pre>
+</body>
+</html>

@@ -44,6 +44,7 @@ services:
   #   networks:
   #     - DMS-network
 
+
   minio:
     image: bitnami/minio:latest
     ports:

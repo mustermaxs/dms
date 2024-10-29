@@ -87,5 +87,10 @@ namespace DMS.Domain.Entities
 
             return this;
         }
+
+        public void UpdateContent(string content)
+        {
+            Content = content;
+        }
     }
 }

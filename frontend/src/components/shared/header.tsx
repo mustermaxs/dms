@@ -29,7 +29,7 @@ export default function Header() {
       tags: selectedTags,
       content: fileContentBase64,
     });
-    console.log(selectedTags);
+
     const tagsArray = tags.map(tag => tag.value);
     closeModal();
     resetForm();
