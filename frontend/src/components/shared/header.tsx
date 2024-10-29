@@ -8,6 +8,7 @@ import { ServiceLocator } from "../../serviceLocator";
 import { IDocumentService } from "../../services/documentService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { ModalSize } from "./Modal";
+import { fileToBase64 } from "../../services/fileService";
 
 export default function Header() {
   const { Modal, isOpen, openModal, closeModal } = useModal();
@@ -17,19 +18,17 @@ export default function Header() {
   const [file, setFile] = useState<File | null>(null);
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-    console.log(title, tags);
-    documentService.uploadDocument(
-      {
-        id: getEmptyGuid(),
-        title: title,
-        tags: selectedTags,
-        content: "Document content goes here",
-      }
-    ).then((res) => {
-    })
+    let fileContentBase64: string = await fileToBase64(file as File);
+
+    await documentService.uploadDocument({
+      id: getEmptyGuid(),
+      title: title,
+      tags: selectedTags,
+      content: fileContentBase64,
+    });
     console.log(selectedTags);
     const tagsArray = tags.map(tag => tag.value);
     closeModal();

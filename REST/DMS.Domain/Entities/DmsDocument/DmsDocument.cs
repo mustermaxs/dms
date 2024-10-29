@@ -7,6 +7,7 @@ namespace DMS.Domain.Entities
     {
         public Guid Id { get; init; }
         public string Title { get; private set; }
+        public string? Content { get; private set; }
         public DateTime UploadDateTime { get; init; }
         public DateTime? ModificationDateTime { get; private set; } = null;
         public string? Path { get; private set; }
@@ -15,7 +16,7 @@ namespace DMS.Domain.Entities
         public ProcessingStatus Status { get; private set; }
         public DmsDocument() {}
 
-        private DmsDocument(Guid id, string title, string content, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+        private DmsDocument(Guid id, string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
             Id = id;
@@ -25,18 +26,15 @@ namespace DMS.Domain.Entities
             Tags = tags;
             DocumentType = documentType;
             Status = status;
-            
-            // AddDomainEvent(new DocumentUploadedToDbDomainEvent(this));
         }
 
-        public static DmsDocument Create(string title, string content, DateTime uploadDateTime,
+        public static DmsDocument Create(string title, DateTime uploadDateTime,
             string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
             return new DmsDocument(
                 Guid.NewGuid(),
                 title,
-                content,
                 uploadDateTime,
                 path,
                 tags,
@@ -64,6 +62,11 @@ namespace DMS.Domain.Entities
         public void RemoveTag(DocumentTag documentTag)
         {
             Tags.Remove(documentTag);
+        }
+
+        public void UpdateContent(string content)
+        {
+            Content = content;
         }
     }
 }

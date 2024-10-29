@@ -12,7 +12,7 @@ export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, set
 
   return (
     <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={(ev) => {handleSubmit(ev)}} className="space-y-4">
         <div>
           <Label title="Title" />
           <Input
@@ -52,7 +52,7 @@ export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, set
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit" className="mt-4">
+          <Button type="submit"  className="mt-4">
             Upload
           </Button>
         </div>
