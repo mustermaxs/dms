@@ -50,7 +50,7 @@ export default function Header() {
     let tagsWithoutIds: Tag[] = newValue.filter(t => t.id === "" || t.id === undefined);
 
     let updatedTagsWithoutIds = tagsWithoutIds.map(t => ({
-      id: 'd290f1ee-6c54-4b01-90e6-d701748f0851',
+      id: getEmptyGuid(),
       label: t.label,
       color: "red",
       value: t.value,

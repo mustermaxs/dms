@@ -18,7 +18,7 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState(document.title);
   const [editedTags, setEditedTags] = useState(
-    document.tags.map(tag => ({ value: tag.id, label: tag.label }))
+    document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", value: tag.id, label: tag.label, color: "#ffffff" }))
   );
 
   const { updateDocument } = useDocuments();
@@ -27,7 +27,7 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
 
   useEffect(() => {
     setEditedTitle(document.title);
-    setEditedTags(document.tags.map(tag => ({ value: tag.id, label: tag.label })));
+    setEditedTags(document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", value: tag.value, label: tag.label, color: "#ffffff" })));
     setIsEditMode(false);
   }, [document]);
 
@@ -39,10 +39,8 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
     const updatedDocument = {
       id: document.id,
       title: editedTitle,
-      tags: editedTags.map(tag => ({ id: tag.value, label: tag.label, color: "#000000", value: tag.label })),
+      tags: editedTags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", label: tag.label, color: "#000000", value: tag.value })),
     } as UpdateDocumentDto;
-
-    console.log(updatedDocument);
 
     updateDocument(updatedDocument as UpdateDocumentDto);
 
@@ -50,14 +48,14 @@ export const DocumentModal = ({ isOpen, closeModal, selectedDocument }) => {
   };
 
   const handleClose = () => {
-    setEditedTags(document.tags.map(tag => ({ value: tag.id, label: tag.label })));
+    setEditedTags(document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", label: tag.label, color: "#000000", value: tag.value  })));
     setIsEditMode(false);
     closeModal();
   }
 
   const handleCancel = () => {
     setEditedTitle(document.title);
-    setEditedTags(document.tags.map(tag => ({ value: tag.id, label: tag.label })));
+    setEditedTags(document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", label: tag.label, color: "#000000", value: tag.value  })));
     setIsEditMode(false);
   }
 

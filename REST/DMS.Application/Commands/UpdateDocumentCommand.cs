@@ -30,29 +30,10 @@ namespace DMS.Application.Commands
                 await unitOfWork.BeginTransactionAsync();
 
                 var document = await dmsDocumentRepository.Get(request.Document.Id);
-
-
                 var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
-
-                logger.LogInformation("Tags associated with document: {0}", JsonSerializer.Serialize(tagsAssociatedWithDocument));
-
-                var newTags = tagsAssociatedWithDocument
-                    .Where(tag => !document.Tags.Any(existingTag => existingTag.Tag.Id == tag.Id))
-                    .ToList();
-
-                logger.LogInformation("New tags: {0}", JsonSerializer.Serialize(newTags));
+                await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
                 List<DocumentTag> documentTags = new List<DocumentTag>();
-
-                newTags.ForEach(tag => documentTags.Add(DocumentTag.Create(tag, document!)));
-
-                documentTags.Concat(document.Tags);
-                logger.LogInformation("Document tags: {0}", JsonSerializer.Serialize(documentTags));
-                // var documentTags = await Task.WhenAll(
-                //     tagsAssociatedWithDocument.Select(t =>
-                //         unitOfWork.DocumentTagRepository.Create(
-                //             DocumentTag.Create(t, document))));
-
-                // var updatedDocumentTags = documentTags.ToList();
+                tagsAssociatedWithDocument.ForEach(tag => documentTags.Add(DocumentTag.Create(tag, document!)));
 
                 document
                     .UpdateTitle(request.Document.Title)
@@ -61,9 +42,7 @@ namespace DMS.Application.Commands
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
 
-
                 await unitOfWork.CommitAsync();
-
 
                 return autoMapper.Map<DmsDocumentDto>(document);
             }

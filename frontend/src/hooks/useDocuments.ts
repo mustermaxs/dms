@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Document, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
 import { MockDocumentService as IDocumentService } from "../services/documentService";
+// import AppContext from "../components/context/AppContext";
 
 export const useDocuments = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
+
+  const [ documents, setDocuments ] = useState<Document[]>([]);
+
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const getDocuments = () => {
@@ -21,10 +24,20 @@ export const useDocuments = () => {
     const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     const updatedDocument = await documentService.updateDocument(document);
 
-    // setDocuments(documents.map(doc => doc.id === document.id ? document : doc));
-    // setSelectedDocument(document);
 
-    return updatedDocument;
+    // setDocuments([]);
+
+
+    setDocuments((prevDocuments) => {
+
+      prevDocuments.map((doc) => {
+        if (doc.id === updatedDocument.id) {
+          return updatedDocument;
+        }
+        return doc;
+      });
+    });
+
   };
 
   const uploadDocument = async (document: UploadDocumentDto) => {
@@ -39,6 +52,9 @@ export const useDocuments = () => {
     const fetchDocuments = async () => {
       const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
       const documents = await documentService.getAllDocuments();
+
+      console.log("documents", documents);
+
       setDocuments(documents);
     };
 

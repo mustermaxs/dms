@@ -19,11 +19,11 @@ public class DocumentTagFactory(
 
         // Separate new tags from existing tags
         var newTags = tagDtos
-            .Where(requestTag => !existingTagValues.Contains(requestTag.Value))
+            .Where(requestTag => requestTag.Id == Guid.Empty)
             .ToList();
 
         var alreadyExistingTagDtos = tagDtos
-            .Where(requestTag => existingTagValues.Contains(requestTag.Value));
+            .Where(requestTag => requestTag.Id != Guid.Empty);
 
         // Process existing tags one by one (sequentially)
         var alreadyExistingTags = new List<Tag>();

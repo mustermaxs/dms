@@ -53,10 +53,7 @@ namespace DMS.Application.Commands
                 }
 
                 var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
-                var documentTags = await Task.WhenAll(
-                    tagsAssociatedWithDocument.Select(t =>
-                        unitOfWork.DocumentTagRepository.Create(
-                            DocumentTag.Create(t, document))));
+                var documentTags = (tagsAssociatedWithDocument.Select(t => DocumentTag.Create(t, document)));
                 
                 document.Tags = [..documentTags];
                 // TODO Put conversion from Base64 to FileStream in a separate service

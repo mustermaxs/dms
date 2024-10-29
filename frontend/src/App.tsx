@@ -9,11 +9,11 @@ import { useDocuments } from "./hooks/useDocuments";
 function App() {
 
   const { availableTags } = useTags();
-  const { documents, getDocuments, setDocuments, getDocument } = useDocuments();
+  const { documents, getDocuments, setDocuments, getDocument, selectedDocument, setSelectedDocument } = useDocuments();
 
   return (
     <>
-      <AppContext.Provider value={{ documents, getDocuments, setDocuments, getDocument, availableTags }}>
+      <AppContext.Provider value={{ documents, getDocuments, setDocuments, getDocument, availableTags, selectedDocument, setSelectedDocument }}>
         <Container>
           <Header />
           <SearchInput />

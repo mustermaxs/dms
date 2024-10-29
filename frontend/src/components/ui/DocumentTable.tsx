@@ -11,9 +11,14 @@ import AppContext from "../context/AppContext";
 
 export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const { documents } = useContext(AppContext);
+  // const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
+  const { documents, selectedDocument, setSelectedDocument } = useContext(AppContext);
+
+useEffect(() => {
+    console.log("documents: ", documents); 
+    
+},[documents]);
 
   const showModal = async (document: Document) => {
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
@@ -28,7 +33,7 @@ export default function DocumentTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {documents && (<div className="overflow-x-auto">
         {/* Table */}
         <table className="dms-table min-w-full text-sm text-left text-gray-500">
           <thead className="text-sm text-gray-700 bg-gray-100">
@@ -84,7 +89,7 @@ export default function DocumentTable() {
 
         {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={{ selectedDocument }} />}
 
-      </div>
+      </div>)}
     </>
   );
 }

@@ -9,6 +9,8 @@ interface AppContextType {
   setDocuments: (documents: Document[]) => void;
   getDocument: (id: string) => Promise<Document>;
   getDocuments: () => Document[];
+  selectedDocument: Document | null;
+  setSelectedDocument: (document: Document) => void;
 } 
 
 const AppContext = createContext<AppContextType>({
@@ -17,6 +19,8 @@ const AppContext = createContext<AppContextType>({
   availableTags: [],
   setDocuments: () => {},
   getDocument: () => Promise.resolve({} as Document),
+  selectedDocument: null,
+  setSelectedDocument: () => {},
 });
 
 export default AppContext;
