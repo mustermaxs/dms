@@ -10,10 +10,9 @@ using MediatR;
 
 namespace DMS.Application.Commands
 {
-    public record GetDocumentQuery(Guid Id) : IDomainEvent, IRequest<DmsDocumentDto>;
+    public record GetDocumentQuery(Guid Id) : IRequest<DmsDocumentDto>;
 
     public class GetDocumentQueryHandler(
-        IMediator mediator,
         IMapper mapper,
         IDmsDocumentRepository documentRepository) : IRequestHandler<GetDocumentQuery, DmsDocumentDto>
     {

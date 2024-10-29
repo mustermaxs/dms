@@ -1,0 +1,31 @@
+<html>
+<head>
+<title>IRequestHandler.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #85c46c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+IRequestHandler.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">MediatR</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">Commands</span>
+<span class="s2">{</span>
+    <span class="s0">public interface </span><span class="s1">ICommand : IRequest </span><span class="s2">{}</span>
+    
+    <span class="s3">// public interface ICommandHandler : IRequestHandler&lt;IRequest2, object&gt; {}</span>
+    <span class="s3">// public interface IRequestHandler&lt;in TCommand, TResponse&gt; where TResponse : class</span>
+    <span class="s3">// {</span>
+    <span class="s3">//     Task&lt;TResponse&gt; Handle(TCommand command);</span>
+    <span class="s3">// }</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

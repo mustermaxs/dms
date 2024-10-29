@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>Dockerfile</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #85c46c; font-style: italic;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #6c95eb;}
+.s3 { color: #bdbdbd;}
+.s4 { color: #ed94c0;}
+.s5 { color: #c9a26d;}
+.ls0 { height: 1px; border-width: 0; color: #404040; background-color:#404040}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Dockerfile</font>
+</center></td></tr></table>
+<pre><span class="s0"># Use .NET 8.0 ASP.NET Core runtime as the base image</span>
+<span class="s2">FROM </span><span class="s1">mcr</span><span class="s3">.</span><span class="s1">microsoft</span><span class="s3">.</span><span class="s1">com</span><span class="s2">/</span><span class="s1">dotnet</span><span class="s2">/</span><span class="s1">aspnet:</span><span class="s4">8.0 </span><span class="s1">AS base</span>
+<span class="s2">WORKDIR /</span><span class="s1">app</span>
+<span class="s0">#EXPOSE 80</span>
+<span class="s0">#EXPOSE 443</span>
+<hr class="ls0"><span class="s0"># Use .NET 8.0 SDK for building the application</span>
+<span class="s2">FROM </span><span class="s1">mcr</span><span class="s3">.</span><span class="s1">microsoft</span><span class="s3">.</span><span class="s1">com</span><span class="s2">/</span><span class="s1">dotnet</span><span class="s2">/</span><span class="s1">sdk:</span><span class="s4">8.0 </span><span class="s1">AS build</span>
+<span class="s2">WORKDIR /</span><span class="s1">src</span>
+
+<span class="s0"># Copy project files and restore dependencies</span>
+<span class="s2">COPY </span><span class="s3">[</span><span class="s5">&quot;DMS.Api/DMS.Api.csproj&quot;</span><span class="s3">, </span><span class="s5">&quot;DMS.Api/&quot;</span><span class="s3">]</span>
+<span class="s2">COPY </span><span class="s3">[</span><span class="s5">&quot;DMS.Application/DMS.Application.csproj&quot;</span><span class="s3">, </span><span class="s5">&quot;DMS.Application/&quot;</span><span class="s3">]</span>
+<span class="s2">COPY </span><span class="s3">[</span><span class="s5">&quot;DMS.Domain/DMS.Domain.csproj&quot;</span><span class="s3">, </span><span class="s5">&quot;DMS.Domain/&quot;</span><span class="s3">]</span>
+<span class="s2">COPY </span><span class="s3">[</span><span class="s5">&quot;DMS.Infrastructure/DMS.Infrastructure.csproj&quot;</span><span class="s3">, </span><span class="s5">&quot;DMS.Infrastructure/&quot;</span><span class="s3">]</span>
+<span class="s2">RUN </span><span class="s1">dotnet restore </span><span class="s5">&quot;DMS.Api/DMS.Api.csproj&quot;</span>
+
+<span class="s0"># Copy the remaining source code</span>
+<span class="s2">COPY </span><span class="s3">. .</span>
+
+<span class="s0"># Build the application</span>
+<span class="s2">WORKDIR </span><span class="s5">&quot;/src/DMS.Api&quot;</span>
+<span class="s2">RUN </span><span class="s1">dotnet build </span><span class="s5">&quot;DMS.Api.csproj&quot; </span><span class="s2">-</span><span class="s1">c Release </span><span class="s2">-</span><span class="s1">o </span><span class="s2">/</span><span class="s1">app</span><span class="s2">/</span><span class="s1">build</span>
+<hr class="ls0"><span class="s0"># Publish the application</span>
+<span class="s2">FROM </span><span class="s1">build AS publish</span>
+<span class="s2">RUN </span><span class="s1">dotnet publish </span><span class="s5">&quot;DMS.Api.csproj&quot; </span><span class="s2">-</span><span class="s1">c Release </span><span class="s2">-</span><span class="s1">o </span><span class="s2">/</span><span class="s1">app</span><span class="s2">/</span><span class="s1">publish</span>
+<hr class="ls0"><span class="s0"># Final stage/image</span>
+<span class="s2">FROM </span><span class="s1">base AS final</span>
+<span class="s2">WORKDIR /</span><span class="s1">app</span>
+<span class="s2">COPY --</span><span class="s1">from=publish </span><span class="s2">/</span><span class="s1">app</span><span class="s2">/</span><span class="s1">publish </span><span class="s3">.</span>
+<span class="s2">ENTRYPOINT </span><span class="s3">[</span><span class="s5">&quot;dotnet&quot;</span><span class="s3">, </span><span class="s5">&quot;DMS.Api.dll&quot;</span><span class="s3">]</span>
+</pre>
+</body>
+</html>

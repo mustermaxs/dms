@@ -18,7 +18,6 @@ public class DocumentsController : BaseController
     {
         try
         {
-            // var res = await _mediator.Send();
             return await ResponseAsync(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
         }
         catch (Exception e)
@@ -31,15 +30,13 @@ public class DocumentsController : BaseController
     [HttpGet]
     public async Task<ActionResult> GetDocuments()
     {
-        var res = await _mediator.Send(new GetDocumentsQuery());
-        return Ok(res);
+        return await ResponseAsync(new GetDocumentsQuery());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDocument(Guid id)
     {
-        var res = await _mediator.Send(new GetDocumentQuery(id));
-        return Ok(res);
+        return await ResponseAsync(new GetDocumentQuery(id));
     }
 
     [HttpPut("{id}")]

@@ -28,6 +28,9 @@ namespace DMS.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("ModificationDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -65,7 +68,7 @@ namespace DMS.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("DocumentTags");
+                    b.ToTable("DocumentTags", (string)null);
                 });
 
             modelBuilder.Entity("DMS.Domain.Entities.Tag.Tag", b =>

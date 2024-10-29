@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>DocumentTag.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DocumentTag.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Application</span><span class="s2">.</span><span class="s1">DTOs</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DMS</span><span class="s2">.</span><span class="s1">Domain</span><span class="s2">.</span><span class="s1">Entities</span>
+<span class="s2">{</span>
+
+    <span class="s0">public class </span><span class="s1">DocumentTag : Entity</span>
+    <span class="s2">{</span>
+        <span class="s0">public </span><span class="s1">Guid DocumentId </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+        <span class="s0">public </span><span class="s1">DmsDocument Document </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+        <span class="s0">public </span><span class="s1">Guid TagId </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+        <span class="s0">public </span><span class="s1">Tag</span><span class="s2">.</span><span class="s1">Tag Tag </span><span class="s2">{ </span><span class="s1">get</span><span class="s2">; </span><span class="s1">set</span><span class="s2">; }</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public static class </span><span class="s1">DocumentTagExtensions</span>
+    <span class="s2">{</span>
+        <span class="s0">public static </span><span class="s1">TagDto ToDto</span><span class="s2">(</span><span class="s0">this </span><span class="s1">DocumentTag documentTag</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">return new </span><span class="s1">TagDto</span>
+            <span class="s2">{</span>
+                <span class="s1">Id </span><span class="s2">= </span><span class="s1">documentTag</span><span class="s2">.</span><span class="s1">TagId</span><span class="s2">,</span>
+                <span class="s1">Label </span><span class="s2">= </span><span class="s1">documentTag</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">.</span><span class="s1">Label</span><span class="s2">,</span>
+                <span class="s1">Color </span><span class="s2">= </span><span class="s1">documentTag</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">.</span><span class="s1">Color</span><span class="s2">,</span>
+                <span class="s1">Value </span><span class="s2">= </span><span class="s1">documentTag</span><span class="s2">.</span><span class="s1">Tag</span><span class="s2">.</span><span class="s1">Value</span>
+            <span class="s2">};</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

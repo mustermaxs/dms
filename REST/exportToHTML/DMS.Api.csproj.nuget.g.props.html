@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>DMS.Api.csproj.nuget.g.props</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c191ff;}
+.s1 { color: #85c46c;}
+.s2 { color: #c9a26d;}
+.s3 { color: #d0d0d0;}
+.s4 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DMS.Api.csproj.nuget.g.props</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;?</span><span class="s1">xml version</span><span class="s2">=&quot;1.0&quot; </span><span class="s1">encoding</span><span class="s2">=&quot;utf-8&quot; </span><span class="s1">standalone</span><span class="s2">=&quot;no&quot;</span><span class="s0">?&gt;</span>
+<span class="s0">&lt;Project </span><span class="s1">ToolsVersion</span><span class="s2">=&quot;14.0&quot; </span><span class="s1">xmlns</span><span class="s2">=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;</span><span class="s0">&gt;</span>
+  <span class="s0">&lt;PropertyGroup </span><span class="s1">Condition</span><span class="s2">=&quot; '$(ExcludeRestorePackageImports)' != 'true' &quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;RestoreSuccess </span><span class="s1">Condition</span><span class="s2">=&quot; '$(RestoreSuccess)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">True</span><span class="s0">&lt;/RestoreSuccess&gt;</span>
+    <span class="s0">&lt;RestoreTool </span><span class="s1">Condition</span><span class="s2">=&quot; '$(RestoreTool)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">NuGet</span><span class="s0">&lt;/RestoreTool&gt;</span>
+    <span class="s0">&lt;ProjectAssetsFile </span><span class="s1">Condition</span><span class="s2">=&quot; '$(ProjectAssetsFile)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">$(MSBuildThisFileDirectory)project.assets.json</span><span class="s0">&lt;/ProjectAssetsFile&gt;</span>
+    <span class="s0">&lt;NuGetPackageRoot </span><span class="s1">Condition</span><span class="s2">=&quot; '$(NuGetPackageRoot)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">/home/mustermax/.nuget/packages/</span><span class="s0">&lt;/NuGetPackageRoot&gt;</span>
+    <span class="s0">&lt;NuGetPackageFolders </span><span class="s1">Condition</span><span class="s2">=&quot; '$(NuGetPackageFolders)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">/home/mustermax/.nuget/packages/</span><span class="s0">&lt;/NuGetPackageFolders&gt;</span>
+    <span class="s0">&lt;NuGetProjectStyle </span><span class="s1">Condition</span><span class="s2">=&quot; '$(NuGetProjectStyle)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">PackageReference</span><span class="s0">&lt;/NuGetProjectStyle&gt;</span>
+    <span class="s0">&lt;NuGetToolVersion </span><span class="s1">Condition</span><span class="s2">=&quot; '$(NuGetToolVersion)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">6.10.1</span><span class="s0">&lt;/NuGetToolVersion&gt;</span>
+  <span class="s0">&lt;/PropertyGroup&gt;</span>
+  <span class="s0">&lt;ItemGroup </span><span class="s1">Condition</span><span class="s2">=&quot; '$(ExcludeRestorePackageImports)' != 'true' &quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;SourceRoot </span><span class="s1">Include</span><span class="s2">=&quot;/home/mustermax/.nuget/packages/&quot; </span><span class="s0">/&gt;</span>
+  <span class="s0">&lt;/ItemGroup&gt;</span>
+  <span class="s0">&lt;ImportGroup </span><span class="s1">Condition</span><span class="s2">=&quot; '$(ExcludeRestorePackageImports)' != 'true' &quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;Import </span><span class="s1">Project</span><span class="s2">=&quot;$(NuGetPackageRoot)microsoft.extensions.apidescription.server/6.0.5/build/Microsoft.Extensions.ApiDescription.Server.props&quot; </span><span class="s1">Condition</span><span class="s2">=&quot;Exists('$(NuGetPackageRoot)microsoft.extensions.apidescription.server/6.0.5/build/Microsoft.Extensions.ApiDescription.Server.props')&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;Import </span><span class="s1">Project</span><span class="s2">=&quot;$(NuGetPackageRoot)swashbuckle.aspnetcore/6.4.0/build/Swashbuckle.AspNetCore.props&quot; </span><span class="s1">Condition</span><span class="s2">=&quot;Exists('$(NuGetPackageRoot)swashbuckle.aspnetcore/6.4.0/build/Swashbuckle.AspNetCore.props')&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;Import </span><span class="s1">Project</span><span class="s2">=&quot;$(NuGetPackageRoot)microsoft.entityframeworkcore/8.0.10/buildTransitive/net8.0/Microsoft.EntityFrameworkCore.props&quot; </span><span class="s1">Condition</span><span class="s2">=&quot;Exists('$(NuGetPackageRoot)microsoft.entityframeworkcore/8.0.10/buildTransitive/net8.0/Microsoft.EntityFrameworkCore.props')&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;Import </span><span class="s1">Project</span><span class="s2">=&quot;$(NuGetPackageRoot)microsoft.entityframeworkcore.design/8.0.10/build/net8.0/Microsoft.EntityFrameworkCore.Design.props&quot; </span><span class="s1">Condition</span><span class="s2">=&quot;Exists('$(NuGetPackageRoot)microsoft.entityframeworkcore.design/8.0.10/build/net8.0/Microsoft.EntityFrameworkCore.Design.props')&quot; </span><span class="s0">/&gt;</span>
+  <span class="s0">&lt;/ImportGroup&gt;</span>
+  <span class="s0">&lt;PropertyGroup </span><span class="s1">Condition</span><span class="s2">=&quot; '$(ExcludeRestorePackageImports)' != 'true' &quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;PkgMicrosoft_Extensions_ApiDescription_Server </span><span class="s1">Condition</span><span class="s2">=&quot; '$(PkgMicrosoft_Extensions_ApiDescription_Server)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">/home/mustermax/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5</span><span class="s0">&lt;/PkgMicrosoft_Extensions_ApiDescription_Server&gt;</span>
+    <span class="s0">&lt;PkgMicrosoft_CodeAnalysis_Analyzers </span><span class="s1">Condition</span><span class="s2">=&quot; '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">/home/mustermax/.nuget/packages/microsoft.codeanalysis.analyzers/3.3.3</span><span class="s0">&lt;/PkgMicrosoft_CodeAnalysis_Analyzers&gt;</span>
+    <span class="s0">&lt;PkgMicrosoft_EntityFrameworkCore_Tools </span><span class="s1">Condition</span><span class="s2">=&quot; '$(PkgMicrosoft_EntityFrameworkCore_Tools)' == '' &quot;</span><span class="s0">&gt;</span><span class="s4">/home/mustermax/.nuget/packages/microsoft.entityframeworkcore.tools/8.0.10</span><span class="s0">&lt;/PkgMicrosoft_EntityFrameworkCore_Tools&gt;</span>
+  <span class="s0">&lt;/PropertyGroup&gt;</span>
+<span class="s0">&lt;/Project&gt;</span></pre>
+</body>
+</html>
