@@ -1,6 +1,6 @@
 
 import { createContext, Dispatch, SetStateAction } from "react";
-import { Document, UpdateDocumentDto } from "../../types/Document";
+import { Document, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
 import { Tag } from "../../types/Tag";
 
 interface AppContextProps {
@@ -10,6 +10,9 @@ interface AppContextProps {
   getDocuments: () => Document[];
   selectedDocument: Document | null;
   availableTags: Tag[];
+  setAvailableTags: Dispatch<SetStateAction<Tag[]>>;
+  setIsLoadingTags: Dispatch<SetStateAction<boolean>>;
+  uploadDocument: (document: UploadDocumentDto) => Promise<Document>;
   updateDocument: (document: UpdateDocumentDto) => Promise<Document>;
   setSelectedDocument: Dispatch<SetStateAction<Document | null>>;
 }
@@ -21,6 +24,9 @@ const AppContext = createContext<AppContextProps>({
   getDocuments: () => [],
   selectedDocument: null,
   availableTags: [],
+  setAvailableTags: () => {},
+  setIsLoadingTags: () => {},
+  uploadDocument: () => Promise.resolve({} as Document),
   updateDocument: () => Promise.resolve({} as Document),
   setSelectedDocument: () => {},
 });

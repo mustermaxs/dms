@@ -1,69 +1,90 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Document, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
 import { IDocumentService } from "../services/documentService";
 
 export const useDocuments = () => {
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-  const [ documents, setDocuments ] = useState<Document[]>([]);
+    const getDocuments = () => documents;
 
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-
-  const getDocuments = () => {
-    return documents;
-  };
-
-  const getDocument = async (id: string) => {
-    const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-    const document = await documentService.getDocument(id);
-    return document;
-  };
-
-  const updateDocument = async (document: UpdateDocumentDto): Promise<Document> => {
-    const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-    const updatedDocument = await documentService.updateDocument(document);
-  
-    setDocuments((prevDocuments) =>
-      prevDocuments.map((doc) => 
-        doc.id === updatedDocument.id ? { ...doc, ...updatedDocument } : doc
-      )
-    );
-
-
-    return updatedDocument as Document;
-  };
-
-    // setDocuments((prevDocuments) => {
-
-    //   prevDocuments.map((doc) => {
-    //     if (doc.id === updatedDocument.id) {
-    //       return updatedDocument;
-    //     }
-    //     return doc;
-    //   });
-    // });
-
-
-  const uploadDocument = async (document: UploadDocumentDto) => {
-    //todo
-  };
-
-  const deleteDocument = async (id: string) => {
-    //todo
-  };
-
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-      const documents = await documentService.getAllDocuments();
-
-      console.log("documents", documents);
-
-      setDocuments(documents);
+    const getDocument = async (id: string): Promise<Document | null> => {
+        try {
+            setError(null);
+            const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+            const document = await documentService.getDocument(id);
+            return document;
+        } catch (err) {
+            setError('Failed to fetch document');
+            return null;
+        }
     };
 
-    fetchDocuments();
-  }, []);
+    const updateDocument = async (document: UpdateDocumentDto): Promise<Document | null> => {
+        try {
+            setError(null);
+            const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+            const updatedDocument = await documentService.updateDocument(document);
 
-  return { documents, getDocuments, setDocuments, getDocument, updateDocument, selectedDocument, setSelectedDocument };
+            setDocuments((prevDocuments) =>
+                prevDocuments.map((doc) => 
+                    doc.id === updatedDocument.id ? { ...doc, ...updatedDocument } : doc
+                )
+            );
+
+            return updatedDocument;
+        } catch (err) {
+            setError('Failed to update document');
+            return null;
+        }
+    };
+
+    const uploadDocument = async (document: UploadDocumentDto): Promise<Document | null> => {
+        try {
+            setError(null);
+            const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+            await documentService.uploadDocument(document);
+            
+            // Refresh the documents list after upload
+            const updatedDocs = await documentService.getAllDocuments();
+            setDocuments(updatedDocs);
+            
+            return updatedDocs.find(doc => doc.title === document.title) || null;
+        } catch (err) {
+            setError('Failed to upload document');
+            return null;
+        }
+    };
+
+
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            try {
+                setError(null);
+                const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+                const fetchedDocuments = await documentService.getAllDocuments();
+                setDocuments(fetchedDocuments);
+            } catch (err) {
+                setError('Failed to fetch documents');
+                setDocuments([]);
+            }
+        };
+
+        fetchDocuments();
+    }, []);
+
+    return { 
+        documents, 
+        getDocuments, 
+        setDocuments, 
+        getDocument, 
+        updateDocument, 
+        selectedDocument, 
+        setSelectedDocument, 
+        uploadDocument, 
+        error 
+    };
 };

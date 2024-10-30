@@ -125,20 +125,33 @@ export class DocumentService implements IDocumentService {
     constructor() {
         this.httpService = new HttpService();
     }
+
     getDocumentContent(id: string): Promise<string> {
         throw new Error("Method not implemented.");
     }
+
     public async getAllDocuments(): Promise<Document[]> {
-        return await this.httpService.get<Document[]>('Documents');
+        const response = await this.httpService.get<Document[]>('Documents');
+        return response.data;
     }
+
     public async uploadDocument(document: UploadDocumentDto): Promise<void> {
-        console.log("DOCUMENT: ", document);
-        return await this.httpService.post<void>('Documents', document);
+        const response = await this.httpService.post<void>('Documents', document);
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error('Failed to upload document');
+        }
     }
+
     public async getDocument(id: string): Promise<Document> {
-        return await this.httpService.get<Document>(`Documents/${id}`);
+        const response = await this.httpService.get<Document>(`Documents/${id}`);
+        return response.data;
     }
+
     public async updateDocument(document: UpdateDocumentDto): Promise<Document> {
-        return await this.httpService.put<Document>(`Documents`, document);
+        const response = await this.httpService.put<Document>(`Documents`, document);
+        if (response.status !== 200) {
+            throw new Error('Failed to update document');
+        }
+        return response.data;
     }
-}
+} 

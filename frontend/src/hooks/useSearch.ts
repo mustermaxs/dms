@@ -1,9 +1,6 @@
 import { useState } from "react";
+import SearchData from "../types/SearchData";
 
-interface SearchData {
-  tags: string[];
-  content: string;
-}
 
 export const useSearch = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);

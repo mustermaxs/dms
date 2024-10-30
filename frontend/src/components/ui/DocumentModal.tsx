@@ -8,13 +8,12 @@ import { useModal } from "../../hooks/useModal";
 import { ContentViewerModal } from "./ContentViewerModal";
 import { useContext, useState, useEffect } from "react";
 import { TagInput } from "../shared/TagInput";
-import TagContext from "../context/AppContext";
 import { FaEye } from "react-icons/fa";
 import { useDocuments } from "../../hooks/useDocuments";
 import AppContext from "../context/AppContext";
 
 export const DocumentModal = ({ isOpen, closeModal }) => {
-  const {selectedDocument: document, setSelectedDocument, setDocuments } = useContext(AppContext);
+  const {availableTags, setIsLoadingTags, selectedDocument: document, setSelectedDocument, setDocuments } = useContext(AppContext);
   const contentModal = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState(document.title);
@@ -24,7 +23,10 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
 
   const { updateDocument } = useDocuments();
 
-  const { availableTags } = useContext(TagContext);
+  useEffect(() => {
+    setIsLoadingTags(true);
+  }, [document]);
+
 
   useEffect(() => {
     setEditedTitle(document.title);
@@ -45,8 +47,12 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
 
     const updatedDoc = await updateDocument(updatedDocument);
 
+    if(!updatedDoc) {
+      console.log("Error updating document");
+      return;
+    }
+
     setSelectedDocument(updatedDoc);
-    updateDocument(updatedDocument);
 
     setDocuments((prevDocuments: Document[]) =>
       prevDocuments.map((doc) =>

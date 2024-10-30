@@ -8,8 +8,8 @@ import { useDocuments } from "./hooks/useDocuments";
 
 function App() {
 
-  const { availableTags } = useTags();
-  const { documents, getDocuments, updateDocument, getDocument, selectedDocument, setSelectedDocument, setDocuments } = useDocuments();
+  const { availableTags, setAvailableTags, setIsLoadingTags } = useTags();
+  const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument } = useDocuments();
 
   return (
     <>
@@ -17,8 +17,11 @@ function App() {
           documents,
           getDocuments,
           updateDocument,
+          uploadDocument,
           getDocument,
           availableTags,
+          setAvailableTags,
+          setIsLoadingTags,
           selectedDocument,
           setSelectedDocument,
           setDocuments,

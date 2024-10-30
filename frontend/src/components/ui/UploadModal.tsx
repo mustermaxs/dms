@@ -2,13 +2,69 @@ import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import { TagInput } from "../shared/TagInput";
-import { useContext, useState } from "react";
-import TagContext from "../context/AppContext";
+import { useContext, useEffect, useState } from "react";
+import { fileToBase64 } from "../../services/fileService";
+import { getEmptyGuid } from "../../services/guidGenerator";
+import { Tag } from "../../types/Tag";
+import AppContext from "../context/AppContext";
 
-export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, setTitle, tags, handleTagChange, selectedTags, file, setFile }) => {
+export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const { availableTags } = useContext(TagContext);
+  const {availableTags, setIsLoadingTags, uploadDocument } = useContext(AppContext);
 
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+
+
+  const handleTagChange = (newValue: Tag[]) => {
+    let tagsWithoutIds: Tag[] = newValue.filter(t => t.id === "" || t.id === undefined);
+
+    let updatedTagsWithoutIds = tagsWithoutIds.map(t => ({
+      id: getEmptyGuid(),
+      label: t.label,
+      color: "red",
+      value: t.value,
+    }));
+
+    setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
+
+    console.log("Tags without ids", updatedTagsWithoutIds);
+
+    let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
+    newValue = [...validTags, ...updatedTagsWithoutIds];
+    console.log("Updated tags", newValue);
+
+    setSelectedTags(newValue);
+  };
+
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let fileContentBase64: string = await fileToBase64(file as File);
+    await uploadDocument({
+      title: title,
+      tags: selectedTags,
+      content: fileContentBase64,
+    });
+
+    const resetForm = () => {
+      setTitle("");
+      setTags([]);
+      setSelectedTags([]);
+      setFile(null);
+    };
+
+    closeModal();
+    resetForm();
+  };
+
+  useEffect(() => {
+    setIsLoadingTags(true);
+  }, [isOpen]);
 
   return (
     <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">

@@ -1,7 +1,6 @@
 import { Tag } from "./Tag";
 
 export type UploadDocumentDto = {
-    id: string;
     title: string;
     content: string;
     tags: Tag[];

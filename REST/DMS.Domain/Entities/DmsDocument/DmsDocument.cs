@@ -52,6 +52,8 @@ namespace DMS.Domain.Entities
             Tags.Add(documentTag);
             ModificationDateTime = DateTime.UtcNow;
 
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
             return this;
         }
         
@@ -59,7 +61,7 @@ namespace DMS.Domain.Entities
         {
             Tags = tags;
             ModificationDateTime = DateTime.UtcNow;
-            AddDomainEvent(new DocumentTagsUpdatedDomainEvent(this));
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
 
             return this;
         }
@@ -69,6 +71,8 @@ namespace DMS.Domain.Entities
             Tags.Remove(documentTag);
             ModificationDateTime = DateTime.UtcNow;
 
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
             return this;
         }
 
@@ -76,6 +80,8 @@ namespace DMS.Domain.Entities
         {
             Title = title;
             ModificationDateTime = DateTime.UtcNow;
+
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
 
             return this;
         }
@@ -85,12 +91,10 @@ namespace DMS.Domain.Entities
             Content = content;
             ModificationDateTime = DateTime.UtcNow;
 
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
             return this;
         }
 
-        public void UpdateContent(string content)
-        {
-            Content = content;
-        }
     }
 }
