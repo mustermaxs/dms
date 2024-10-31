@@ -6,8 +6,8 @@ using FluentValidation;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DocumentTagRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<DocumentTag> validator)
-    : BaseRepository<DocumentTag>(dbContext, eventDispatcher, validator),
+public class DocumentTagRepository(DmsDbContext dbContext, IValidator<DocumentTag> validator)
+    : BaseRepository<DocumentTag>(dbContext, validator),
         IDocumentTagRepository
 {
     public async Task<DocumentTag> CreateOrGetIfExists(DocumentTag documentTag)

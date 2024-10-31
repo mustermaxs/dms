@@ -5,7 +5,6 @@ namespace DMS.Domain.Entities
 {
     public class DmsDocument : AggregateRoot
     {
-        public Guid Id { get; init; }
         public string Title { get; private set; }
         public string? Content { get; private set; }
         public DateTime UploadDateTime { get; init; }
@@ -16,10 +15,9 @@ namespace DMS.Domain.Entities
         public ProcessingStatus Status { get; private set; }
         public DmsDocument() {}
 
-        private DmsDocument(Guid id, string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+        private DmsDocument(string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
             ProcessingStatus status)
         {
-            Id = id;
             Title = title;
             UploadDateTime = uploadDateTime;
             Path = path;
@@ -33,7 +31,6 @@ namespace DMS.Domain.Entities
             ProcessingStatus status)
         {
             return new DmsDocument(
-                Guid.NewGuid(),
                 title,
                 uploadDateTime,
                 path,

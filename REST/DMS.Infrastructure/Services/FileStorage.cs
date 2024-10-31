@@ -1,68 +1,76 @@
 using DMS.Application.Interfaces;
-using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using MinioConfig = DMS.Infrastructure.Configs.MinioConfig;
 
-namespace DMS.Infrastructure.Services;
-
-public class FileStorage : IFileStorage
+namespace DMS.Infrastructure.Services
 {
-    private  IMinioClient _minioClient;
-    private string BucketName { get; }
-
-    public FileStorage(string accessKey, string secretKey, string endpoint, string bucketName)
+    public class FileStorage : IFileStorage
     {
-        BucketName = bucketName;
-        _minioClient = new MinioClient()
-            .WithCredentials(accessKey, secretKey)
-            .WithEndpoint(endpoint)
-            .Build();
-    }
+        private readonly IMinioClient _minioClient;
+        private readonly string _bucketName;
 
-    private async Task SetupMinioClient()
-    {
-        try
+        public FileStorage(IMinioClient minioClient, IConfiguration config)
         {
-            var beArgs = new BucketExistsArgs()
-                .WithBucket(BucketName);
-            bool found = await _minioClient.BucketExistsAsync(beArgs).ConfigureAwait(false);
-            if (!found)
+            _minioClient = minioClient;
+            _bucketName = config["MinIO:BucketName"] ?? throw new InvalidOperationException();
+        }
+
+        private async Task EnsureBucketExistsAsync()
+        {
+            try
             {
-                var mbArgs = new MakeBucketArgs()
-                    .WithBucket(BucketName);
-                await _minioClient.MakeBucketAsync(mbArgs).ConfigureAwait(false);
+                var beArgs = new BucketExistsArgs()
+                    .WithBucket(_bucketName);
+                bool found = await _minioClient.BucketExistsAsync(beArgs).ConfigureAwait(false);
+                
+                if (!found)
+                {
+                    var mbArgs = new MakeBucketArgs()
+                        .WithBucket(_bucketName);
+                    await _minioClient.MakeBucketAsync(mbArgs).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting up MinIO bucket: {ex.Message}");
+                throw;
             }
         }
-        catch (Exception e)
+
+        public async Task<string> SaveFileAsync(Guid id, Stream fileStream)
         {
-            Console.WriteLine(e);
-            throw;
+            try {
+                await EnsureBucketExistsAsync();
+
+                var args = new PutObjectArgs()
+                    .WithBucket(_bucketName)
+                    .WithObject(id.ToString())
+                    .WithStreamData(fileStream)
+                    .WithObjectSize(fileStream.Length)
+                    .WithContentType("application/pdf");
+
+                await _minioClient.PutObjectAsync(args).ConfigureAwait(false);
+
+                return $"{id}";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving file to MinIO: {ex.Message}");
+                throw;
+            }
         }
-    }
 
-    public async Task<string> SaveFileAsync(Guid id, Stream fileStream)
-    {
-        await SetupMinioClient();
-        var args = new PutObjectArgs()
-            .WithBucket(BucketName)
-            .WithObject(id.ToString())
-            .WithStreamData(fileStream)
-            .WithObjectSize(fileStream.Length)
-            .WithContentType("application/pdf");
-        await _minioClient.PutObjectAsync(args).ConfigureAwait(false);
-        
-        return $"{BucketName}/{id.ToString()}";
-    }
+        public Task<Stream> GetFileAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
 
-    public Task<Stream> GetFileAsync(Guid id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> DeleteFileAsync(Guid id)
-    {
-        throw new NotImplementedException();
+        public Task<bool> DeleteFileAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

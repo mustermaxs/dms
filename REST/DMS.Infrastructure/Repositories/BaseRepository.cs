@@ -16,12 +16,11 @@ where TEntity : Entity
     protected DbSet<TEntity> DbSet;
     protected readonly IEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<TEntity> validator)
+    public BaseRepository(DmsDbContext dbContext, IValidator<TEntity> validator)
     {
         Validator = validator;
         Context = dbContext;
         DbSet = Context.Set<TEntity>();
-        _eventDispatcher = eventDispatcher;
     }
     
     public virtual async Task<TEntity?> Get(Guid id)
@@ -37,7 +36,6 @@ where TEntity : Entity
     public virtual async Task<TEntity> Create(TEntity entity)
     {
         await Validator.ValidateAndThrowAsync(entity);
-        entity.Id = Guid.NewGuid();
         var e = await DbSet.AddAsync(entity);
         
         return e.Entity;

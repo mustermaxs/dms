@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class TagRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<Tag> validator)
-    : BaseRepository<Tag>(dbContext, eventDispatcher, validator), ITagRepository
+public class TagRepository(DmsDbContext dbContext, IValidator<Tag> validator)
+    : BaseRepository<Tag>(dbContext, validator), ITagRepository
 {
     public async Task<Tag?> GetByValue(string value)
     {

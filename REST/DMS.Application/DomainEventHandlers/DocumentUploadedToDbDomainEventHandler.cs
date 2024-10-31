@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.DomainEventHandlers;
 
-public class DocumentUploadedToDbDomainEventHandler(
+public class DocumentUploadedToDbEventHandler(
     ILogger<DocumentUploadedToDbDomainEvent> logger,
     FileHelper fileHelper,
     IFileStorage fileStorage,
     IMediator mediator)
-    : IDomainEventHandler<DocumentUploadedToDbDomainEvent>(logger)
+    : Domain.DomainEvents.EventHandler<DocumentUploadedToDbDomainEvent>(logger)
 {
     public override async Task HandleEvent(DocumentUploadedToDbDomainEvent notification,
         CancellationToken cancellationToken)

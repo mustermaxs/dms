@@ -14,7 +14,6 @@ namespace DMS.Infrastructure.Repositories;
     {
         private readonly DmsDbContext _context;
         private readonly IMediator _mediator;
-        private IEventDispatcher _eventDispatcher;
         private readonly IValidator<Tag> _tagValidator;
         private readonly IValidator<DmsDocument> _documentValidator;
         private readonly IValidator<DocumentTag> _documentTagValidator;
@@ -26,21 +25,19 @@ namespace DMS.Infrastructure.Repositories;
         public UnitOfWork(
             DmsDbContext context,
             IMediator mediator,
-            IEventDispatcher eventDispatcher,
             IValidator<Tag> tagValidator,
             IValidator<DmsDocument> documentValidator,
             IValidator<DocumentTag> documentTagValidator)
         {
             _context = context;
             _mediator = mediator;
-            _eventDispatcher = eventDispatcher;
-            _tagValidator = tagValidator;
+                _tagValidator = tagValidator;
             _documentValidator = documentValidator;
             _documentTagValidator = documentTagValidator;
         }
-        public IDmsDocumentRepository DmsDocumentRepository => _documentRepository ??= new DmsDocumentRepository(_context, _eventDispatcher, _documentValidator);
-        public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context, _eventDispatcher, _tagValidator);
-        public IDocumentTagRepository DocumentTagRepository => _documentTagRepository ??= new DocumentTagRepository(_context, _eventDispatcher, _documentTagValidator);
+        public IDmsDocumentRepository DmsDocumentRepository => _documentRepository ??= new DmsDocumentRepository(_context, _documentValidator);
+        public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context, _tagValidator);
+        public IDocumentTagRepository DocumentTagRepository => _documentTagRepository ??= new DocumentTagRepository(_context, _documentTagValidator);
 
         private IReadOnlyCollection<object> GetDomainEventsFromEntities()
         {

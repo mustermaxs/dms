@@ -12,7 +12,7 @@ namespace DMS.Application.IntegrationEvents
     
     public class DocumentSavedInFileStorageIntegrationEventHandler(
         ILogger<DocumentSavedInFileStorageIntegrationEvent> logger,
-        IMessageBroker messageBroker) : IDomainEventHandler<DocumentSavedInFileStorageIntegrationEvent>(logger)
+        IMessageBroker messageBroker) : Domain.DomainEvents.EventHandler<DocumentSavedInFileStorageIntegrationEvent>(logger)
     {
         public override async Task HandleEvent(DocumentSavedInFileStorageIntegrationEvent notification, CancellationToken cancellationToken)
         {

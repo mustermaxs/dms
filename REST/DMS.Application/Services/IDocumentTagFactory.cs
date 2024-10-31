@@ -7,5 +7,5 @@ namespace DMS.Domain.Services;
 
 public interface IDocumentTagFactory
 {
-    public Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos, IUnitOfWork unitOfWork);
+    public Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos);
 }
