@@ -9,7 +9,6 @@ interface TagAndContentInputProps {
   content: string;
   setContent: (content: string) => void;
   isSearching: boolean;
-  setIsSearching: (isSearching: boolean) => void;
   className?: string;
   handleSearch: () => void;
 }

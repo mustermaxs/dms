@@ -1,26 +1,23 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
 import { Document } from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
-import { IDocumentService } from "../../services/documentService";
+import { MockDocumentService as IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";
 import "./DocumentTable.css";
-import { ContentViewerModal } from "./ContentViewerModal";
+import AppContext from "../context/AppContext";
 
 export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [documents, setDocuments] = useState<Document[]>([]);
+  // const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
+  const { documents, selectedDocument, setSelectedDocument } = useContext(AppContext);
 
-  useEffect(() => {
-    let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
-    documentService.getAllDocuments().then(documents => {
-      setDocuments(documents);
-    });
-  }, []);
+useEffect(() => {
+    console.log("documents in DocumentTable: ", documents); 
+},[documents]);
 
   const showModal = async (document: Document) => {
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
@@ -35,7 +32,7 @@ export default function DocumentTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {documents && (<div className="overflow-x-auto">
         {/* Table */}
         <table className="dms-table min-w-full text-sm text-left text-gray-500">
           <thead className="text-sm text-gray-700 bg-gray-100">
@@ -49,7 +46,7 @@ export default function DocumentTable() {
           <tbody>
             {documents.map((doc, index) => (
               <tr
-                key={index}
+                key={doc.id}
                 className="bg-white border-b hover:bg-gray-50 cursor-pointer"
                 onClick={async () => await showModal(doc as Document)}
               >
@@ -89,10 +86,9 @@ export default function DocumentTable() {
           </tbody>
         </table>
 
-        {/* Modal */}
-        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} selectedDocument={{ selectedDocument }} />}
+        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal}  />}
 
-      </div>
+      </div>)}
     </>
   );
 }

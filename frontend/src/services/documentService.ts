@@ -1,11 +1,12 @@
 import { upload } from "@testing-library/user-event/dist/upload";
-import {Document, UploadDocumentDto} from "../types/Document";
+import {Document, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
     getAllDocuments(): Promise<Document[]>;
     uploadDocument(document: UploadDocumentDto): Promise<void>;
+    updateDocument(document: UpdateDocumentDto): Promise<Document>;
     getDocumentContent(id: string): Promise<string>;
 }
 
@@ -113,6 +114,9 @@ export class MockDocumentService implements IDocumentService {
     uploadDocument(document: UploadDocumentDto): Promise<void> {
         return Promise.resolve();
     }
+    updateDocument(document: UpdateDocumentDto): Promise<Document> {
+        return Promise.resolve(document as Document);
+    }
 }
 
 export class DocumentService implements IDocumentService {
@@ -121,17 +125,33 @@ export class DocumentService implements IDocumentService {
     constructor() {
         this.httpService = new HttpService();
     }
+
     getDocumentContent(id: string): Promise<string> {
         throw new Error("Method not implemented.");
     }
+
     public async getAllDocuments(): Promise<Document[]> {
-        return await this.httpService.get<Document[]>('Documents');
+        const response = await this.httpService.get<Document[]>('Documents');
+        return response.data;
     }
+
     public async uploadDocument(document: UploadDocumentDto): Promise<void> {
-        console.log("DOCUMENT: ", document);
-        return await this.httpService.post<void>('Documents', document);
+        const response = await this.httpService.post<void>('Documents', document);
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error('Failed to upload document');
+        }
     }
+
     public async getDocument(id: string): Promise<Document> {
-        return await this.httpService.get<Document>(`Documents/${id}`);
+        const response = await this.httpService.get<Document>(`Documents/${id}`);
+        return response.data;
     }
-}
+
+    public async updateDocument(document: UpdateDocumentDto): Promise<Document> {
+        const response = await this.httpService.put<Document>(`Documents`, document);
+        if (response.status !== 200) {
+            throw new Error('Failed to update document');
+        }
+        return response.data;
+    }
+} 

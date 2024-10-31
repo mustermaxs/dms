@@ -1,3 +1,8 @@
+interface HttpResponse<T> {
+    data: T;
+    status: number;
+}
+
 export class HttpService {
     public readonly config: any;
     public readonly baseUrl: string;
@@ -12,7 +17,7 @@ export class HttpService {
         return this.baseUrl + url;
     }
 
-    public async get<T>(url: string): Promise<T> {
+    public async get<T>(url: string): Promise<HttpResponse<T>> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -20,10 +25,13 @@ export class HttpService {
             mode: 'cors',
             cache: 'no-cache',
         })
-            .then(response => response.json())
-            .then(data => data);
+            .then(async response => ({
+                data: await response.json(),
+                status: response.status
+            }));
     }
-    public async post<T>(url: string, data: any): Promise<T> {
+
+    public async post<T>(url: string, data: any): Promise<HttpResponse<T>> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -33,11 +41,13 @@ export class HttpService {
             },
             body: JSON.stringify(data)
         })
-            .then(response => response.json())
-            .then(data => data);
+            .then(async response => ({
+                data: await response.json(),
+                status: response.status
+            }));
     }
 
-    public async put<T>(url: string, data: any): Promise<T> {
+    public async put<T>(url: string, data: any): Promise<HttpResponse<T>> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
@@ -47,17 +57,21 @@ export class HttpService {
             },
             body: JSON.stringify(data)
         })
-            .then(response => response.json())
-            .then(data => data);
+            .then(async response => ({
+                data: await response.json(),
+                status: response.status
+            }));
     }
 
-    public async delete<T>(url: string): Promise<T> {
+    public async delete<T>(url: string): Promise<HttpResponse<T>> {
         let completeUrl: string = this.urlBuilder(url);
 
         return fetch(completeUrl, {
             method: 'DELETE'
         })
-            .then(response => response.json())
-            .then(data => data);
+            .then(async response => ({
+                data: await response.json(),
+                status: response.status
+            }));
     }
 }

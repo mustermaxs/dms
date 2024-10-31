@@ -20,7 +20,7 @@ using Testcontainers.Minio;
 
 namespace DMS.Tests.DomainEvents.Mocks;
 
-public class Givens
+public class Givens : IAsyncDisposable
 {
     public IMinioClient? _MinioClient { get; private set; } = null;
     public ServiceProvider ServiceProvider { get; private set; }
@@ -49,18 +49,18 @@ public class Givens
             .Build();
         services.AddSingleton<IConfiguration>(configuration);
         services.AddDbContext<DmsDbContext>(options => options.UseInMemoryDatabase("DmsDbContext"));
-        
+
         services.AddSingleton<IMinioClient>(sp =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
             var minioConfig = config.GetSection("MinIO").Get<DmsMinioConfig>();
-    
+
             return new MinioClient()
                 .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
                 .WithEndpoint(minioConfig.Endpoint)
                 .Build();
         });
-        
+
         services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
         services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
@@ -81,7 +81,7 @@ public class Givens
         try
         {
             var minioConfig = GetMinioConfig();
-            var container  = new MinioBuilder()
+            var container = new MinioBuilder()
                 .WithImage("minio/minio")
                 .WithPortBinding(9000)
                 .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(9000))
@@ -102,7 +102,7 @@ public class Givens
             throw;
         }
     }
-    
+
     public IMinioClient GivenMinioClient()
     {
         if (_MinioClient is null)
@@ -182,7 +182,6 @@ public class Givens
 
     public IFileStorage GivenFileStorage(IMinioClient client)
     {
-        
         return new FileStorage(client, ServiceProvider.GetRequiredService<IConfiguration>());
     }
 
@@ -191,5 +190,23 @@ public class Givens
         var config = ServiceProvider.GetRequiredService<IConfiguration>();
         var mockBase64PdfContent = config["MockBase64PdfContent"];
         return mockBase64PdfContent ?? throw new Exception("MockBase64PdfContent not found in configuration");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dbContext != null)
+        {
+            _dbContext.Tags.RemoveRange(_dbContext.Tags);
+            _dbContext.Documents.RemoveRange(_dbContext.Documents);
+            await _dbContext.SaveChangesAsync();
+            await _dbContext.DisposeAsync();
+        }
+        var minioClientAsyncDisposable = _MinioClient as IAsyncDisposable;
+        if (minioClientAsyncDisposable != null)
+            await minioClientAsyncDisposable.DisposeAsync();
+        else if (_MinioClient != null)
+            _MinioClient.Dispose();
+        await ServiceProvider.DisposeAsync();
+        if (_dbContext != null) await _dbContext.DisposeAsync();
     }
 }

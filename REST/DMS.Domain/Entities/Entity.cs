@@ -11,6 +11,14 @@ public class Entity
         _domainEvents.Add(eventItem);
     }
 
+    public void AddDomainEventIfNotExists(object eventItem)
+    {
+        if (!_domainEvents.Contains(eventItem))
+        {
+            _domainEvents.Add(eventItem);
+        }
+    }
+
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();

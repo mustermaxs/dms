@@ -37,4 +37,11 @@ public class DmsDocumentRepository(DmsDbContext dbContext, IValidator<DmsDocumen
             .ThenInclude(e => e.Tag)
             .ToListAsync();
     }
+
+    public override async Task UpdateAsync(DmsDocument entity)
+    {
+        await Validator.ValidateAndThrowAsync(entity);
+        DbSet
+        .Update(entity);
+    }
 }

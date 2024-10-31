@@ -40,7 +40,8 @@ builder.Services.AddMediatR(
     typeof(UploadDocumentCommand).Assembly,
     typeof(UpdateDocumentCommand).Assembly,
     typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly,
-    typeof(DocumentTagsUpdatedDomainEvent).Assembly
+    typeof(DocumentTagsUpdatedDomainEvent).Assembly,
+    typeof(DocumentUpdatedDomainEvent).Assembly
     );
 
 builder.Services.AddControllers();

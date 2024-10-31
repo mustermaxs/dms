@@ -44,31 +44,53 @@ namespace DMS.Domain.Entities
             );
         }
 
-        public void AddTag(Tag.Tag tag)
+        public DmsDocument AddTag(Tag.Tag tag)
         {
             var documentTag = new DocumentTag(this, tag);
 
             if (!Tags.Contains(documentTag))
                 Tags.Add(documentTag);
+            
+            return this;
         }
 
-        public void UpdateTags(List<Tag.Tag> tags)
+        public DmsDocument UpdateTags(List<Tag.Tag> tags)
         {
             Tags = new List<DocumentTag>();
-            tags.ForEach(AddTag);
+            tags.ForEach(tag => AddTag(tag));
             this.ModificationDateTime = DateTime.UtcNow;
-            AddDomainEvent(new DocumentTagsUpdatedDomainEvent(this));
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+            return this;
         }
 
-        public void RemoveTag(Tag.Tag tag)
+        public DmsDocument RemoveTag(Tag.Tag tag)
         {
             var documentTag = new DocumentTag(this, tag);
             Tags.Remove(documentTag);
+            ModificationDateTime = DateTime.UtcNow;
+
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
+            return this;
         }
 
-        public void UpdateContent(string content)
+        public DmsDocument UpdateTitle(string title)
+        {
+            Title = title;
+            ModificationDateTime = DateTime.UtcNow;
+
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
+            return this;
+        }
+
+        public DmsDocument UpdateContent(string content)
         {
             Content = content;
+            ModificationDateTime = DateTime.UtcNow;
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+
+            return this;
         }
     }
 }

@@ -4,7 +4,6 @@ import Modal, { ModalSize } from "../shared/Modal";
 import "./ContentViewerModal.css";
 import { ServiceLocator } from "../../serviceLocator";
 import { IDocumentService } from "../../services/documentService";
-import { Document } from "../../types/Document";
 
 export const ContentViewerModal = ({isOpen, closeModal, openModal, document}) => {
     const [isDocumentContentLoaded, setIsDocumentContentLoaded] = useState(false);
