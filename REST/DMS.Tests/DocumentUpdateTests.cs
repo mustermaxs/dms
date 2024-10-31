@@ -31,9 +31,9 @@ public class DocumentUpdateTests
     }
 
     [Test]
-    public async Task UpdateDocument_RemovesPreexistingTags()
+    public async Task UpdateDocument_IgnoresPreexistingTags()
     {
-        // GIVEN & WHEN
+        // GIVEN
         var repo = Givens.ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
         var tag1 = new Tag("test", "test", "#F0000");
         var tag2 = new Tag("test", "test", "#F0000");
@@ -47,5 +47,17 @@ public class DocumentUpdateTests
             ProcessingStatus.NotStarted);
         document.AddTag(tag1);
         await repo.Create(document);
+        await repo.SaveAsync();
+        
+        // WHEN
+        var preexistingDocTags = (await repo.Get((document.Id))!).Tags;
+        var preexistingTag = preexistingDocTags.ToList().First();      
+        document.UpdateTags([new Tag(preexistingTag.Tag.Label, preexistingTag.Tag.Value, preexistingTag.Tag.Color)]);
+        await repo.UpdateAsync(document);
+        await repo.SaveAsync();
+        
+        // THEN
+        var documentInDb = await repo.Get(document.Id);
+        Assert.That(documentInDb.Tags.Count, Is.EqualTo(1));
     }
 }
