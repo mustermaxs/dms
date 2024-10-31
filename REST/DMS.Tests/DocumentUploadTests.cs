@@ -25,13 +25,9 @@ public class DocumentUploadTests
     }
 
     [TearDown]
-    public async Task TearDown()
+    public async Task Teardown()
     {
-        if (minioContainer != null)
-        {
-            await minioContainer.StopAsync();
-            await minioContainer.DisposeAsync();
-        }
+        await Givens.DisposeAsync();
     }
 
     [Test]
