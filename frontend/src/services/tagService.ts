@@ -49,6 +49,7 @@ export class TagService implements ITagService {
     }
 
     public async getTags(): Promise<Tag[]> {
-        return await this.httpService.get<Tag[]>('Tags');
+        const response = await this.httpService.get<Tag[]>('Tags');
+        return response.data;
     }
 }

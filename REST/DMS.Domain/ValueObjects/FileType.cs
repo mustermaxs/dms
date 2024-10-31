@@ -9,9 +9,9 @@ namespace DMS.Domain.ValueObjects
             var extension = GetExtensionFromName(fileName);
             return extension switch
             {
-                ".pdf" => new FileType("pdf"),
-                ".docx" => new FileType("docx"),
-                ".txt" => new FileType("txt"),
+                ".pdf" => new FileType("1.pdf"),
+                ".docx" => new FileType("1.docx"),
+                ".txt" => new FileType("1.txt"),
                 _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
             };
         }

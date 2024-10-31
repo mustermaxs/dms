@@ -39,11 +39,12 @@ public class DocumentsController : BaseController
         return await ResponseAsync(new GetDocumentQuery(id));
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateDocument(Guid id)
+    [HttpPut]
+    public async Task<ActionResult> UpdateDocument([FromBody] UpdateDocumentDto documentDto)
     {
-        var res = await _mediator.Send(new UpdateDocumentCommand(id));
-        return Ok(res);
+        Console.WriteLine(documentDto);
+
+        return await ResponseAsync(new UpdateDocumentCommand( documentDto));
     }
 
     [HttpDelete("{id}")]

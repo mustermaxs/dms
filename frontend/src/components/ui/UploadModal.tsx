@@ -1,53 +1,70 @@
 import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
-import CreatableSelect from "react-select/creatable";
-import { useEffect } from "react";
+import { TagInput } from "../shared/TagInput";
+import { useContext, useEffect, useState } from "react";
+import { fileToBase64 } from "../../services/fileService";
+import { getEmptyGuid } from "../../services/guidGenerator";
+import { Tag } from "../../types/Tag";
+import AppContext from "../context/AppContext";
 
-export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, tags, setTitle, handleTagChange, selectedTags, file, setFile }) => {
+export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const customStyles = {
-    multiValue: (styles: any) => ({
-      ...styles,
-      backgroundColor: '#DBEAFE', // bg-blue-100
-      color: '#1E40AF', // text-blue-800
-      fontSize: '0.9rem', // text-xs
-      fontWeight: '600', // font-semibold
-      padding: '0.3rem 0.4rem', // px-2.5 py-0.5
-      borderRadius: '0.375rem', // rounded
-      ':hover': {
-        cursor: 'pointer',
-      },
-    }),
-    multiValueLabel: (styles: any) => ({
-      ...styles,
-      color: '#1E40AF', // text-blue-800
-      padding: 0,
-    }),
-    multiValueRemove: (styles: any) => ({
-      ...styles,
-      color: '#1E40AF', // text-blue-800
-      marginLeft: '0.3rem',
-      padding: '0.1rem',
-      ':hover': {
-        backgroundColor: '#BFDBFE',
-      },
-    }),
-    control: (styles: any) => ({
-      ...styles,
-      fontSize: '0.9rem',
-      borderRadius: '0.375rem', // rounded
-      ':hover': {
-        borderColor: 'black', // border-blue-800
-        cursor: 'text',
-      },
-    }),
-    menu: (styles: any) => ({
-      ...styles,
-      fontSize: '0.9rem',
-    }),
+  const {availableTags, setIsLoadingTags, uploadDocument } = useContext(AppContext);
+
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+
+
+  const handleTagChange = (newValue: Tag[]) => {
+    let tagsWithoutIds: Tag[] = newValue.filter(t => t.id === "" || t.id === undefined);
+
+    let updatedTagsWithoutIds = tagsWithoutIds.map(t => ({
+      id: getEmptyGuid(),
+      label: t.label,
+      color: "red",
+      value: t.value,
+    }));
+
+    setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
+
+    console.log("Tags without ids", updatedTagsWithoutIds);
+
+    let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
+    newValue = [...validTags, ...updatedTagsWithoutIds];
+    console.log("Updated tags", newValue);
+
+    setSelectedTags(newValue);
   };
 
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let fileContentBase64: string = await fileToBase64(file as File);
+    await uploadDocument({
+      title: title,
+      tags: selectedTags,
+      content: fileContentBase64,
+    });
+
+    const resetForm = () => {
+      setTitle("");
+      setTags([]);
+      setSelectedTags([]);
+      setFile(null);
+    };
+
+    closeModal();
+    resetForm();
+  };
+
+  useEffect(() => {
+    setIsLoadingTags(true);
+  }, [isOpen]);
 
   return (
     <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">
@@ -65,14 +82,11 @@ export const UploadModal = ({ size, isOpen, closeModal, handleSubmit, title, tag
         </div>
         <div>
           <Label title="Tags" />
-          <CreatableSelect
-            options={tags}
-            isMulti
-            value={selectedTags}
+          <TagInput
+            selectedTags={selectedTags}
             onChange={handleTagChange}
-            placeholder="Add or create tags..."
-            className="mt-1 "
-            styles={customStyles}
+            availableTags={availableTags}
+            className="mt-1"
           />
         </div>
 

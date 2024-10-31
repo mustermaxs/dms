@@ -1,28 +1,56 @@
+using System.Text.Json;
+using AutoMapper;
 using DMS.Application.DTOs;
+using DMS.Application.Interfaces;
+using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
+using DMS.Domain.IRepositories;
+using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.Commands
 {
-    public record UpdateDocumentCommand(Guid Id) : IRequest<DmsDocumentDto>;
-    
-    public class UpdateDocumentCommandHandler : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
+    public record UpdateDocumentCommand(UpdateDocumentDto Document) : IRequest<DmsDocumentDto>;
+
+    public class UpdateDocumentCommandHandler(
+        IUnitOfWork unitOfWork,
+        IDmsDocumentRepository dmsDocumentRepository,
+        IDocumentTagFactory documentTagFactory,
+        IMapper autoMapper,
+        ILogger<UpdateDocumentCommandHandler> logger)
+        : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
     {
         public async Task<DmsDocumentDto> Handle(UpdateDocumentCommand request, CancellationToken cancellationToken)
         {
-            var document = new DmsDocumentDto
+            try
             {
-                Id = Guid.NewGuid(), Title = "Document 1.pdf",
-                UploadDateTime = DateTime.Now,
-                ModificationDateTime = DateTime.Now,
-                Status = ProcessingStatus.Finished,
-                Tags = [new TagDto{ Label = "contract", Color = "#FF0000", Value = "contract" }],
-                DocumentType = FileType.GetFileTypeFromExtension("blabla.pdf")
-            };
-            
-            return await Task.FromResult(document);
+                await unitOfWork.BeginTransactionAsync();
+
+                var document = await dmsDocumentRepository.Get(request.Document.Id);
+                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
+                await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
+                List<DocumentTag> documentTags = new List<DocumentTag>();
+                tagsAssociatedWithDocument.ForEach(tag => documentTags.Add(DocumentTag.Create(tag, document!)));
+
+                document
+                    .UpdateTitle(request.Document.Title)
+                    .UpdateTags(documentTags);
+                await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
+
+                document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
+
+                await unitOfWork.CommitAsync();
+
+                return autoMapper.Map<DmsDocumentDto>(document);
+            }
+            catch
+            {
+                await unitOfWork.RollbackAsync();
+                throw;
+            }
         }
     }
 }
