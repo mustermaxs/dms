@@ -1,7 +1,9 @@
 using DMS.Application.DTOs;
 using DMS.Application.Services;
 using DMS.Domain.Entities.Tag;
+using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
+using DMS.Domain.ValueObjects;
 using DMS.Infrastructure.Services;
 using DMS.Tests.DomainEvents.Mocks;
 using DotNet.Testcontainers.Containers;
@@ -59,5 +61,58 @@ public class DocumentUploadTests
         }
         Assert.That(bucketItems.Count, Is.EqualTo(1));
         Assert.That(bucketItems.Contains(fileName), Is.True);
+    }
+
+    [Test]
+    public async Task DmsDocumentRepository_Creates_New_Document()
+    {
+        // GIVEN
+        var repo = Givens.ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
+        var document = DmsDocument.Create("testDocument.pdf",
+            DateTime.UtcNow,
+            "",
+            new List<DocumentTag>(),
+            new FileType("testDocument.pdf"),
+            ProcessingStatus.NotStarted);
+        
+        // WHEN
+        await repo.Create(document);
+        await repo.SaveAsync();
+        
+        // THEN
+        var documentFromDb = await repo.Get(document.Id);
+        Assert.That(documentFromDb, Is.Not.Null);
+        Assert.That(documentFromDb.Id, Is.EqualTo(document.Id));
+        Assert.That(documentFromDb.Title, Is.EqualTo(document.Title));
+    }
+
+    [Test]
+    public async Task DmsDocumentRepository_Creates_New_Document_With_Tags()
+    {
+        // GIVEN & WHEN
+        var repo = Givens.ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
+        var tag1 = new Tag("test", "test", "#F0000");
+        var tag2 = new Tag("test", "test", "#F0000");
+        var document = DmsDocument.Create("testDocument.pdf",
+            DateTime.UtcNow,
+            "",
+            new List<DocumentTag>
+            {
+            },
+            new FileType("testDocument.pdf"),
+            ProcessingStatus.NotStarted);
+        document.AddTag(tag1);
+        document.AddTag(tag2);
+        await repo.Create(document);
+        await repo.SaveAsync();
+
+        // THEN
+        var documentFromDb = await repo.Get(document.Id);
+        Assert.That(documentFromDb, Is.Not.Null);
+        Assert.That(documentFromDb.Id, Is.EqualTo(document.Id));
+        Assert.That(documentFromDb.Title, Is.EqualTo(document.Title));
+        Assert.That(documentFromDb.Tags.Count, Is.EqualTo(2));
+        Assert.That(documentFromDb.Tags.ToList()[0].Tag.Label, Is.EqualTo(tag1.Label));
+        Assert.That(documentFromDb.Tags.ToList()[1].Tag.Label, Is.EqualTo(tag2.Label));
     }
 }

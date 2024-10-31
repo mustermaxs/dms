@@ -53,12 +53,8 @@ namespace DMS.Application.Commands
                 }
 
                 var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
-                var documentTags = await Task.WhenAll(
-                    tagsAssociatedWithDocument.Select(t =>
-                        unitOfWork.DocumentTagRepository.Create(
-                            DocumentTag.Create(t, document))));
                 
-                document.Tags = [..documentTags];
+                tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
                 // TODO Put conversion from Base64 to FileStream in a separate service
                 // or make the client send it as stream in JSON object if possible
                 // await fileStorage.SaveFileAsync(document.Id, new MemoryStream(Convert.FromBase64String(request.Content)));

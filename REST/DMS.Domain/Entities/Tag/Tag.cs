@@ -8,6 +8,8 @@ namespace DMS.Domain.Entities.Tag
         public string Label { get; set; }
         public string Value { get; set; }
         public string Color { get; set; }
+        public ICollection<DocumentTag> DocumentTags { get; set; } = new List<DocumentTag>();
+
         public Tag(){}
 
         public Tag(string label, string value, string color)

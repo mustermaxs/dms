@@ -10,12 +10,16 @@ namespace DMS.Domain.Entities
         public DateTime UploadDateTime { get; init; }
         public DateTime? ModificationDateTime { get; private set; } = null;
         public string? Path { get; private set; }
-        public List<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
+        public ICollection<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
         public FileType DocumentType { get; private set; }
         public ProcessingStatus Status { get; private set; }
-        public DmsDocument() {}
 
-        private DmsDocument(string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags, FileType documentType,
+        public DmsDocument()
+        {
+        }
+
+        private DmsDocument(string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags,
+            FileType documentType,
             ProcessingStatus status)
         {
             Title = title;
@@ -40,15 +44,14 @@ namespace DMS.Domain.Entities
             );
         }
 
-        public void AddTag(DocumentTag documentTag)
+        public void AddTag(Tag.Tag tag)
         {
-            if (Tags.Contains(documentTag))
-            {
-                return;
-            }
-            Tags.Add(documentTag);
+            var documentTag = new DocumentTag(this, tag);
+
+            if (!Tags.Contains(documentTag))
+                Tags.Add(documentTag);
         }
-        
+
         public void UpdateTags(List<DocumentTag> tags)
         {
             Tags = tags;
