@@ -52,15 +52,17 @@ namespace DMS.Domain.Entities
                 Tags.Add(documentTag);
         }
 
-        public void UpdateTags(List<DocumentTag> tags)
+        public void UpdateTags(List<Tag.Tag> tags)
         {
-            Tags = tags;
+            Tags = new List<DocumentTag>();
+            tags.ForEach(AddTag);
             this.ModificationDateTime = DateTime.UtcNow;
             AddDomainEvent(new DocumentTagsUpdatedDomainEvent(this));
         }
 
-        public void RemoveTag(DocumentTag documentTag)
+        public void RemoveTag(Tag.Tag tag)
         {
+            var documentTag = new DocumentTag(this, tag);
             Tags.Remove(documentTag);
         }
 
