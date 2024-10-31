@@ -1,10 +1,12 @@
 using DMS.Api;
 using DMS.Api.Configuration;
+using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
 using DMS.Application.Services;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
+using DMS.Domain.ValueObjects;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Repositories;
 using DMS.Infrastructure.Services;
@@ -12,17 +14,21 @@ using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using Testcontainers.Minio;
+using Moq;
 
 namespace DMS.Tests.DomainEvents.Mocks;
 
 public class Givens : IAsyncDisposable
 {
+    public readonly Mock<IMediator> _MockMediator;
     public IMinioClient? _MinioClient { get; private set; } = null;
+    public IContainer? _MinioContainer { get; private set; } = null;
     public ServiceProvider ServiceProvider { get; private set; }
     private DmsDbContext? _dbContext { get; set; } = null;
 
@@ -49,7 +55,17 @@ public class Givens : IAsyncDisposable
             .Build();
         services.AddSingleton<IConfiguration>(configuration);
         services.AddDbContext<DmsDbContext>(options => options.UseInMemoryDatabase("DmsDbContext"));
+        services.AddAutoMapper( typeof(DmsMappingProfile) );
+        // REPOSITORIES
+        services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
+        services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
 
+// VALIDATORS
+        services.AddScoped<IValidator<DmsDocument>, DmsDocumentValidator>();
+        services.AddScoped<IValidator<Tag>, TagValidator>();
+        services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
+        
         services.AddSingleton<IMinioClient>(sp =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
@@ -65,6 +81,7 @@ public class Givens : IAsyncDisposable
         services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddTransient<FileHelper>();
 
@@ -94,7 +111,9 @@ public class Givens : IAsyncDisposable
             container.StartAsync()
                 .GetAwaiter()
                 .GetResult();
-            return container;
+            _MinioContainer = container;
+            
+            return _MinioContainer;
         }
         catch (Exception e)
         {
@@ -185,7 +204,7 @@ public class Givens : IAsyncDisposable
         return new FileStorage(client, ServiceProvider.GetRequiredService<IConfiguration>());
     }
 
-    public string GetMockBase64PdfContent()
+    public string GivenPdfContentInBase64()
     {
         var config = ServiceProvider.GetRequiredService<IConfiguration>();
         var mockBase64PdfContent = config["MockBase64PdfContent"];
@@ -201,12 +220,73 @@ public class Givens : IAsyncDisposable
             await _dbContext.SaveChangesAsync();
             await _dbContext.DisposeAsync();
         }
+
+        await DisposeMinioAsync();
+        await ServiceProvider.DisposeAsync();
+        if (_dbContext != null) await _dbContext.DisposeAsync();
+    }
+
+    private async Task DisposeMinioAsync()
+    {
         var minioClientAsyncDisposable = _MinioClient as IAsyncDisposable;
         if (minioClientAsyncDisposable != null)
             await minioClientAsyncDisposable.DisposeAsync();
         else if (_MinioClient != null)
             _MinioClient.Dispose();
-        await ServiceProvider.DisposeAsync();
-        if (_dbContext != null) await _dbContext.DisposeAsync();
+        
+        if (_MinioContainer != null)
+            await _MinioContainer.DisposeAsync();
+    }
+
+    public async Task<DmsDocument> GivenDocumentInDb(List<Tag>? tags = null)
+    {
+        var repo = ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
+        var document = DmsDocument.Create("testDocument.pdf",
+            DateTime.UtcNow,
+            "",
+            new List<DocumentTag>
+            {
+            },
+            new FileType("testDocument.pdf"),
+            ProcessingStatus.NotStarted);
+        
+        tags?.ForEach(t => document.AddTag(t));
+        await repo.Create(document);
+        await repo.SaveAsync();
+
+        return document;
+    }
+
+    public DmsDocument GivenDocument()
+    {
+        return DmsDocument.Create("testDocument.pdf",
+            DateTime.UtcNow,
+            "",
+            new List<DocumentTag>
+            {
+            },
+            new FileType("testDocument.pdf"),
+            ProcessingStatus.NotStarted);
+    }
+
+    public async Task<DmsDocument> GivenDocumentInDbAndFileStorage()
+    {
+        if (_MinioContainer == null)
+        {
+            await GivenMinioContainer();
+        }
+
+        if (_MinioClient == null)
+        {
+            GivenMinioClient();
+        }
+        
+        var document = await GivenDocumentInDb();
+        var fileStorage = GivenFileStorage(_MinioClient);
+        var fileHelper = ServiceProvider.GetRequiredService<FileHelper>();
+        var mockContent = GivenPdfContentInBase64();
+        await fileStorage.SaveFileAsync(document.Id, fileHelper.FromBase64ToStream(mockContent));
+        
+        return document;
     }
 }

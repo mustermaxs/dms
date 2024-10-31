@@ -68,9 +68,25 @@ namespace DMS.Infrastructure.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteFileAsync(Guid id)
+        public async Task<bool> DeleteFileAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await EnsureBucketExistsAsync();
+                var args = new RemoveObjectArgs()
+                    .WithBucket(_bucketName)
+                    .WithObject(id.ToString());
+            
+                await _minioClient.RemoveObjectAsync(args);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+                throw;
+            }
+
         }
     }
 }

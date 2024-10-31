@@ -37,7 +37,7 @@ public class DocumentUploadTests
         minioContainer = await Givens.GivenMinioContainer();
         var minioClient = Givens.ServiceProvider.GetService<IMinioClient>();
         var fileStorage = Givens.GivenFileStorage(minioClient);
-        var documentContenBase64 = Givens.GetMockBase64PdfContent();
+        var documentContenBase64 = Givens.GivenPdfContentInBase64();
         var fileHelper = Givens.ServiceProvider.GetService<FileHelper>();
         var fileContentStream = fileHelper.FromBase64ToStream(documentContenBase64);
         var minioConfig = Givens.GetMinioConfig();

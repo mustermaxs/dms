@@ -50,7 +50,6 @@ public class DocumentsController : BaseController
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteDocument(Guid id)
     {
-        var res = await _mediator.Send(new DeleteDocumentCommand(id));
-        return Ok(res);
+        return await ResponseAsync(new DeleteDocumentCommand(id));
     }
 }
