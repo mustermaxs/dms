@@ -18,12 +18,11 @@ public class DocumentTagFactory(
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
 
         // Separate new tags from existing tags
-        var newTags = tagDtos
-            .Where(requestTag => requestTag.Id == Guid.Empty)
-            .ToList();
+        var newTags = tagDtos.Where(requestTag => 
+            !existingTagValues.Contains(requestTag.Value));
 
-        var alreadyExistingTagDtos = tagDtos
-            .Where(requestTag => requestTag.Id != Guid.Empty);
+        var alreadyExistingTagDtos = tagsInDb.Where(dbTag =>
+            tagDtos.Any(requestTag => requestTag.Value == dbTag.Value));
 
         // Process existing tags one by one (sequentially)
         var alreadyExistingTags = new List<Tag>();

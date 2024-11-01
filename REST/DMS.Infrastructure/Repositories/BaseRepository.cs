@@ -46,6 +46,11 @@ where TEntity : Entity
         DbSet.Remove(entity);
         
     }
+    
+    public virtual async Task DeleteAllAsync()
+    {
+        DbSet.RemoveRange(DbSet);
+    }
 
     public async Task SaveAsync()
     {

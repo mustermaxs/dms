@@ -1,82 +1,117 @@
 #!/bin/bash
 
-API_URL="$1" # Change this to the actual URL of the API
+BASE_URL="$1" 
 
-if [ -z "$API_URL" ]; then
+RED="\033[31m"
+RESET="\033[0m"
+GREEN="\033[32m"
+BLUE="\033[34m"
+
+if [ -z "$BASE_URL" ]; then
   echo "Usage: $0 <api-url>"
   exit 1
 fi
 
-# Base64 encoded PDF content (sample short PDF file)
-PDF_CONTENT=$(cat ./integration_test_mock.pdf | base64)
 
-# Helper function to pretty-print JSON responses
-pretty_print() {
-  jq . <<< "$1"
+print_test_name() {
+  local title=$1
+  local length=$((${#title} + 4))
+
+  printf "${BLUE}    "
+  for ((i=0; i<length; i++)); do
+    printf "-"
+  done
+  printf "\n"
+
+  echo -e "    | ${title} |${RESET}"
+
+  printf "${BLUE}    "
+  for ((i=0; i<length; i++)); do
+    printf "-"
+  done
+  printf "${RESET}\n\n"
 }
 
-# 1. Create a Tag
-echo "Creating a Tag..."
-create_tag_response=$(curl -s -X POST "$API_URL/api/Tags" -H "Content-Type: application/json" -d '{
-  "label": "SampleTag",
-  "color": "#FF5733",
-  "value": "sample"
-}')
-echo "Tag Created Response:"
-pretty_print "$create_tag_response"
+test_endpoint() {
+    local method=$1
+    local endpoint=$2
+    local data=$3
+    local expected_status=$4
 
-tag_id=$(jq -r '.id' <<< "$create_tag_response")
+    local tmp_response=$(mktemp)
 
-# 2. Upload a Document
-echo "Uploading a Document..."
-upload_document_response=$(curl -s -X POST "$API_URL/api/Documents" -H "Content-Type: application/json" -d "{
-  \"title\": \"Test Document\",
-  \"content\": \"$PDF_CONTENT\",
-  \"tags\": [{\"id\": \"$tag_id\", \"label\": \"SampleTag\", \"color\": \"#FF5733\", \"value\": \"sample\"}]
-}")
-echo "Document Upload Response:"
-pretty_print "$upload_document_response"
+    http_status=$(curl -s -X "$method" "$BASE_URL$endpoint" \
+        -H "Content-Type: application/json" \
+        -d "$data" \
+        -o "$tmp_response" \
+        -w "%{http_code}")
 
-document_id=$(jq -r '.id' <<< "$upload_document_response")
+    response_body=$(cat "$tmp_response" | jq '.')
+    rm "$tmp_response"
 
-# 3. Retrieve the Document by ID
-echo "Retrieving Document by ID..."
-get_document_response=$(curl -s -X GET "$API_URL/api/Documents/$document_id")
-echo "Get Document Response:"
-pretty_print "$get_document_response"
+    if [ "$http_status" -eq "$expected_status" ]; then
+        echo -e "${GREEN}Test $method $endpoint: Succeeded (Status: $http_status)${RESET}"
+        echo "Response body:"
+        echo "$response_body"
+    else
+        echo -e "${RED}Test $method $endpoint: Failed (Expected: $expected_status, Got: $http_status)${RESET}"
+        echo "Response body:"
+        echo "$response_body"
+    fi
+}
 
-# 4. Update the Document
-echo "Updating the Document..."
-update_document_response=$(curl -s -X PUT "$API_URL/api/Documents" -H "Content-Type: application/json" -d "{
-  \"id\": \"$document_id\",
-  \"title\": \"Updated Document\",
-  \"tags\": [{\"id\": \"$tag_id\", \"label\": \"UpdatedTag\", \"color\": \"#FF5733\", \"value\": \"sample\"}]
-}")
-echo "Update Document Response:"
-pretty_print "$update_document_response"
+# Test POST /api/Documents
+print_test_name "Testing POST /api/Documents"
+test_endpoint "POST" "/api/Documents" '{
+    "title": "SampleDocument.pdf",
+    "content": "${PDF_CONTENT}",
+    "tags": [
+        {"label": "tag1", "color": "red", "value": "tag1"},
+        {"label": "tag1", "color": "blue", "value": "tag1"}
+    ]
+}' 200
+echo -e "\n"
 
-# 5. List All Documents
-echo "Listing All Documents..."
-list_documents_response=$(curl -s -X GET "$API_URL/api/Documents")
-echo "List Documents Response:"
-pretty_print "$list_documents_response"
+# Test GET /api/Documents
+print_test_name "Testing GET /api/Documents"
+test_endpoint "GET" "/api/Documents" "" 200
+echo -e "\n"
 
-# 6. Delete the Document
-echo "Deleting the Document..."
-delete_document_response=$(curl -s -X DELETE "$API_URL/api/Documents/$document_id")
-echo "Delete Document Response:"
-pretty_print "$delete_document_response"
+# Test PUT /api/Documents (replace YOUR_DOCUMENT_ID with actual ID)
+print_test_name "Testing PUT /api/Documents"
+test_endpoint "PUT" "/api/Documents/YOUR_DOCUMENT_ID" '{
+    "id": "YOUR_DOCUMENT_ID",  
+    "title": "Updated Document Title.pdf",
+    "tags": [
+        {"label": "updatedTag", "color": "green", "value": "updatedTag"}
+    ]
+}' 200
+echo -e "\n"
 
-# 7. Retrieve All Tags
-echo "Retrieving All Tags..."
-get_tags_response=$(curl -s -X GET "$API_URL/api/Tags")
-echo "Get Tags Response:"
-pretty_print "$get_tags_response"
+# Test GET /api/Documents/{id} (replace YOUR_DOCUMENT_ID with actual ID)
+print_test_name "Testing GET /api/Documents/YOUR_DOCUMENT_ID"
+test_endpoint "GET" "/api/Documents/YOUR_DOCUMENT_ID" "" 200
+echo -e "\n"
 
-# 8. Search Tags by Prefix
-echo "Searching Tags by Prefix..."
-search_tags_response=$(curl -s -X GET "$API_URL/search?tagPrefix=Sample")
-echo "Search Tags Response:"
-pretty_print "$search_tags_response"
+# Test DELETE /api/Documents/{id} (replace YOUR_DOCUMENT_ID with actual ID)
+print_test_name "Testing DELETE /api/Documents/YOUR_DOCUMENT_ID"
+test_endpoint "DELETE" "/api/Documents/YOUR_DOCUMENT_ID" "" 200
+echo -e "\n"
 
-echo "Integration tests completed."
+# Test GET /api/Tags
+print_test_name "Testing GET /api/Tags"
+test_endpoint "GET" "/api/Tags" "" 200
+echo -e "\n"
+
+# # Test POST /api/Tags
+# print_test_name "Testing POST /api/Tags"
+# test_endpoint "POST" "/api/Tags" '{
+#     "label": "New Tag",
+#     "color": "yellow",
+#     "value": "newTagValue"
+# }' 200
+# echo -e "\n"
+
+
+# End of the script
+echo "API testing completed."

@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace DMS.Application.Commands
 {
-    public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags) : IRequest<Unit>;
+    public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags) : IRequest<DmsDocumentDto>;
 
     public class UploadDocumentCommandHandler(
         IDmsDocumentRepository documentRepository,
@@ -28,9 +28,9 @@ namespace DMS.Application.Commands
         IDocumentTagFactory documentTagFactory,
         IMediator mediator,
         IMapper mapper
-        ) : IRequestHandler<UploadDocumentCommand, Unit>
+        ) : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
     {
-        public async Task<Unit> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace DMS.Application.Commands
                 // ...
                 await unitOfWork.CommitAsync();
                 
-                return Unit.Value;
+                return mapper.Map<DmsDocumentDto>(document);
             }
             catch (Exception e)
             {

@@ -1,3 +1,4 @@
+using DMS.Api.Configuration;
 using DMS.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using DMS.REST.Api.Controllers;
@@ -9,47 +10,141 @@ namespace DMS.REST.Api.Controllers;
 [Route("/api/[controller]")]
 public class DocumentsController : BaseController
 {
-    public DocumentsController(IMediator mediator) : base(mediator)
+    public DocumentsController(IMediator mediator, ILogger<DocumentsController> logger) : base(mediator, logger)
     {
     }
 
     [HttpPost]
-    public async Task<ActionResult> UploadDocument([FromBody] UploadDocumentDto documentDto)
+    public async Task<ActionResult<DmsDocumentDto>> UploadDocument([FromBody] UploadDocumentDto documentDto)
     {
-        try
-        {
-            return await ResponseAsync(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        return await ApiResponse<UploadDocumentCommand, DmsDocumentDto>(
+            new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags),
+            onSuccess: data => Ok(
+                new Response<DmsDocumentDto>
+                {
+                    Success = true,
+                    Data = data,
+                    Message = "Successfully uploaded document"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to upload document",
+                    Success = false
+                })
+        );
+        // try
+        // {
+        //     var res = await _mediator.Send(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
+        //     return Ok(new Response<string>{ Success = true, Message = "Successfully uploaded document" });
+        // }
+        // catch (Exception e)
+        // {
+        //     return BadRequest(new Response<string>{Message = "Failed to upload document", Success = false});
+        //     throw;
+        // }
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetDocuments()
+    public async Task<ActionResult<List<DmsDocumentDto>>> GetDocuments()
     {
-        return await ResponseAsync(new GetDocumentsQuery());
+        return await ApiResponse<GetDocumentsQuery, List<DmsDocumentDto>>(
+            new GetDocumentsQuery(),
+            onSuccess: data => Ok(
+                new Response<List<DmsDocumentDto>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Successfully retrieved documents"
+            }),
+            onFailure: () => BadRequest( 
+                new Response
+            {
+                Message = "Failed to retrieve documents",
+                Success = false
+            })
+            );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetDocument(Guid id)
+    public async Task<ActionResult<DmsDocumentDto>> GetDocument(Guid id)
     {
-        return await ResponseAsync(new GetDocumentQuery(id));
+        return await ApiResponse<GetDocumentQuery, DmsDocumentDto>(
+            new GetDocumentQuery(id),
+            onSuccess: data => Ok(
+                new Response<DmsDocumentDto>
+                {
+                    Success = true,
+                    Data = data,
+                    Message = "Successfully retrieved document"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to retrieve document",
+                    Success = false
+                })
+        );
     }
 
-    [HttpPut]
-    public async Task<ActionResult> UpdateDocument([FromBody] UpdateDocumentDto documentDto)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<DmsDocumentDto>> UpdateDocument([FromBody] UpdateDocumentDto documentDto)
     {
-        Console.WriteLine(documentDto);
-
-        return await ResponseAsync(new UpdateDocumentCommand( documentDto));
+        return await ApiResponse<UpdateDocumentCommand, DmsDocumentDto>(
+            command: new UpdateDocumentCommand(documentDto),
+            onSuccess: data => Ok(
+                new Response<DmsDocumentDto>
+                {
+                    Success = true,
+                    Data = data,
+                    Message = "Successfully updated document"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to update document",
+                    Success = false
+                })
+        );
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteDocument(Guid id)
     {
-        return await ResponseAsync(new DeleteDocumentCommand(id));
+        return await ApiResponse<DeleteDocumentCommand>(
+            command: new DeleteDocumentCommand(id),
+            onSuccess: () => Ok(
+                new Response
+                {
+                    Success = true,
+                    Message = "Successfully deleted document"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to delete document",
+                    Success = false
+                })
+        );
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteAllDocuments()
+    {
+        return await ApiResponse<DeleteAllDocumentsCommand>(
+            command: new DeleteAllDocumentsCommand(),
+            onSuccess: () => Ok(
+                new Response
+                {
+                    Success = true,
+                    Message = "Successfully deleted all documents"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to delete all documents",
+                    Success = false
+                })
+        );
     }
 }

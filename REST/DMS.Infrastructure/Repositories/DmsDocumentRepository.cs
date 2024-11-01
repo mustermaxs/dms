@@ -41,7 +41,7 @@ public class DmsDocumentRepository(DmsDbContext dbContext, IValidator<DmsDocumen
     public override async Task UpdateAsync(DmsDocument entity)
     {
         await Validator.ValidateAndThrowAsync(entity);
-        DbSet
-        .Update(entity);
+        DbSet.Entry(entity).State = EntityState.Modified;
+        DbSet.Update(entity);
     }
 }
