@@ -39,7 +39,6 @@ namespace DMS.Application.Commands
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
-
                 await unitOfWork.CommitAsync();
 
                 return autoMapper.Map<DmsDocumentDto>(document);

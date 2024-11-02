@@ -52,4 +52,23 @@ public class TagsController : BaseController
         var res = await _mediator.Send(new CreateTagCommand(createTagDto.Label, createTagDto.Value));
         return Ok(res);
     }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteAllTags()
+    {
+        return await ApiResponse<DeleteAllTagsCommand>(
+            new DeleteAllTagsCommand(),
+            onSuccess: () => Ok(
+                new Response
+                {
+                    Message = "Successfully deleted all tags",
+                    Success = true
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to delete all tags",
+                    Success = false
+                }));
+    }
 }

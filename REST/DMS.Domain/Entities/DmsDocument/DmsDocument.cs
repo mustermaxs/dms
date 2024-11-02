@@ -24,7 +24,7 @@ namespace DMS.Domain.Entities
         {
             Title = title;
             UploadDateTime = uploadDateTime;
-            Path = path;
+            Path = path ?? Id.ToString();
             Tags = tags;
             DocumentType = documentType;
             Status = status;
@@ -50,7 +50,7 @@ namespace DMS.Domain.Entities
 
             if (!Tags.Contains(documentTag))
                 Tags.Add(documentTag);
-            
+
             return this;
         }
 
@@ -90,6 +90,15 @@ namespace DMS.Domain.Entities
             ModificationDateTime = DateTime.UtcNow;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
 
+            return this;
+        }
+
+        public DmsDocument UpdatePath(string path)
+        {
+            Path = path;
+            ModificationDateTime = DateTime.UtcNow;
+            AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+            
             return this;
         }
     }

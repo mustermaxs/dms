@@ -63,6 +63,8 @@ builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 builder.Services.AddScoped<IMessageBroker, RabbitMqClient>();
 builder.Services.AddTransient<FileHelper>();
+builder.Services.AddScoped<IOcrService, OcrService>();
+builder.Services.AddScoped<ISearchService, ElasticSearchService>();
 
 // MINIO
 builder.Services.AddSingleton<IMinioClient>(sp =>

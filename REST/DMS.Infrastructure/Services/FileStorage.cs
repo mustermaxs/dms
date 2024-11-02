@@ -88,5 +88,34 @@ namespace DMS.Infrastructure.Services
             }
 
         }
+
+        public async Task DeleteAllFilesAsync()
+        {
+            try
+            {
+                var args = new ListObjectsArgs()
+                    .WithBucket(_bucketName)
+                    .WithRecursive(true);
+                
+                var fileNames = new List<string>();
+            
+                await foreach (var file in _minioClient.ListObjectsEnumAsync(args).ConfigureAwait(false))
+                {
+                    fileNames.Add(file.Key);
+                }
+
+                foreach (var fileName in fileNames)
+                {
+                    await DeleteFileAsync(Guid.Parse(fileName));
+                }
+            }
+            catch (Exception e)
+            {
+                
+                throw;
+            }
+            await EnsureBucketExistsAsync();
+
+        }
     }
 }
