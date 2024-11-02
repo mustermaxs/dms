@@ -151,7 +151,7 @@ def upload_document(document=None):
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
-    return response.json()
+    return response.json()["content"]
 
 def delete_all_documents():
     response = requests.delete(url("Documents"))
