@@ -27,7 +27,7 @@ public class TagsController : BaseController
                 new Response<List<TagDto>>
                 {
                     Success = true,
-                    Data = data,
+                    Content = data,
                     Message = "Successfully retrieved tags"
                 }),
             onFailure: () => BadRequest(

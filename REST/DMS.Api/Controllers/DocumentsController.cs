@@ -23,7 +23,7 @@ public class DocumentsController : BaseController
                 new Response<DmsDocumentDto>
                 {
                     Success = true,
-                    Data = data,
+                    Content = data,
                     Message = "Successfully uploaded document"
                 }),
             onFailure: () => BadRequest(
@@ -54,7 +54,7 @@ public class DocumentsController : BaseController
                 new Response<List<DmsDocumentDto>>
             {
                 Success = true,
-                Data = data,
+                Content = data,
                 Message = "Successfully retrieved documents"
             }),
             onFailure: () => BadRequest( 
@@ -75,7 +75,7 @@ public class DocumentsController : BaseController
                 new Response<DmsDocumentDto>
                 {
                     Success = true,
-                    Data = data,
+                    Content = data,
                     Message = "Successfully retrieved document"
                 }),
             onFailure: () => BadRequest(
@@ -96,7 +96,7 @@ public class DocumentsController : BaseController
                 new Response<DmsDocumentDto>
                 {
                     Success = true,
-                    Data = data,
+                    Content = data,
                     Message = "Successfully updated document"
                 }),
             onFailure: () => BadRequest(

@@ -26,10 +26,11 @@ export class HttpService {
             cache: 'no-cache',
         })
             .then(async response => ({
-                data: await response.json(),
+                data: (await response.json()).content,
                 status: response.status
             }));
     }
+
 
     public async post<T>(url: string, data: any): Promise<HttpResponse<T>> {
         let completeUrl: string = this.urlBuilder(url);
@@ -42,7 +43,7 @@ export class HttpService {
             body: JSON.stringify(data)
         })
             .then(async response => ({
-                data: await response.json(),
+                data: (await response.json()).content,
                 status: response.status
             }));
     }
@@ -58,7 +59,7 @@ export class HttpService {
             body: JSON.stringify(data)
         })
             .then(async response => ({
-                data: await response.json(),
+                data: (await response.json()).content,
                 status: response.status
             }));
     }
@@ -70,7 +71,7 @@ export class HttpService {
             method: 'DELETE'
         })
             .then(async response => ({
-                data: await response.json(),
+                data: (await response.json()).content,
                 status: response.status
             }));
     }

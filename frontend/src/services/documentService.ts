@@ -8,9 +8,13 @@ export interface IDocumentService {
     uploadDocument(document: UploadDocumentDto): Promise<void>;
     updateDocument(document: UpdateDocumentDto): Promise<Document>;
     getDocumentContent(id: string): Promise<string>;
+    deleteDocument(id: string): Promise<void>;
 }
 
 export class MockDocumentService implements IDocumentService {
+    deleteDocument(id: string): Promise<void> {
+        return Promise.resolve();
+    }
     getDocumentContent(id: string): Promise<string> {
         console.log("ID", id);
         return Promise.resolve("content");
@@ -125,6 +129,10 @@ export class DocumentService implements IDocumentService {
     constructor() {
         this.httpService = new HttpService();
     }
+    async deleteDocument(id: string): Promise<void> {
+        var response = await this.httpService.delete<void>(`Documents/${id}`);
+        return response.data;
+    }
 
     getDocumentContent(id: string): Promise<string> {
         throw new Error("Method not implemented.");
@@ -148,7 +156,7 @@ export class DocumentService implements IDocumentService {
     }
 
     public async updateDocument(document: UpdateDocumentDto): Promise<Document> {
-        const response = await this.httpService.put<Document>(`Documents`, document);
+        const response = await this.httpService.put<Document>(`Documents/{document.id}`, document);
         if (response.status !== 200) {
             throw new Error('Failed to update document');
         }
