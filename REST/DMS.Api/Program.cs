@@ -97,6 +97,8 @@ builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
