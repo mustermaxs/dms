@@ -78,7 +78,7 @@ public class DmsDbContext : DbContext
             .HasOne(dt => dt.Document)
             .WithMany(d => d.Tags)
             .HasForeignKey(dt => dt.DocumentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<DocumentTag>()
             .HasOne(dt => dt.Tag)

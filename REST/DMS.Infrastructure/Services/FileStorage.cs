@@ -93,6 +93,7 @@ namespace DMS.Infrastructure.Services
         {
             try
             {
+                await EnsureBucketExistsAsync();
                 var args = new ListObjectsArgs()
                     .WithBucket(_bucketName)
                     .WithRecursive(true);
@@ -114,7 +115,6 @@ namespace DMS.Infrastructure.Services
                 
                 throw;
             }
-            await EnsureBucketExistsAsync();
 
         }
     }
