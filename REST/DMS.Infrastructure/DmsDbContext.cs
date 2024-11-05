@@ -86,6 +86,8 @@ public class DmsDbContext : DbContext
             .HasForeignKey(dt => dt.TagId);
 
         base.OnModelCreating(modelBuilder);
+        
+        if (!Database.ProviderName.Contains("InMemory"))
         Database.Migrate();
     }
 }
