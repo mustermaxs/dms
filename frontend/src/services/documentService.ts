@@ -1,6 +1,7 @@
 import { upload } from "@testing-library/user-event/dist/upload";
 import {Document, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
+import { mockData } from "./mockData";
 
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
@@ -45,14 +46,14 @@ export class MockDocumentService implements IDocumentService {
             {
                 id: "14987sgkjh25",
                 title: "Document 2.pdf",
-                content: "Lorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablabla",
+                content: mockData.lorem,
                 uploadDateTime: '2020-01-01T00:00:00',
                 tags: [
                     {
                         id: '2',
-                        label: 'penis',
+                        label: 'important',
                         color: 'blue',
-                        value: 'penis'
+                        value: 'important'
                     },
                     {
                         id: '3',
@@ -92,14 +93,14 @@ export class MockDocumentService implements IDocumentService {
         let mockDock2: Document =             {
             id: "14987sgkjh25",
             title: "Document 2.pdf",
-            content: "Lorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablabla",
+            content: mockData.lorem,
             uploadDateTime: '2020-01-01T00:00:00',
             tags: [
                 {
                     id: '2',
-                    label: 'penis',
+                    label: 'important',
                     color: 'blue',
-                    value: 'penis'
+                    value: 'important'
                 },
                 {
                     id: '3',
