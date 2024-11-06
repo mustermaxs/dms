@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher eventDispatcher, IValidator<DmsDocument> validator)
-    : BaseRepository<DmsDocument>(dbContext, eventDispatcher, validator), IDmsDocumentRepository
+public class DmsDocumentRepository(DmsDbContext dbContext, IValidator<DmsDocument> validator)
+    : BaseRepository<DmsDocument>(dbContext, validator), IDmsDocumentRepository
 {
-    public async Task<DmsDocument> GetDocumentByIdAsync(Guid id)
+    public async Task<DmsDocument?> GetDocumentByIdAsync(Guid id)
     {
         return await DbSet.FindAsync(id);
     }
@@ -41,7 +41,7 @@ public class DmsDocumentRepository(DmsDbContext dbContext, IEventDispatcher even
     public override async Task UpdateAsync(DmsDocument entity)
     {
         await Validator.ValidateAndThrowAsync(entity);
-        DbSet
-        .Update(entity);
+        DbSet.Entry(entity).State = EntityState.Modified;
+        DbSet.Update(entity);
     }
 }

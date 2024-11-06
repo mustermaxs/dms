@@ -68,7 +68,7 @@ namespace DMS.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("DocumentTags", (string)null);
+                    b.ToTable("DocumentTags");
                 });
 
             modelBuilder.Entity("DMS.Domain.Entities.Tag.Tag", b =>
@@ -137,9 +137,9 @@ namespace DMS.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("DMS.Domain.Entities.Tag.Tag", "Tag")
-                        .WithMany()
+                        .WithMany("DocumentTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Document");
@@ -150,6 +150,11 @@ namespace DMS.Infrastructure.Migrations
             modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
                 {
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("DMS.Domain.Entities.Tag.Tag", b =>
+                {
+                    b.Navigation("DocumentTags");
                 });
 #pragma warning restore 612, 618
         }

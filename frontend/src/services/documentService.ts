@@ -1,6 +1,7 @@
 import { upload } from "@testing-library/user-event/dist/upload";
 import {Document, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
+import { mockData } from "./mockData";
 
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
@@ -8,9 +9,13 @@ export interface IDocumentService {
     uploadDocument(document: UploadDocumentDto): Promise<void>;
     updateDocument(document: UpdateDocumentDto): Promise<Document>;
     getDocumentContent(id: string): Promise<string>;
+    deleteDocument(id: string): Promise<void>;
 }
 
 export class MockDocumentService implements IDocumentService {
+    deleteDocument(id: string): Promise<void> {
+        return Promise.resolve();
+    }
     getDocumentContent(id: string): Promise<string> {
         console.log("ID", id);
         return Promise.resolve("content");
@@ -41,14 +46,14 @@ export class MockDocumentService implements IDocumentService {
             {
                 id: "14987sgkjh25",
                 title: "Document 2.pdf",
-                content: "Lorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablabla",
+                content: mockData.lorem,
                 uploadDateTime: '2020-01-01T00:00:00',
                 tags: [
                     {
                         id: '2',
-                        label: 'penis',
+                        label: 'important',
                         color: 'blue',
-                        value: 'penis'
+                        value: 'important'
                     },
                     {
                         id: '3',
@@ -88,14 +93,14 @@ export class MockDocumentService implements IDocumentService {
         let mockDock2: Document =             {
             id: "14987sgkjh25",
             title: "Document 2.pdf",
-            content: "Lorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablablaLorem ipsum dolor blablabla",
+            content: mockData.lorem,
             uploadDateTime: '2020-01-01T00:00:00',
             tags: [
                 {
                     id: '2',
-                    label: 'penis',
+                    label: 'important',
                     color: 'blue',
-                    value: 'penis'
+                    value: 'important'
                 },
                 {
                     id: '3',
@@ -125,6 +130,10 @@ export class DocumentService implements IDocumentService {
     constructor() {
         this.httpService = new HttpService();
     }
+    async deleteDocument(id: string): Promise<void> {
+        var response = await this.httpService.delete<void>(`Documents/${id}`);
+        return response.data;
+    }
 
     getDocumentContent(id: string): Promise<string> {
         throw new Error("Method not implemented.");
@@ -148,7 +157,7 @@ export class DocumentService implements IDocumentService {
     }
 
     public async updateDocument(document: UpdateDocumentDto): Promise<Document> {
-        const response = await this.httpService.put<Document>(`Documents`, document);
+        const response = await this.httpService.put<Document>(`Documents/{document.id}`, document);
         if (response.status !== 200) {
             throw new Error('Failed to update document');
         }

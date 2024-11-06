@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.DomainEventHandlers;
 
-public class DocumentTagsUpdatedDomainEventHandler(
+public class DocumentTagsUpdatedEventHandler(
     ILogger<DocumentTagsUpdatedDomainEvent> logger
-) : IDomainEventHandler<DocumentTagsUpdatedDomainEvent>(logger)
+) : Domain.DomainEvents.EventHandler<DocumentTagsUpdatedDomainEvent>(logger)
 {
     public override async Task HandleEvent(DocumentTagsUpdatedDomainEvent notification, CancellationToken cancellationToken)
     {

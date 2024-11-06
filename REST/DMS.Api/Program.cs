@@ -20,6 +20,7 @@ using log4net.Config;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Minio;
+using DMS.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -62,19 +63,22 @@ builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 builder.Services.AddScoped<IMessageBroker, RabbitMqClient>();
 builder.Services.AddTransient<FileHelper>();
+builder.Services.AddScoped<IOcrService, OcrService>();
+builder.Services.AddScoped<ISearchService, ElasticSearchService>();
 
 // MINIO
-builder.Services.AddScoped<IFileStorage, FileStorage>( sp =>
+builder.Services.AddSingleton<IMinioClient>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     var minioConfig = config.GetSection("MinIO").Get<DmsMinioConfig>();
-    return new FileStorage(minioConfig.AccessKey, minioConfig.SecretKey, minioConfig.Endpoint, minioConfig.BucketName);
+    
+    return new MinioClient()
+        .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
+        .WithEndpoint(minioConfig.Endpoint)
+        .Build();
 });
 
-// builder.Services.AddMinio(cgf => cgf
-//     .WithEndpoint(minioConfig.Endpoint)
-//     .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
-//     .Build());
+builder.Services.AddScoped<IFileStorage, FileStorage>();
 
 // REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
@@ -92,6 +96,8 @@ builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
 // DATABASE
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+
 
 var app = builder.Build();
 

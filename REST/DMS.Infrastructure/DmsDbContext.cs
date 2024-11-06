@@ -21,6 +21,11 @@ public class DmsDbContext : DbContext
             : "Failed to connect to the database.");
     }
 
+    public void ApplyMigrations()
+    {
+        Database.Migrate();
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DmsDocument>()
@@ -55,10 +60,20 @@ public class DmsDbContext : DbContext
             .HasIndex(e => e.Label)
             .IsUnique();
 
+        // modelBuilder.Entity<DocumentTag>()
+        //     .HasOne(dt => dt.Document)
+        //     .WithMany(d => d.Tags)
+        //     .HasForeignKey(dt => dt.DocumentId)
+        //     .OnDelete(DeleteBehavior.Cascade);
+        //
+        // modelBuilder.Entity<DocumentTag>()
+        //     .HasOne(dt => dt.Tag)
+        //     .WithMany()
+        //     .HasForeignKey(dt => dt.TagId)
+        //     .OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<DocumentTag>()
-            .ToTable("DocumentTags")
             .HasKey(dt => new { dt.DocumentId, dt.TagId });
-
+        
         modelBuilder.Entity<DocumentTag>()
             .HasOne(dt => dt.Document)
             .WithMany(d => d.Tags)
@@ -67,10 +82,12 @@ public class DmsDbContext : DbContext
 
         modelBuilder.Entity<DocumentTag>()
             .HasOne(dt => dt.Tag)
-            .WithMany()
-            .HasForeignKey(dt => dt.TagId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany(t => t.DocumentTags)
+            .HasForeignKey(dt => dt.TagId);
 
         base.OnModelCreating(modelBuilder);
+        
+        if (!Database.ProviderName.Contains("InMemory"))
+        Database.Migrate();
     }
 }

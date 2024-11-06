@@ -4,10 +4,8 @@ using MediatR;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class SearchController(IMediator mediator) : BaseController(mediator)
+public class SearchController(IMediator mediator, ILogger<SearchController> logger) : BaseController(mediator, logger)
 {
-    private ILogger<SearchController> _logger;
-
     // [HttpGet]
     // public async Task<ActionResult<IResponse>> Search([FromBody] SearchQuery searchQuery)
     // {

@@ -32,16 +32,13 @@ namespace DMS.Application.Commands
                 var document = await dmsDocumentRepository.Get(request.Document.Id);
                 var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
                 await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
-                List<DocumentTag> documentTags = new List<DocumentTag>();
-                tagsAssociatedWithDocument.ForEach(tag => documentTags.Add(DocumentTag.Create(tag, document!)));
 
                 document
                     .UpdateTitle(request.Document.Title)
-                    .UpdateTags(documentTags);
+                    .UpdateTags(tagsAssociatedWithDocument);
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
-
                 await unitOfWork.CommitAsync();
 
                 return autoMapper.Map<DmsDocumentDto>(document);

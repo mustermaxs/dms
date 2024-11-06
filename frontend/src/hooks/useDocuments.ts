@@ -58,6 +58,17 @@ export const useDocuments = () => {
         }
     };
 
+    const deleteDocument = async (id: string): Promise<void> => {
+        try {
+            setError(null);
+            const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+            await documentService.deleteDocument(id);
+            setDocuments((prevDocuments) => prevDocuments.filter((doc) => doc.id !== id));
+        } catch (err) {
+            setError('Failed to delete document');
+        }
+    }
+
 
 
     useEffect(() => {
@@ -85,6 +96,7 @@ export const useDocuments = () => {
         selectedDocument, 
         setSelectedDocument, 
         uploadDocument, 
-        error 
+        error,
+        deleteDocument
     };
 };

@@ -7,19 +7,18 @@ using MediatR;
 
 namespace DMS.Application.Commands
 {
-public record GetTagsQuery() : IRequest<List<TagDto>>;
+    public record GetTagsQuery() : IRequest<List<TagDto>>;
 
-public class GetTagsQueryHandler(
-    ITagRepository tagRepository,
-    IMapper mapper) : IRequestHandler<GetTagsQuery, List<TagDto>>
-{
-    public async Task<List<TagDto>> Handle(GetTagsQuery request, CancellationToken cancellationToken)
+    public class GetTagsQueryHandler(
+        ITagRepository tagRepository,
+        IMapper mapper) : IRequestHandler<GetTagsQuery, List<TagDto>>
     {
-        var tags = await tagRepository.GetAll();
-        var tagDtos = tags.Select(t => mapper.Map<TagDto>(t)).ToList();
-        
-        return await Task.FromResult(tagDtos);
+        public async Task<List<TagDto>> Handle(GetTagsQuery request, CancellationToken cancellationToken)
+        {
+            var tags = await tagRepository.GetAll();
+            var tagDtos = tags.Select(t => mapper.Map<TagDto>(t)).ToList();
+
+            return await Task.FromResult(tagDtos);
+        }
     }
 }
-}
-

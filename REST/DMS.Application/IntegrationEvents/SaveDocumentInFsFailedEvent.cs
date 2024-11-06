@@ -11,7 +11,7 @@ public record SaveDocumentInFsFailedEvent(DmsDocument Document) : INotification;
 
 public class SaveDocumentInFsFailedEventHandler(
     ILogger<SaveDocumentInFsFailedEvent> logger,
-    IUnitOfWork unitOfWork) : IDomainEventHandler<SaveDocumentInFsFailedEvent>(logger)
+    IUnitOfWork unitOfWork) : Domain.DomainEvents.EventHandler<SaveDocumentInFsFailedEvent>(logger)
 {
     public override async Task HandleEvent(SaveDocumentInFsFailedEvent notification, CancellationToken cancellationToken)
     {

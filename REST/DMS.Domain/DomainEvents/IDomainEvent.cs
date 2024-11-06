@@ -5,7 +5,7 @@ namespace DMS.Domain.DomainEvents
 {
 public interface IDomainEvent : IRequest {}
     
-public abstract class IDomainEventHandler<TEvent>(ILogger<TEvent> logger) : INotificationHandler<TEvent> where TEvent : INotification
+public abstract class EventHandler<TEvent>(ILogger<TEvent> logger) : INotificationHandler<TEvent> where TEvent : INotification
 {
     public ILogger Logger { get; } = logger;
 

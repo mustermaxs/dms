@@ -15,6 +15,7 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Database=DMSDB;Username=dmsadmin;Password=dmsadmin"
     depends_on:
       - postgres
+      - minio
   
   postgres:
     image: "postgres:13"
@@ -35,20 +36,23 @@ services:
     networks:
       - DMS-network
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:80"
-  #   networks:
-  #     - DMS-network
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - DMS-network
+    depends_on:
+      - api
 
 
   minio:
     image: bitnami/minio:latest
     ports:
       - '9000:9000'
+      - '9090:9090'
       - '9090:9090'
     networks:
       - DMS-network
