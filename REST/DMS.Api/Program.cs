@@ -21,6 +21,8 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Minio;
 using DMS.Api.Configuration;
+using DMS.Infrastructure.Configs;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -61,7 +63,6 @@ builder.Logging.AddLog4Net();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
-builder.Services.AddScoped<IMessageBroker, RabbitMqClient>();
 builder.Services.AddTransient<FileHelper>();
 builder.Services.AddScoped<IOcrService, OcrService>();
 builder.Services.AddScoped<ISearchService, ElasticSearchService>();
@@ -76,6 +77,15 @@ builder.Services.AddSingleton<IMinioClient>(sp =>
         .WithCredentials(minioConfig.AccessKey, minioConfig.SecretKey)
         .WithEndpoint(minioConfig.Endpoint)
         .Build();
+});
+
+// RABBITMQ
+builder.Services.AddScoped<IConnectionFactory, ConnectionFactory>();
+builder.Services.AddSingleton<IMessageBroker, RabbitMqClient>(cfg =>
+{
+    var config = cfg.GetRequiredService<IConfiguration>();
+    var rabbitMqConfig = config.GetSection("RabbitMq").Get<RabbitMqConfig>();
+    return new RabbitMqClient(rabbitMqConfig!);
 });
 
 builder.Services.AddScoped<IFileStorage, FileStorage>();

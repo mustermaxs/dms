@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7ef45132-9273-43a7-88e6-d2ddafa8c11c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.dms.dir/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dms.dir/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REST/.Dockerfile.un~" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/REST/.docker-compose.yml.un~" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/REST/.idea/.idea.REST/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/REST/.idea/.idea.REST/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REST/DMS.Infrastructure/DMS.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/REST/DMS.Infrastructure/DMS.Infrastructure.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REST/DMS.Infrastructure/Services/RabbitMqClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/REST/DMS.Infrastructure/Services/RabbitMqClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,25 +17,25 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "mustermaxs"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;mustermaxs&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/mustermaxs/dms.git",
-    "accountId": "5a8bc7ff-17d3-43bd-8173-a6a415cef7c4"
+    "accountId": "6ccdf007-97a3-4ba5-81a0-5fd8a08675f5"
   }
 }]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/REST/DMS.Api/Program.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2nPz6PArA5uTKUMWYIQM08fIreK" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,8 +43,16 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.CodyAccountHistoryMigration": "true",
+    "RunOnceActivity.CodyAccountsIdsRefresh": "true",
+    "RunOnceActivity.CodyAssignOrphanedChatsToActiveAccount": "true",
+    "RunOnceActivity.CodyConvertUrlToCodebaseName": "true",
+    "RunOnceActivity.CodyHistoryLlmMigration": "true",
+    "RunOnceActivity.CodyMigrateChatHistory-v2": "true",
+    "RunOnceActivity.CodyProjectSettingsMigration": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "RunOnceActivity.ToggleCodyToolWindowAfterMigration": "true",
+    "git-widget-placeholder": "feature/dms-33-rabbitmq",
     "last_opened_file_path": "/home/max/projects/dms",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
@@ -54,6 +67,7 @@
       <option name="presentableId" value="Default" />
       <updated>1728889326325</updated>
       <workItem from="1728889328788" duration="124000" />
+      <workItem from="1730980052400" duration="97000" />
     </task>
     <servers />
   </component>
