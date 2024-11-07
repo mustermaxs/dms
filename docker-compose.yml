@@ -16,6 +16,7 @@ services:
     depends_on:
       - postgres
       - minio
+      - rabbitmq
   
   postgres:
     image: "postgres:13"
@@ -62,6 +63,24 @@ services:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
       - MINIO_DEFAULT_BUCKETS=dmsbucket
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    hostname: "dms-rabbitmq"
+    ports:
+      - "5672:5672"
+      - "9093:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "dmsadmin"
+      RABBITMQ_DEFAULT_PASS: "dmsadmin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 3
 #  admin:
 #    image: adminer
 #    restart: always
