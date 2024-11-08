@@ -14,7 +14,8 @@ namespace DMS.Application.IntegrationEvents
     public class DocumentSavedInFileStorageIntegrationEventHandler(
         ILogger<DocumentSavedInFileStorageIntegrationEvent> logger,
         IOcrService ocrService,
-        IMapper mapper) : Domain.DomainEvents.EventHandler<DocumentSavedInFileStorageIntegrationEvent>(logger)
+        IMapper mapper,
+        IUnitOfWork unitOfWork) : Domain.DomainEvents.EventHandler<DocumentSavedInFileStorageIntegrationEvent>(logger)
     {
         public override async Task HandleEvent(
             DocumentSavedInFileStorageIntegrationEvent notification,
@@ -26,7 +27,13 @@ namespace DMS.Application.IntegrationEvents
                 // then, wait for OCR Worker to finish processing the file
                 // then dispatch event that the file has been processed
                 // handler should take care of updating content of document in db
-                await ocrService.ExtractTextFromPdfAsync(mapper.Map<DmsDocumentDto>(notification.Document));
+                var documentContent = await ocrService.ExtractTextFromPdfAsync(mapper.Map<DmsDocumentDto>(notification.Document));
+                
+                await unitOfWork.BeginTransactionAsync();
+                
+                notification.Document.UpdateContent(documentContent);
+                await unitOfWork.DmsDocumentRepository.UpdateAsync(notification.Document);
+                await unitOfWork.CommitAsync();
                 await Task.CompletedTask;
             }
             catch (Exception e)

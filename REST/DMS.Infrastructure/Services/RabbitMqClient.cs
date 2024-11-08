@@ -22,14 +22,12 @@ namespace DMS.Infrastructure.Services
         public RabbitMqClient(RabbitMqConfig config)
         {
             _config = config;
-            _connectionFactory = new ConnectionFactory();
-            _connectionFactory.UserName = _config.Username;
-            _connectionFactory.Password = _config.Password;
+            _connectionFactory = new ConnectionFactory
             {
-                HostName = _config.Host,
-                Port = _config.Port,
-                UserName = _config.Username,
-                Password = _config.Password
+                HostName = config.HostName,
+                Password = config.Password,
+                Port = config.Port,
+                Endpoint = new AmqpTcpEndpoint(config.Endpoint)
             };
         }
 
