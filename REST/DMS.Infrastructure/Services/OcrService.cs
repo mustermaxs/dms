@@ -15,5 +15,5 @@ public class OcrService(IMessageBroker messageBroker) : IOcrService
         
     }
     
-    private async Task SubscriptionHandler()
+    private async Task SubscriptionHandler(string )
 }

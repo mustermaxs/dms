@@ -114,11 +114,11 @@ namespace DMS.Infrastructure.Services
                 mandatory: true);
         }
 
-        public Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
+        public async Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += eventHandler;
-            
+            await _channel.BasicConsumeAsync(queueName, false, consumer);
         }
 
         public Task Acknowledge(ulong deliveryTag)
