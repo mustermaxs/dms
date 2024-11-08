@@ -73,34 +73,34 @@ namespace DMS.Infrastructure.Services
             }
         }
 
-        // public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message)
-        // {
-        //     await EnsureInitialized();
-        //     if (!await QueueExists(queueName)) await CreateQueue(queueName);
-        //     var props = new BasicProperties
-        //     {
-        //         CorrelationId = Guid.NewGuid().ToString(),
-        //         ReplyTo = queueName
-        //     };
-        //     var tcs = new TaskCompletionSource<string>(
-        //         TaskCreationOptions.RunContinuationsAsynchronously);
-        //     _callbackMapper.TryAdd(props.CorrelationId, tcs);
-        //     
-        //     var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
-        //     var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
-        //     await _channel.BasicPublishAsync(
-        //         exchange: "", 
-        //         routingKey: queueName,
-        //         body: messageBody,
-        //         basicProperties: props,
-        //         mandatory: true);
-        //     
-        //     var openChannel = await _channel.BasicGetAsync(queueName, true);
-        //     if (openChannel == null) throw new RabbitMQ.Client.Exceptions.OperationInterruptedException();
-        //
-        //     var reponse = await tcs.Task;
-        //     return reponse;
-        // }
+        public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message)
+        {
+            await EnsureInitialized();
+            if (!await QueueExists(queueName)) await CreateQueue(queueName);
+            var props = new BasicProperties
+            {
+                CorrelationId = Guid.NewGuid().ToString(),
+                ReplyTo = queueName
+            };
+            var tcs = new TaskCompletionSource<string>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            _callbackMapper.TryAdd(props.CorrelationId, tcs);
+            
+            var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
+            var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
+            await _channel.BasicPublishAsync(
+                exchange: "", 
+                routingKey: queueName,
+                body: messageBody,
+                basicProperties: props,
+                mandatory: true);
+            
+            var openChannel = await _channel.BasicGetAsync(queueName, true);
+            if (openChannel == null) throw new RabbitMQ.Client.Exceptions.OperationInterruptedException();
+        
+            var reponse = await tcs.Task;
+            return reponse;
+        }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
         {

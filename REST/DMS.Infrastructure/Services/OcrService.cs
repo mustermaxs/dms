@@ -1,19 +1,21 @@
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
-using DMS.Domain.Entities;
 
 namespace DMS.Infrastructure.Services;
 
 public class OcrService(IMessageBroker messageBroker) : IOcrService
 {
     private readonly IMessageBroker _messageBroker = messageBroker;
-
-    public async Task<string> ExtractTextFromPdfAsync(DmsDocumentDto document)
+    public async Task<string> ProcessDocumentAsync(DmsDocumentDto document)
     {
-        // var content = await _messageBroker.PublishRpc<object>("ocr-doc", document);
-        await _messageBroker.Publish<DmsDocumentDto>("ocr-process", document);
-        
+        return await messageBroker.PublishRpc<DmsDocumentDto>("ocr-process", document);
     }
-    
-    private async Task SubscriptionHandler(string )
+
+    // // TODO Implement
+    // private async void SubscriptionHandler(string channel, BasicDeliverEventArgs eventArgs)
+    // {
+    //     var body = eventArgs.Body.ToArray();
+    //     var message = Encoding.UTF8.GetString(body);
+    //     
+    // }
 }

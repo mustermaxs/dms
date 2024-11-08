@@ -27,7 +27,8 @@ namespace DMS.Application.IntegrationEvents
                 // then, wait for OCR Worker to finish processing the file
                 // then dispatch event that the file has been processed
                 // handler should take care of updating content of document in db
-                var documentContent = await ocrService.ExtractTextFromPdfAsync(mapper.Map<DmsDocumentDto>(notification.Document));
+                var documentContent = await ocrService.ProcessDocumentAsync(mapper.Map<DmsDocumentDto>(notification.Document));
+                // TODO how to document content?
                 
                 await unitOfWork.BeginTransactionAsync();
                 

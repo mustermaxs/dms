@@ -5,5 +5,5 @@ namespace DMS.Application.Interfaces;
 
 public interface IOcrService
 {
-    Task<string> ExtractTextFromPdfAsync(DmsDocumentDto document);
+    Task<string> ProcessDocumentAsync(DmsDocumentDto document);
 }
