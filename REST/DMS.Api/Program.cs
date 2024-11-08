@@ -88,11 +88,11 @@ builder.Services.AddSingleton<IMessageBroker, RabbitMqClient>(cfg =>
     return new RabbitMqClient(rabbitMqConfig!);
 });
 
-var sp = builder.Services.BuildServiceProvider();
-var rabbit = sp.GetRequiredService<IMessageBroker>();
-var obj = new { name = "test" };
-var res = await rabbit.PublishRpc<object>("dms-upload", obj);
-Console.WriteLine(res.ToString());
+// var sp = builder.Services.BuildServiceProvider();
+// var rabbit = sp.GetRequiredService<IMessageBroker>();
+// var obj = new { name = "test" };
+// var res = await rabbit.PublishRpc<object>("dms-upload", obj);
+// Console.WriteLine(res.ToString());
 
 
 builder.Services.AddScoped<IFileStorage, FileStorage>();

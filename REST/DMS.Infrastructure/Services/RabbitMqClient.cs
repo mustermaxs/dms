@@ -17,6 +17,7 @@ namespace DMS.Infrastructure.Services
         protected static bool IsInitialized { get; set; }
         private static IConnection _connection;
         private static IChannel _channel;
+
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper
             = new();
 
@@ -28,14 +29,23 @@ namespace DMS.Infrastructure.Services
                 HostName = config.HostName,
                 Password = config.Password,
                 Port = config.Port,
-                Endpoint = new AmqpTcpEndpoint(config.Endpoint)
+                Endpoint = new AmqpTcpEndpoint(config.Endpoint),
+                UserName = config.UserName
             };
         }
 
         public async Task InitiliazeAsync()
         {
-            _connection = await _connectionFactory.CreateConnectionAsync();
-            _channel = await _connection.CreateChannelAsync();
+            try
+            {
+                _connection = await _connectionFactory.CreateConnectionAsync();
+                _channel = await _connection.CreateChannelAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private async Task EnsureInitialized()
@@ -73,9 +83,34 @@ namespace DMS.Infrastructure.Services
             }
         }
 
-        public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message)
+        public async Task StartAsync(string queueName)
         {
-            await EnsureInitialized();
+            await InitiliazeAsync();
+            var replyQueueName = $"{queueName}_reply";
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += (model, ea) =>
+            {
+                string? correlationId = ea.BasicProperties.CorrelationId;
+
+                if (false == string.IsNullOrEmpty(correlationId))
+                {
+                    if (_callbackMapper.TryRemove(correlationId, out var tcs))
+                    {
+                        var body = ea.Body.ToArray();
+                        var response = Encoding.UTF8.GetString(body);
+                        tcs.TrySetResult(response);
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+            await _channel.BasicConsumeAsync(queueName, false, consumer);
+        }
+
+        public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message,
+            CancellationToken cancellationToken = default)
+        {
+            await StartAsync(queueName);
             if (!await QueueExists(queueName)) await CreateQueue(queueName);
             var props = new BasicProperties
             {
@@ -85,21 +120,23 @@ namespace DMS.Infrastructure.Services
             var tcs = new TaskCompletionSource<string>(
                 TaskCreationOptions.RunContinuationsAsynchronously);
             _callbackMapper.TryAdd(props.CorrelationId, tcs);
-            
+
             var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
             var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
             await _channel.BasicPublishAsync(
-                exchange: "", 
+                exchange: "",
                 routingKey: queueName,
                 body: messageBody,
                 basicProperties: props,
                 mandatory: true);
-            
-            var openChannel = await _channel.BasicGetAsync(queueName, true);
-            if (openChannel == null) throw new RabbitMQ.Client.Exceptions.OperationInterruptedException();
-        
-            var reponse = await tcs.Task;
-            return reponse;
+
+            await using CancellationTokenRegistration ctr =
+                cancellationToken.Register(() =>
+                {
+                    _callbackMapper.TryRemove(props.CorrelationId, out _);
+                    tcs.SetCanceled(cancellationToken);
+                });
+            return await tcs.Task;
         }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)

@@ -2,7 +2,7 @@ namespace DMS.Application.Interfaces
 {
     public interface IMessageBroker
     {
-        Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject messageObject);
+        Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject messageObject,  CancellationToken cancellationToken = default);
         Task Publish<TMessageObject>(string queueName, TMessageObject messageObject);
         // Task Subscribe(string queueName, Action<T> handler);
         Task Acknowledge(ulong deliveryTag);
