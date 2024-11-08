@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DMS.Application.Interfaces;
@@ -12,7 +13,7 @@ namespace DMS.Infrastructure.Services
     public class RabbitMqClient : IMessageBroker, IDisposable
     {
         private readonly RabbitMqConfig _config;
-        private readonly IConnectionFactory _connectionFactory;
+        private static IConnectionFactory _connectionFactory;
         protected static bool IsInitialized { get; set; }
         private static IConnection _connection;
         private static IChannel _channel;
@@ -72,38 +73,52 @@ namespace DMS.Infrastructure.Services
             }
         }
 
-        public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message)
+        // public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message)
+        // {
+        //     await EnsureInitialized();
+        //     if (!await QueueExists(queueName)) await CreateQueue(queueName);
+        //     var props = new BasicProperties
+        //     {
+        //         CorrelationId = Guid.NewGuid().ToString(),
+        //         ReplyTo = queueName
+        //     };
+        //     var tcs = new TaskCompletionSource<string>(
+        //         TaskCreationOptions.RunContinuationsAsynchronously);
+        //     _callbackMapper.TryAdd(props.CorrelationId, tcs);
+        //     
+        //     var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
+        //     var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
+        //     await _channel.BasicPublishAsync(
+        //         exchange: "", 
+        //         routingKey: queueName,
+        //         body: messageBody,
+        //         basicProperties: props,
+        //         mandatory: true);
+        //     
+        //     var openChannel = await _channel.BasicGetAsync(queueName, true);
+        //     if (openChannel == null) throw new RabbitMQ.Client.Exceptions.OperationInterruptedException();
+        //
+        //     var reponse = await tcs.Task;
+        //     return reponse;
+        // }
+
+        public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
         {
             await EnsureInitialized();
-            if (!await QueueExists(queueName)) await CreateQueue(queueName);
-            var props = new BasicProperties
-            {
-                CorrelationId = Guid.NewGuid().ToString(),
-                ReplyTo = queueName
-            };
-            var tcs = new TaskCompletionSource<string>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
-            _callbackMapper.TryAdd(props.CorrelationId, tcs);
-            
-            var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
-            var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
+            var msgContentJson = JsonSerializer.Serialize<TMessageObject>(messageObject);
+            var body = Encoding.UTF8.GetBytes(msgContentJson);
             await _channel.BasicPublishAsync(
-                exchange: "", 
+                exchange: string.Empty,
                 routingKey: queueName,
-                body: messageBody,
-                basicProperties: props,
+                body: body,
                 mandatory: true);
-            
-            var openChannel = await _channel.BasicGetAsync(queueName, true);
-            if (openChannel == null) throw new RabbitMQ.Client.Exceptions.OperationInterruptedException();
-
-            var reponse = await tcs.Task;
-            return reponse;
         }
 
-        public Task Subscribe(string queueName)
+        public Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
         {
-            throw new NotImplementedException();
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += eventHandler;
+            
         }
 
         public Task Acknowledge(ulong deliveryTag)

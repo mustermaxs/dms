@@ -10,7 +10,10 @@ public class OcrService(IMessageBroker messageBroker) : IOcrService
 
     public async Task<string> ExtractTextFromPdfAsync(DmsDocumentDto document)
     {
-        var content = await _messageBroker.PublishRpc<object>("ocr-doc", document);
-        return content;
+        // var content = await _messageBroker.PublishRpc<object>("ocr-doc", document);
+        await _messageBroker.Publish<DmsDocumentDto>("ocr-process", document);
+        
     }
+    
+    private async Task SubscriptionHandler()
 }
