@@ -17,6 +17,9 @@ namespace DMS.Infrastructure.Services
         protected static bool IsInitialized { get; set; }
         private static IConnection _connection;
         private static IChannel _channel;
+        private string? _replyQueueName;
+        private const string QUEUE_NAME = "ocr";
+
 
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper
             = new();
@@ -50,7 +53,7 @@ namespace DMS.Infrastructure.Services
 
         private async Task EnsureInitialized()
         {
-            if (!_connection.IsOpen || !_channel.IsOpen)
+            if (_connection is null || _channel is null || !_connection.IsOpen || !_channel.IsOpen)
             {
                 await InitiliazeAsync();
             }
@@ -70,22 +73,24 @@ namespace DMS.Infrastructure.Services
             await EnsureInitialized();
             try
             {
-                var queueDeclareOk = await _channel.QueueDeclarePassiveAsync(queueName);
+                await _channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false);
 
-                return queueDeclareOk.MessageCount > 0;
+                return true;
             }
             catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex) when (ex.ShutdownReason is
                 {
                     ReplyCode: 404
                 })
             {
-                return await Task.FromResult(false);
+                await _channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false);
+                return await Task.FromResult(true);
             }
         }
 
         public async Task StartAsync(string queueName)
         {
-            await InitiliazeAsync();
+            await EnsureInitialized();
+            await CreateQueue(queueName);
             var replyQueueName = $"{queueName}_reply";
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += (model, ea) =>
@@ -110,32 +115,33 @@ namespace DMS.Infrastructure.Services
         public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message,
             CancellationToken cancellationToken = default)
         {
-            await StartAsync(queueName);
-            if (!await QueueExists(queueName)) await CreateQueue(queueName);
+            if (_channel is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            string correlationId = Guid.NewGuid().ToString();
             var props = new BasicProperties
             {
-                CorrelationId = Guid.NewGuid().ToString(),
-                ReplyTo = queueName
+                CorrelationId = correlationId,
+                ReplyTo = _replyQueueName
             };
+
             var tcs = new TaskCompletionSource<string>(
                 TaskCreationOptions.RunContinuationsAsynchronously);
-            _callbackMapper.TryAdd(props.CorrelationId, tcs);
+            _callbackMapper.TryAdd(correlationId, tcs);
 
-            var msgContent = JsonSerializer.Serialize<TMessageObject>(message);
-            var messageBody = System.Text.Encoding.UTF8.GetBytes(msgContent);
-            await _channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: queueName,
-                body: messageBody,
-                basicProperties: props,
-                mandatory: true);
+            var messageBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+            await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: QUEUE_NAME,
+                mandatory: true, basicProperties: props, body: messageBytes);
 
-            await using CancellationTokenRegistration ctr =
+            using CancellationTokenRegistration ctr =
                 cancellationToken.Register(() =>
                 {
-                    _callbackMapper.TryRemove(props.CorrelationId, out _);
-                    tcs.SetCanceled(cancellationToken);
+                    _callbackMapper.TryRemove(correlationId, out _);
+                    tcs.SetCanceled();
                 });
+
             return await tcs.Task;
         }
 

@@ -1,14 +1,16 @@
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
+using DMS.Domain.Entities;
 
 namespace DMS.Infrastructure.Services;
 
 public class OcrService(IMessageBroker messageBroker) : IOcrService
 {
     private readonly IMessageBroker _messageBroker = messageBroker;
-    public async Task<string> ProcessDocumentAsync(DmsDocumentDto document)
+    public async Task<string> ProcessDocumentAsync(DmsDocument document)
     {
-        return await messageBroker.PublishRpc<DmsDocumentDto>("ocr-process", document);
+        await _messageBroker.StartAsync("ocr-process");
+        return await messageBroker.PublishRpc<DmsDocument>("ocr-process", document);
     }
 
     // // TODO Implement

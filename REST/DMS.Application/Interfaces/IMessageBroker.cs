@@ -8,5 +8,6 @@ namespace DMS.Application.Interfaces
         Task Acknowledge(ulong deliveryTag);
         Task Reject(ulong deliveryTag, bool requeue);
         Task Close();
+        Task StartAsync(string queueName);
     }
 }

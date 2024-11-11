@@ -3,6 +3,7 @@ using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;
 using DMS.Application.Services;
 using DMS.Domain.DomainEvents;
+using DMS.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

@@ -4,6 +4,8 @@ using DMS.Domain.ValueObjects;
 
 namespace DMS.Application.DTOs;
 
+// IMPORTANT weil content hier fehlt gehts im rabbitclient nicht
+// vlt einfach das UploadDocumentDto weitergeben
 public class DmsDocumentDto
 {
     public Guid Id { get; set; }

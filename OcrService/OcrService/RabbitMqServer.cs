@@ -52,7 +52,6 @@ public class RabbitMqServer : IAsyncDisposable
             document.RootElement.TryGetProperty("content", out var content);
             var contentStream = new MemoryStream(Convert.FromBase64String(content.ToString()));
             
-            
             IChannel channel = cons.Channel;
             var documentContent = await requestHandler(contentStream);
             var responseBytes = Encoding.UTF8.GetBytes(documentContent);
