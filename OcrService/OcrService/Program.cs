@@ -1,16 +1,18 @@
 ﻿
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using OcrService.DTOs;
 using WorkerService1;
+using OcrService.Configs;
 
 namespace OcrService;
 class Program
 {
     private static IMinioClient _minioClient;
-    private static MinioConfig _minioConfig;
+    private static FileStorageConfig _fileStorageConfig;
     private static RabbitMqClient? _rabbitMq = null;
     private static OcrWorker _ocrWorker = new OcrWorker();
     private static RabbitMqConfig _rabbitMqConfig;
@@ -20,11 +22,12 @@ class Program
     {
         LoadConfig(Directory.GetCurrentDirectory());
         _rabbitMqConfig = _configurationBuilder.GetSection("RabbitMq").Get<RabbitMqConfig>();
-        _minioConfig = _configurationBuilder.GetSection("Minio").Get<MinioConfig>();
+        _fileStorageConfig = _configurationBuilder.GetSection("MinIO").Get<FileStorageConfig>();
         _minioClient = new MinioClient()
             .WithEndpoint(_rabbitMqConfig.Endpoint)
-            .WithCredentials(_minioConfig.AccessKey, _minioConfig.SecretKey);
-        _fileStorage = new FileStorage(_minioClient, _minioConfig);
+            .WithCredentials(_fileStorageConfig.AccessKey, _fileStorageConfig.SecretKey)
+            .Build();
+        _fileStorage = new FileStorage(_minioClient, _fileStorageConfig);
         _rabbitMq = new RabbitMqClient(_rabbitMqConfig);
         
         await _rabbitMq.InitiliazeAsync();
@@ -55,7 +58,7 @@ class Program
     private static void LoadConfig(string path)
     {
         _configurationBuilder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
             .AddJsonFile("settings.json", optional: false, reloadOnChange: true)
             .Build();
     }

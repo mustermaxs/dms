@@ -4,6 +4,7 @@ using DMS.Application.EventHandlers;
 using DMS.Application.Interfaces;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
+using DMS.Domain.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -23,19 +24,15 @@ namespace DMS.Application.IntegrationEvents
         {
             try
             {
+                await unitOfWork.BeginTransactionAsync();
                 // TODO inform OCR Worker that file is ready to be processed
                 // then, wait for OCR Worker to finish processing the file
                 // then dispatch event that the file has been processed
                 // handler should take care of updating content of document in db
-                var documentContent = await ocrService.ProcessDocumentAsync(notification.Document);
-                // TODO how to document content?
-                
-                await unitOfWork.BeginTransactionAsync();
-                
-                notification.Document.UpdateContent(documentContent);
+                ocrService.ProcessDocumentAsync(mapper.Map<DmsDocumentDto>(notification.Document));
+                notification.Document.SetStatus(ProcessingStatus.Pending);
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(notification.Document);
                 await unitOfWork.CommitAsync();
-                await Task.CompletedTask;
             }
             catch (Exception e)
             {

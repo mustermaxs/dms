@@ -6,7 +6,9 @@
     "Password": "dmsadmin",
     "Queue": "ocr-process",
     "Exchange": "ocr-process",
-    "RoutingKey": "ocr-process"
+    "RoutingKey": "ocr-process",
+    "Endpoint": "localhost",
+    "HostName": "localhost"
   },
   "MinIO": {
     "Endpoint": "localhost:9000",

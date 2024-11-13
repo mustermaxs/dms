@@ -1,4 +1,4 @@
-namespace OcrService;
+namespace OcrService.Configs;
 
 public class RabbitMqConfig
 {

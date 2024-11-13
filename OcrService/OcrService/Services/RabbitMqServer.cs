@@ -4,7 +4,7 @@ using System.Text.Json;
 using OcrService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-
+using OcrService.Configs;
 namespace WorkerService1;
 // https://www.rabbitmq.com/tutorials/tutorial-six-dotnet
 

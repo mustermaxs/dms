@@ -88,8 +88,9 @@ namespace DMS.Domain.Entities
         {
             Content = content;
             ModificationDateTime = DateTime.UtcNow;
+            Status = ProcessingStatus.Finished;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
-
+            
             return this;
         }
 
@@ -98,6 +99,13 @@ namespace DMS.Domain.Entities
             Path = path;
             ModificationDateTime = DateTime.UtcNow;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
+            
+            return this;
+        }
+
+        public DmsDocument SetStatus(ProcessingStatus status)
+        {
+            Status = status;
             
             return this;
         }

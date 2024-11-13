@@ -5,5 +5,5 @@ namespace DMS.Application.Interfaces;
 
 public interface IOcrService
 {
-    Task<string> ProcessDocumentAsync(DmsDocument document);
+    Task ProcessDocumentAsync(DmsDocumentDto document);
 }

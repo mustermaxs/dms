@@ -1,3 +1,4 @@
+using System.Text;
 using DMS.Application.DTOs;
 using DMS.Application.IntegrationEvents;
 using DMS.Application.Interfaces;

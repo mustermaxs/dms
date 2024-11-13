@@ -1,6 +1,6 @@
-namespace OcrService;
+namespace OcrService.Configs;
 
-public class MinioConfig
+public class FileStorageConfig
 {
     public required string Endpoint { get; set; }
     public required string AccessKey { get; set; }

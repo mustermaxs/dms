@@ -6,4 +6,5 @@ public interface IFileStorage
     Task<Stream> GetFileAsync(Guid id);
     Task<bool> DeleteFileAsync(Guid id);
     Task DeleteAllFilesAsync();
+    public Task<MemoryStream> GetFileStreamAsync(string fileName);
 }
