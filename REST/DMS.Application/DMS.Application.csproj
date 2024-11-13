@@ -12,6 +12,12 @@
     <ProjectReference Include="..\DMS.Domain\DMS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="RabbitMQ.Client">
+      <HintPath>..\..\..\..\.nuget\packages\rabbitmq.client\7.0.0\lib\net8.0\RabbitMQ.Client.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

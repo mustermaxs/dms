@@ -1,16 +1,14 @@
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using DMS.Application.Interfaces;
-using DMS.Infrastructure.Configs;
-using Microsoft.EntityFrameworkCore.Metadata;
+using OcrService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace DMS.Infrastructure.Services
-{
-    public class RabbitMqClient : IMessageBroker, IDisposable
+namespace WorkerService1;
+// https://www.rabbitmq.com/tutorials/tutorial-six-dotnet
+
+    public class RabbitMqClient : IDisposable
     {
         private readonly RabbitMqConfig _config;
         private static IConnectionFactory _connectionFactory;
@@ -153,4 +151,3 @@ namespace DMS.Infrastructure.Services
             _connection?.Dispose();
         }
     }
-}
