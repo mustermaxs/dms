@@ -1,10 +1,11 @@
+using RabbitMQ.Client.Events;
+
 namespace DMS.Application.Interfaces
 {
     public interface IMessageBroker
     {
-        Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject messageObject,  CancellationToken cancellationToken = default);
         Task Publish<TMessageObject>(string queueName, TMessageObject messageObject);
-        // Task Subscribe(string queueName, Action<T> handler);
+        Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler);
         Task Acknowledge(ulong deliveryTag);
         Task Reject(ulong deliveryTag, bool requeue);
         Task Close();

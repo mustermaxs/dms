@@ -112,39 +112,6 @@ namespace DMS.Infrastructure.Services
             await _channel.BasicConsumeAsync(queueName, false, consumer);
         }
 
-        public async Task<string> PublishRpc<TMessageObject>(string queueName, TMessageObject message,
-            CancellationToken cancellationToken = default)
-        {
-            if (_channel is null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            string correlationId = Guid.NewGuid().ToString();
-            var props = new BasicProperties
-            {
-                CorrelationId = correlationId,
-                ReplyTo = _replyQueueName
-            };
-
-            var tcs = new TaskCompletionSource<string>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
-            _callbackMapper.TryAdd(correlationId, tcs);
-
-            var messageBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
-            await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: QUEUE_NAME,
-                mandatory: true, basicProperties: props, body: messageBytes);
-
-            using CancellationTokenRegistration ctr =
-                cancellationToken.Register(() =>
-                {
-                    _callbackMapper.TryRemove(correlationId, out _);
-                    tcs.SetCanceled();
-                });
-
-            return await tcs.Task;
-        }
-
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
         {
             await EnsureInitialized();
@@ -159,6 +126,7 @@ namespace DMS.Infrastructure.Services
 
         public async Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
         {
+            await EnsureInitialized();
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += eventHandler;
             await _channel.BasicConsumeAsync(queueName, false, consumer);

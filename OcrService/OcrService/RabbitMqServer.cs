@@ -1,75 +1,153 @@
+using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
-using IronOcr;
+using OcrService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace WorkerService1;
 // https://www.rabbitmq.com/tutorials/tutorial-six-dotnet
-public class RabbitMqServer : IAsyncDisposable
-{
-    private ConnectionFactory _factory;
-    private IConnection _connection;
-    private IChannel _channel;
-    private readonly string _queueName;
 
-    public RabbitMqServer(string hostName, string queueName)
+    public class RabbitMqClient : IDisposable
     {
-        _factory = new ConnectionFactory()
+        private readonly RabbitMqConfig _config;
+        private static IConnectionFactory _connectionFactory;
+        protected static bool IsInitialized { get; set; }
+        private static IConnection _connection;
+        private static IChannel _channel;
+        private string? _replyQueueName;
+        private const string QUEUE_NAME = "ocr";
+
+
+        private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper
+            = new();
+
+        public RabbitMqClient(RabbitMqConfig config)
         {
-            HostName = hostName,
-            Port = 5672,
-            UserName = "dmsadmin",
-            Password = "dmsadmin",
-            Endpoint = new AmqpTcpEndpoint("localhost")
-        };
-        _queueName = queueName;
-    }
-
-    private async Task InitializeAsync()
-    {
-        _connection = await _factory.CreateConnectionAsync();
-        _channel = await _connection.CreateChannelAsync();
-        await _channel.QueueDeclareAsync(queue: _queueName, durable:false, exclusive: false, autoDelete: false, arguments: null);
-        await _channel.BasicQosAsync(prefetchCount:1, prefetchSize:0, global: false);
-    }
-
-    public async Task StartListeningAsync(Func<Stream, Task<string>> requestHandler)
-    {
-        await InitializeAsync();
-        var consumer = new AsyncEventingBasicConsumer(_channel);
-        consumer.ReceivedAsync += async (sender, ea) =>
-        {
-            AsyncEventingBasicConsumer cons = (AsyncEventingBasicConsumer)sender;
-            IReadOnlyBasicProperties props = ea.BasicProperties;
-            var replyProps = new BasicProperties
+            _config = config;
+            _connectionFactory = new ConnectionFactory
             {
-                CorrelationId = props.CorrelationId,
+                HostName = config.HostName,
+                Password = config.Password,
+                Port = config.Port,
+                Endpoint = new AmqpTcpEndpoint(config.Endpoint),
+                UserName = config.UserName
             };
-            
-            var body = ea.Body.ToArray();
-            var document = JsonDocument.Parse(Encoding.UTF8.GetString(body));
-            document.RootElement.TryGetProperty("content", out var content);
-            var contentStream = new MemoryStream(Convert.FromBase64String(content.ToString()));
-            
-            IChannel channel = cons.Channel;
-            var documentContent = await requestHandler(contentStream);
-            var responseBytes = Encoding.UTF8.GetBytes(documentContent);
+        }
+
+        public async Task InitiliazeAsync()
+        {
+            try
+            {
+                _connection = await _connectionFactory.CreateConnectionAsync();
+                _channel = await _connection.CreateChannelAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private async Task EnsureInitialized()
+        {
+            if (_connection is null || _channel is null || !_connection.IsOpen || !_channel.IsOpen)
+            {
+                await InitiliazeAsync();
+            }
+        }
+
+        protected async Task CreateQueue(string queueName)
+        {
+            await _channel.QueueDeclareAsync(queue: queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+        }
+
+        protected async Task<bool> QueueExists(string queueName)
+        {
+            await EnsureInitialized();
+            try
+            {
+                await _channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false);
+
+                return true;
+            }
+            catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex) when (ex.ShutdownReason is
+                {
+                    ReplyCode: 404
+                })
+            {
+                await _channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false);
+                return await Task.FromResult(true);
+            }
+        }
+
+        public async Task StartAsync(string queueName)
+        {
+            await EnsureInitialized();
+            await CreateQueue(queueName);
+            var replyQueueName = $"{queueName}_reply";
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += (model, ea) =>
+            {
+                string? correlationId = ea.BasicProperties.CorrelationId;
+
+                if (false == string.IsNullOrEmpty(correlationId))
+                {
+                    if (_callbackMapper.TryRemove(correlationId, out var tcs))
+                    {
+                        var body = ea.Body.ToArray();
+                        var response = Encoding.UTF8.GetString(body);
+                        tcs.TrySetResult(response);
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+            await _channel.BasicConsumeAsync(queueName, false, consumer);
+        }
+
+        public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
+        {
+            await EnsureInitialized();
+            var msgContentJson = JsonSerializer.Serialize<TMessageObject>(messageObject);
+            var body = Encoding.UTF8.GetBytes(msgContentJson);
             await _channel.BasicPublishAsync(
                 exchange: string.Empty,
-                routingKey:props.ReplyTo,
-                mandatory:true,
-                basicProperties:replyProps,
-                body:responseBytes);
-            await _channel.BasicAckAsync(deliveryTag:ea.DeliveryTag, multiple:false);
-        };
-        
-        await _channel.BasicConsumeAsync(_queueName, false, consumer);
+                routingKey: queueName,
+                body: body,
+                mandatory: true);
+        }
+
+        public async Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
+        {
+            await EnsureInitialized();
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += eventHandler;
+            await _channel.BasicConsumeAsync(queueName, false, consumer);
+        }
+
+        public Task Acknowledge(ulong deliveryTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Reject(ulong deliveryTag, bool requeue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Close()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            _channel?.Dispose();
+            _connection?.Dispose();
+        }
     }
-    
-    public async ValueTask DisposeAsync()
-    {
-        await _connection.DisposeAsync();
-        await _channel.DisposeAsync();
-    }
-}
