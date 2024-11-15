@@ -23,7 +23,11 @@ namespace DMS.Application.IntegrationEvents
                 // then, wait for OCR Worker to finish processing the file
                 // then dispatch event that the file has been processed
                 // handler should take care of updating content of document in db
-                await ocrService.ExtractTextFromPdfAsync(notification.Document.Path!);
+                var tags = notification.Document.Tags?.ToList().Select(t => t.Tag.Label).ToList();
+                await ocrService.ExtractTextFromPdfAsync(new OcrDocumentRequestDto(
+                    notification.Document.Id,
+                    tags,
+                    notification.Document.Title)).ConfigureAwait(false);
                 await Task.CompletedTask;
             }
             catch (Exception e)

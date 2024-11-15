@@ -1,2 +1,3 @@
 psqldatabase
 IntegrationTests/venv
+/rabbitmq/

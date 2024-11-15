@@ -1,18 +1,14 @@
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using DMS.Application.Interfaces;
-using DMS.Infrastructure.Configs;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.EntityFrameworkCore.Metadata;
+using OcrService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
+using OcrService.Configs;
+namespace WorkerService1;
+// https://www.rabbitmq.com/tutorials/tutorial-six-dotnet
 
-namespace DMS.Infrastructure.Services
-{
-    public class RabbitMqClient : IMessageBroker, IDisposable
+    public class RabbitMqClient : IDisposable
     {
         private readonly RabbitMqConfig _config;
         private static IConnectionFactory _connectionFactory;
@@ -20,6 +16,7 @@ namespace DMS.Infrastructure.Services
         private static IConnection _connection;
         private static IChannel _channel;
         private string? _replyQueueName;
+        private const string QUEUE_NAME = "ocr";
 
 
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper
@@ -44,6 +41,7 @@ namespace DMS.Infrastructure.Services
             {
                 _connection = await _connectionFactory.CreateConnectionAsync();
                 _channel = await _connection.CreateChannelAsync();
+                await CreateQueue("ocr-process"); // Pass queue name as argument
             }
             catch (Exception e)
             {
@@ -125,18 +123,11 @@ namespace DMS.Infrastructure.Services
                 mandatory: true);
         }
 
-        public async Task Subscribe<TResponseObj>(string queueName, Action<TResponseObj> callback)
+        public async Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
         {
             await EnsureInitialized();
             var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.ReceivedAsync += async (ch, ea) =>
-            {
-                byte[] body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var responseObj = JsonSerializer.Deserialize<TResponseObj>(message);
-                callback(responseObj!);
-                await _channel.BasicAckAsync(ea.DeliveryTag, false);
-            };
+            consumer.ReceivedAsync += eventHandler;
             await _channel.BasicConsumeAsync(queueName, false, consumer);
         }
 
@@ -161,4 +152,3 @@ namespace DMS.Infrastructure.Services
             _connection?.Dispose();
         }
     }
-}
