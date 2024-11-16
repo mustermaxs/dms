@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using IronOcr;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using OcrService.DTOs;
@@ -20,6 +21,7 @@ class Program
     private static FileStorage _fileStorage;
     static async Task Main(string[] args)
     {
+        License.LicenseKey = "IRONSUITE.IF22B066.TECHNIKUM.WIEN.AT.13212-E87A0AF9CC-AIQRPGWZD57RN3RC-P3SK7TQNFL23-LUGKCGFU42LV-CELNTVRC7Y5B-GQKQEZYCMJ3H-AMVEAWUIPLZU-UDGLQC-TVSAPLTXUJWOEA-DEPLOYMENT.TRIAL-PGRG5C.TRIAL.EXPIRES.16.DEC.2024";
         LoadConfig(Directory.GetCurrentDirectory());
         _rabbitMqConfig = _configurationBuilder.GetSection("RabbitMq").Get<RabbitMqConfig>();
         _fileStorageConfig = _configurationBuilder.GetSection("MinIO").Get<FileStorageConfig>();
