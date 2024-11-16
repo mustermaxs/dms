@@ -34,7 +34,8 @@ namespace DMS.Infrastructure.Services
                 Password = config.Password,
                 Port = config.Port,
                 Endpoint = new AmqpTcpEndpoint(config.Endpoint),
-                UserName = config.UserName
+                UserName = config.UserName,
+                VirtualHost = "/"
             };
         }
 
@@ -44,6 +45,8 @@ namespace DMS.Infrastructure.Services
             {
                 _connection = await _connectionFactory.CreateConnectionAsync();
                 _channel = await _connection.CreateChannelAsync();
+                await CreateQueue("ocr-process");
+                await CreateQueue("ocr-result");
             }
             catch (Exception e)
             {

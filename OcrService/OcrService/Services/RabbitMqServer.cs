@@ -31,7 +31,8 @@ namespace WorkerService1;
                 Password = config.Password,
                 Port = config.Port,
                 Endpoint = new AmqpTcpEndpoint(config.Endpoint),
-                UserName = config.UserName
+                UserName = config.UserName,
+                VirtualHost = "/"
             };
         }
 

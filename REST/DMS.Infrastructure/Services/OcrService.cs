@@ -11,7 +11,7 @@ public class OcrService(IMessageBroker messageBroker) : IOcrService
     public async Task ExtractTextFromPdfAsync(OcrDocumentRequestDto ocrDocumentRequest)
     {
         await _messageBroker.Publish<OcrDocumentRequestDto>("ocr-process", ocrDocumentRequest).ConfigureAwait(false);
-        await _messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-response", async (OcrProcessedDocumentDto processedDocumentDto) =>
+        await _messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-result", async (OcrProcessedDocumentDto processedDocumentDto) =>
         {
             Console.WriteLine(processedDocumentDto.Content);
         }).ConfigureAwait(false);

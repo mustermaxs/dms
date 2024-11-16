@@ -13,6 +13,7 @@ public class OcrWorker
 
     public async Task<string> ProcessPdfAsync(Stream stream)
     {
+        stream.Position = 0;
         using var ocrInput = new OcrInput();
         ocrInput.LoadPdf(stream);
         var result = await _ironOcr.ReadAsync(ocrInput);

@@ -30,7 +30,7 @@ public class DocumentUploadedToDbEventHandler(
         {
             logger.LogError(e.Message);
             await fileStorage.DeleteFileAsync(notification.Document.Id);
-            mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
+            // mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
         }
     }
 }
