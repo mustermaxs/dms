@@ -107,3 +107,16 @@ class DocumentTests(unittest.TestCase):
         self.assertEqual(len(documents_in_db), 0, f"Expected 0 documents, got {len(documents_in_db)}")
         self.assertEqual(len(minio_files), 0, f"Expected 0 objects in Minio, got {len(minio_files)}")
 
+    def test_uploaded_document_has_content(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+
+        # WHEN
+        response = requests.get(url(f"Documents/{document_id}"))
+        resObj = response.json()
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertTrue("content" in resObj["content"], f"Expected content in document, got {resObj['content']["content"]}")
+

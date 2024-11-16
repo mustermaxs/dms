@@ -12,7 +12,7 @@ namespace DMS.Domain.Entities
         public string? Path { get; private set; }
         public ICollection<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
         public FileType DocumentType { get; private set; }
-        public ProcessingStatus Status { get; private set; }
+        public ProcessingStatus Status { get; private set; } = ProcessingStatus.NotStarted;
 
         public DmsDocument()
         {
@@ -88,6 +88,7 @@ namespace DMS.Domain.Entities
         {
             Content = content;
             ModificationDateTime = DateTime.UtcNow;
+            Status = ProcessingStatus.Finished;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
 
             return this;
@@ -99,6 +100,12 @@ namespace DMS.Domain.Entities
             ModificationDateTime = DateTime.UtcNow;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
             
+            return this;
+        }
+        
+        public DmsDocument SetStatus(ProcessingStatus status)
+        {
+            Status = status;
             return this;
         }
     }

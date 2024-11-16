@@ -1,6 +1,6 @@
 
 import { createContext, Dispatch, SetStateAction } from "react";
-import { Document, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
+import { Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
 import { Tag } from "../../types/Tag";
 
 interface AppContextProps {

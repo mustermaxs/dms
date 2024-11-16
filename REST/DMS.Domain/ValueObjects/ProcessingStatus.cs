@@ -4,5 +4,6 @@ public enum ProcessingStatus
 {
     Pending,
     NotStarted,
-    Finished
+    Finished,
+    Failed
 }

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
-import { Document } from "../../types/Document";
+import { Document, DocumentContentDto } from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
 import { MockDocumentService as IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";

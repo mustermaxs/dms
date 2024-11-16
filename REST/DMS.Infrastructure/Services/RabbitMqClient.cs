@@ -119,6 +119,7 @@ namespace DMS.Infrastructure.Services
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
         {
             await EnsureInitialized();
+            Console.WriteLine($"Processing message: {messageObject}");
             var msgContentJson = JsonSerializer.Serialize<TMessageObject>(messageObject);
             var body = Encoding.UTF8.GetBytes(msgContentJson);
             await _channel.BasicPublishAsync(

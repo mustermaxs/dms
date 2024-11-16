@@ -88,6 +88,8 @@ builder.Services.AddSingleton<IMessageBroker, RabbitMqClient>(cfg =>
     return new RabbitMqClient(rabbitMqConfig!);
 });
 
+builder.Services.AddHostedService<OcrServiceSubscriber>();
+
 // var sp = builder.Services.BuildServiceProvider();
 // var rabbit = sp.GetRequiredService<IMessageBroker>();
 // var obj = new { name = "test" };

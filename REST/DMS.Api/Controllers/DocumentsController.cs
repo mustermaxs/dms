@@ -86,6 +86,27 @@ public class DocumentsController : BaseController
                 })
         );
     }
+    
+    [HttpGet("{id}/content")]
+    public async Task<ActionResult<DocumentContentDto>> GetDocumentContent(Guid id)
+    {
+        return await ApiResponse<GetDocumentContentQuery, DocumentContentDto>(
+            new GetDocumentContentQuery(id),
+            onSuccess: data => Ok(
+                new Response<DocumentContentDto>
+                {
+                    Success = true,
+                    Content = data,
+                    Message = "Successfully retrieved documents content"
+                }),
+            onFailure: () => BadRequest(
+                new Response
+                {
+                    Message = "Failed to retrieve document content",
+                    Success = false
+                })
+        );
+    }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<DmsDocumentDto>> UpdateDocument([FromBody] UpdateDocumentDto documentDto)

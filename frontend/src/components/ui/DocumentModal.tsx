@@ -1,7 +1,7 @@
 import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { DateFormatter } from "../../services/dateFormatter";
-import { Document, UpdateDocumentDto } from "../../types/Document";
+import { Document, DocumentContentDto, UpdateDocumentDto } from "../../types/Document";
 import { Button, Input } from "rizzui";
 import "../ui/DocumentModal.css";
 import { useModal } from "../../hooks/useModal";
@@ -23,7 +23,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   const [editedTags, setEditedTags] = useState(
     document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", value: tag.id, label: tag.label, color: "#ffffff" }))
   );
-
+  const [documentContentObj, setDocumentContentObj] = useState<DocumentContentDto | null>(null);
   const { updateDocument, deleteDocument } = useDocuments();
 
   useEffect(() => {
