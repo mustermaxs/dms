@@ -24,13 +24,13 @@ namespace DMS.Application.IntegrationEvents
                 {
                     throw new Exception($"Document with id {notification.DocumentId} not found");
                 }
-                
+                logger.LogDebug($"Saving document content.\nId: {notification.DocumentId}.\nTitle: {document.Title}");
                 document.UpdateContent(notification.Content);
                 await unitOfWork.CommitAsync();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.LogError(e, $"[Event Error] {typeof(DocumentContentExtractedIntegrationEvent).FullName}: {e.Message}");
                 throw;
             }
         }

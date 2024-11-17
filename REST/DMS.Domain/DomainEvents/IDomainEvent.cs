@@ -17,7 +17,7 @@ namespace DMS.Domain.DomainEvents
             try
             {
                 var eventName = typeof(TEvent).FullName;
-                logger.LogInformation($"[Domain Event] {notification}");
+                logger.LogInformation($"[Domain Event] {eventName}");
                 await HandleEvent(notification, cancellationToken);
             }
             catch (Exception e)

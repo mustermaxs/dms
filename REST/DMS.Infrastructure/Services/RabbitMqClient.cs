@@ -65,6 +65,9 @@ namespace DMS.Infrastructure.Services
 
         protected async Task CreateQueue(string queueName)
         {
+            var args = new Dictionary<string, object>();
+            args.Add("x-max-length", 50);
+            
             await _channel.QueueDeclareAsync(queue: queueName,
                 durable: true,
                 exclusive: false,

@@ -4,70 +4,60 @@ using DMS.Application.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DMS.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class OcrServiceSubscriber : IHostedService
+public class OcrServiceSubscriber : BackgroundService
 {
-    private Task _executingTask;
-    private CancellationTokenSource _cts;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public OcrServiceSubscriber(IServiceScopeFactory serviceScopeFactory)
     {
-        _cts = new CancellationTokenSource();
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task ProcessOcrResults(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var messageBroker = scope.ServiceProvider.GetRequiredService<IMessageBroker>();
-        
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<OcrServiceSubscriber>>();
+
+        logger.LogInformation("OCR service subscriber started.");
+
         await messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-result", async (processedDocumentDto) =>
-        {
-            Console.WriteLine($"Received OCR result for document ID: {processedDocumentDto.Id}");
-            using var callbackScope = _serviceScopeFactory.CreateScope();
-            var mediator = callbackScope.ServiceProvider.GetRequiredService<IMediator>();
-            var logger = callbackScope.ServiceProvider.GetRequiredService<ILogger<OcrServiceSubscriber>>();
-            logger.LogInformation($"Received OCR result for document ID: {processedDocumentDto.Id}");
-            
-            await mediator.Publish(new DocumentContentExtractedIntegrationEvent(
-                processedDocumentDto.Id,
-                processedDocumentDto.Content), cancellationToken);
-        });
-
-        
-        await Task.CompletedTask; 
-    }
-
-
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        _executingTask = Task.Run(() => ProcessOcrResults(_cts.Token), cancellationToken);
-        
-        return Task.CompletedTask;
-    }
-
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _cts.Cancel();
-        
-        if (_executingTask != null)
         {
             try
             {
-                await Task.WhenAny(_executingTask, Task.Delay(-1, cancellationToken));
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    logger.LogInformation("Subscription cancelled.");
+                    return;
+                }
+        
+                using var callbackScope = _serviceScopeFactory.CreateScope();
+                var mediator = callbackScope.ServiceProvider.GetRequiredService<IMediator>();
+
+                logger.LogInformation($"Received OCR result for document ID: {processedDocumentDto.Id}");
+                await mediator.Publish(new DocumentContentExtractedIntegrationEvent(
+                    processedDocumentDto.Id,
+                    processedDocumentDto.Content), stoppingToken);
             }
-            catch (OperationCanceledException)
+            catch (Exception ex)
             {
-                
+                logger.LogError(ex, ex.Message);
             }
-        }
+
+        });
+
+        // This delay keeps the background task running until the application shuts down.
+        await Task.Delay(Timeout.Infinite, stoppingToken);
     }
-    public void Dispose()
+
+    public override Task StopAsync(CancellationToken cancellationToken)
     {
-        _cts?.Dispose();
+        // Log any additional cleanup here if needed
+        Console.WriteLine("STOPPING OCR SERVICE SUBSCRIBER");
+        return base.StopAsync(cancellationToken);
     }
 }

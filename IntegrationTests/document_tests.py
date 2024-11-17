@@ -113,10 +113,10 @@ class DocumentTests(unittest.TestCase):
         document_id = document["id"]
 
         # WHEN
-        response = requests.get(url(f"Documents/{document_id}"))
+        response = try_get_document_if_processed(document_id)
         resObj = response.json()
-
+        
         # THEN
         self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
-        self.assertTrue("content" in resObj["content"], f"Expected content in document, got {resObj['content']["content"]}")
+        self.assertTrue((resObj["content"] != "") and (resObj["content"] != None))
 

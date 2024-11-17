@@ -91,7 +91,6 @@ namespace WorkerService1;
         {
             await EnsureInitialized();
             await CreateQueue(queueName);
-            var replyQueueName = $"{queueName}_reply";
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += (model, ea) =>
             {
@@ -109,7 +108,7 @@ namespace WorkerService1;
 
                 return Task.CompletedTask;
             };
-            await _channel.BasicConsumeAsync(queueName, false, consumer);
+            await _channel.BasicConsumeAsync(queueName, true, consumer);
         }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
