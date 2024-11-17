@@ -1,4 +1,3 @@
-using RabbitMQ.Client.Events;
 
 namespace DMS.Application.Interfaces
 {
@@ -9,5 +8,8 @@ namespace DMS.Application.Interfaces
         Task Acknowledge(ulong deliveryTag);
         Task Reject(ulong deliveryTag, bool requeue);
         Task Close();
+        public Task EnsureInitialized();
+        public Task<bool> QueueExists(string queueName);
+        public Task StartAsync(string queueName);
     }
 }

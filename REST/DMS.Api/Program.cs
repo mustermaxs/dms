@@ -88,7 +88,6 @@ builder.Services.AddSingleton<IMessageBroker, RabbitMqClient>(cfg =>
     return new RabbitMqClient(rabbitMqConfig!);
 });
 
-builder.Services.AddHostedService<OcrServiceSubscriber>();
 
 // var sp = builder.Services.BuildServiceProvider();
 // var rabbit = sp.GetRequiredService<IMessageBroker>();
@@ -116,6 +115,7 @@ builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
 builder.Services.AddDbContext<DmsDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddHostedService<OcrServiceSubscriber>();
 
 
 var app = builder.Build();

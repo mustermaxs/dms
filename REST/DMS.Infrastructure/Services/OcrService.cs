@@ -18,24 +18,4 @@ public class OcrService(
     {
         await _messageBroker.Publish<OcrDocumentRequestDto>("ocr-process", ocrDocumentRequest).ConfigureAwait(false);
     }
-
-    // public async Task ProcessOcrResults()
-    // {
-    //     await _messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-result",
-    //         async (OcrProcessedDocumentDto processedDocumentDto) =>
-    //         {
-    //             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-    //             await mediator.Publish(new DocumentContentExtractedIntegrationEvent(
-    //                 processedDocumentDto.Id,
-    //                 processedDocumentDto.Content));
-    //         });
-    // }
-    //
-    // private async Task SubscribeToOcrResult(OcrProcessedDocumentDto processedDocumentDto)
-    // {
-    //     Console.WriteLine(processedDocumentDto.Content);
-    //     await mediator.Publish(new DocumentContentExtractedIntegrationEvent(
-    //         processedDocumentDto.Id,
-    //         processedDocumentDto.Content));
-    // }
 }

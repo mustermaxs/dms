@@ -24,7 +24,7 @@ public class OcrServiceSubscriber : BackgroundService
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<OcrServiceSubscriber>>();
 
         logger.LogInformation("OCR service subscriber started.");
-
+        await messageBroker.StartAsync("ocr-result");
         await messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-result", async (processedDocumentDto) =>
         {
             try
@@ -50,13 +50,11 @@ public class OcrServiceSubscriber : BackgroundService
 
         });
 
-        // This delay keeps the background task running until the application shuts down.
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
     public override Task StopAsync(CancellationToken cancellationToken)
     {
-        // Log any additional cleanup here if needed
         Console.WriteLine("STOPPING OCR SERVICE SUBSCRIBER");
         return base.StopAsync(cancellationToken);
     }

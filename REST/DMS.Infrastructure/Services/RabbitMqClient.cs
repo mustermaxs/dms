@@ -28,6 +28,7 @@ namespace DMS.Infrastructure.Services
         public RabbitMqClient(RabbitMqConfig config)
         {
             _config = config;
+            Console.WriteLine($"RABBIT MQ CONFIG: {JsonSerializer.Serialize(_config)}");
             _connectionFactory = new ConnectionFactory
             {
                 HostName = config.HostName,
@@ -35,7 +36,9 @@ namespace DMS.Infrastructure.Services
                 Port = config.Port,
                 Endpoint = new AmqpTcpEndpoint(config.Endpoint),
                 UserName = config.UserName,
-                VirtualHost = "/"
+                VirtualHost = "/",
+                NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
+                AutomaticRecoveryEnabled = true
             };
         }
 
@@ -55,7 +58,7 @@ namespace DMS.Infrastructure.Services
             }
         }
 
-        private async Task EnsureInitialized()
+        public async Task EnsureInitialized()
         {
             if (_connection is null || _channel is null || !_connection.IsOpen || !_channel.IsOpen)
             {
@@ -75,7 +78,7 @@ namespace DMS.Infrastructure.Services
                 arguments: null);
         }
 
-        protected async Task<bool> QueueExists(string queueName)
+        public async Task<bool> QueueExists(string queueName)
         {
             await EnsureInitialized();
             try
@@ -116,7 +119,6 @@ namespace DMS.Infrastructure.Services
 
                 return Task.CompletedTask;
             };
-            await _channel.BasicConsumeAsync(queueName, false, consumer);
         }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)

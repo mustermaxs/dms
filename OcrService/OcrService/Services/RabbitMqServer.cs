@@ -108,7 +108,6 @@ namespace WorkerService1;
 
                 return Task.CompletedTask;
             };
-            await _channel.BasicConsumeAsync(queueName, true, consumer);
         }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)

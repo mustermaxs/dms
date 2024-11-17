@@ -56,9 +56,20 @@ public class FileStorage
             var args = new GetObjectArgs()
                 .WithBucket(_bucketName)
                 .WithObject(fileName)
-                .WithCallbackStream((stream) => { stream.CopyTo(fileStream); });
+                .WithCallbackStream(async stream => 
+                {
+                    await stream.CopyToAsync(fileStream);
+                    fileStream.Position = 0;
+                });
 
             var objRes = await _minioClient.GetObjectAsync(args).ConfigureAwait(false);
+
+            var fileStreamAsBase64 = Convert.ToBase64String(fileStream.ToArray());
+            if (fileStream.Length <= 0)
+            {
+                throw new Exception($"FICK ASON: {fileStreamAsBase64}");
+            }
+            Console.WriteLine($"FileStreamAsBase64: {fileStreamAsBase64}");
             return fileStream;
         }
         catch (Minio.Exceptions.BucketNotFoundException ex)
