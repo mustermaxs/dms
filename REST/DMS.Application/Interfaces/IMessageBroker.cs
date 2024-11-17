@@ -1,5 +1,3 @@
-using RabbitMQ.Client.Events;
-
 namespace DMS.Application.Interfaces
 {
     public interface IMessageBroker

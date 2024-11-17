@@ -8,6 +8,7 @@ import { useDocuments } from "../../hooks/useDocuments";
 import { DocumentContentDto, DocumentStatus } from "../../types/Document";
 import { SkeletonText } from "./SkeletonText";
 import MsgModal from "./MsgModal";
+import { MsgModalContainer, useMsgModal } from "./MsgModalContainer";
 
 export const ContentViewerModal = ({ isOpen, closeModal, openModal, document }) => {
     const [documentBase64Content, setDocumentBase64Content] = useState<string | null>(null);
@@ -38,9 +39,10 @@ export const ContentViewerModal = ({ isOpen, closeModal, openModal, document }) 
     }, [isOpen]);
 
 
+
     return (
         <>
-      <MsgModal isVisible={document.status < DocumentStatus.Finished} setIsVisible={setDocumentContentDto} title="" message="Document is being processed..." handleClick={undefined} type="normal" />
+      {/* <MsgModal isVisible={document.status < DocumentStatus.Finished} setIsVisible={setDocumentContentDto} title="" message="Document is being processed..." handleClick={undefined} type="normal" /> */}
             <Modal size={ModalSize.LARGE} isOpen={isOpen} closeModal={closeModal} title={document.title}>
                 {
                 (documentContentDto && document.status === DocumentStatus.Finished) ?
