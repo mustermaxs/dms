@@ -24,7 +24,6 @@ public class OcrServiceSubscriber : BackgroundService
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<OcrServiceSubscriber>>();
 
         logger.LogInformation("OCR service subscriber started.");
-        await messageBroker.StartAsync("ocr-result");
         await messageBroker.Subscribe<OcrProcessedDocumentDto>("ocr-result", async (processedDocumentDto) =>
         {
             try

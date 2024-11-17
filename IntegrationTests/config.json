@@ -1,4 +1,4 @@
 {
     "base_url": "http://localhost:8000/api",
-    "document_processing_status_check_max_attempts": 10
+    "document_processing_status_check_max_attempts": 20
 }

@@ -87,28 +87,7 @@ namespace WorkerService1;
             }
         }
 
-        public async Task StartAsync(string queueName)
-        {
-            await EnsureInitialized();
-            await CreateQueue(queueName);
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.ReceivedAsync += (model, ea) =>
-            {
-                string? correlationId = ea.BasicProperties.CorrelationId;
 
-                if (false == string.IsNullOrEmpty(correlationId))
-                {
-                    if (_callbackMapper.TryRemove(correlationId, out var tcs))
-                    {
-                        var body = ea.Body.ToArray();
-                        var response = Encoding.UTF8.GetString(body);
-                        tcs.TrySetResult(response);
-                    }
-                }
-
-                return Task.CompletedTask;
-            };
-        }
 
         public async Task Publish<TMessageObject>(string queueName, TMessageObject messageObject)
         {
@@ -125,9 +104,29 @@ namespace WorkerService1;
         public async Task Subscribe(string queueName, AsyncEventHandler<BasicDeliverEventArgs> eventHandler)
         {
             await EnsureInitialized();
+
             var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.ReceivedAsync += eventHandler;
-            await _channel.BasicConsumeAsync(queueName, false, consumer);
+
+            consumer.ReceivedAsync += async (_model, ea) =>
+            {
+                try
+                {
+                    if (eventHandler != null)
+                    {
+                        await eventHandler.Invoke(this, ea);
+                    }
+
+                    await _channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing message: {ex.Message}");
+                    await _channel.BasicRejectAsync(ea.DeliveryTag, requeue: true);
+                }
+            };
+
+            // Start consuming messages from the specified queue
+            await _channel.BasicConsumeAsync(queueName, autoAck: false, consumer);
         }
 
         public Task Acknowledge(ulong deliveryTag)
