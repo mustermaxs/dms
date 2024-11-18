@@ -84,12 +84,15 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   };
 
   const handleDelete = async () => {
+    if (document.status < DocumentStatus.Finished)
+    {
+      addMessage("Cannot be deleted. Still processing document...");
+      return;
+    }
     setDocuments((prevDocuments: Document[]) =>
       prevDocuments.filter((doc) => doc.id !== document.id)
     );
-
     await deleteDocument(document.id);
-
     closeModal();
   };
 
@@ -173,7 +176,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
                 <Button type="button" onClick={handleSave} className="mt-4 mx-1 bg-green-600">
                   Save
                 </Button>
-                <Button type="button" disabled={isEditable.delete} onClick={handleDelete} className={`${isEditable.delete && 'btn-disabled'} mt-4 mx-1 bg-red`}>
+                <Button type="button" onClick={handleDelete} className={`${!isEditable.delete && 'btn-disabled'} mt-4 mx-1 bg-red`}>
                   Delete
                 </Button>
               </>

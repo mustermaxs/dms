@@ -7,10 +7,11 @@ import { fileToBase64 } from "../../services/fileService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { Tag } from "../../types/Tag";
 import AppContext from "../context/AppContext";
+import { DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const {availableTags, setIsLoadingTags, uploadDocument } = useContext(AppContext);
+  const {availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -40,10 +41,18 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
     e.preventDefault();
 
     let fileContentBase64: string = await fileToBase64(file as File);
-    await uploadDocument({
+    let uploadedDocument = await uploadDocument({
       title: title,
       tags: selectedTags,
       content: fileContentBase64,
+    });
+
+    watchDocumentStatus(uploadedDocument.id, (status) => {
+      if (status === DocumentStatus.Finished) {
+        unwatchDocumentStatus(uploadedDocument.id);
+        addMessage(`Document ${title} uploaded successfully!`);
+        closeModal();
+      }
     });
 
     const resetForm = () => {
