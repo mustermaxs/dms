@@ -1,4 +1,3 @@
-import { upload } from "@testing-library/user-event/dist/upload";
 import {Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 import { mockData } from "./mockData";
@@ -6,7 +5,7 @@ import { mockData } from "./mockData";
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
     getAllDocuments(): Promise<Document[]>;
-    uploadDocument(document: UploadDocumentDto): Promise<void>;
+    uploadDocument(document: UploadDocumentDto): Promise<Document>;
     updateDocument(document: UpdateDocumentDto): Promise<Document>;
     getDocumentContent(id: string): Promise<DocumentContentDto>;
     deleteDocument(id: string): Promise<void>;
@@ -120,8 +119,8 @@ export class MockDocumentService implements IDocumentService {
 
         return Promise.resolve(mockDocks.get(id) as Document);
     }
-    uploadDocument(document: UploadDocumentDto): Promise<void> {
-        return Promise.resolve();
+    uploadDocument(document: UploadDocumentDto): Promise<Document> {
+        return Promise.resolve( document as Document);
     }
     updateDocument(document: UpdateDocumentDto): Promise<Document> {
         return Promise.resolve(document as Document);
@@ -149,11 +148,13 @@ export class DocumentService implements IDocumentService {
         return response.data;
     }
 
-    public async uploadDocument(document: UploadDocumentDto): Promise<void> {
-        const response = await this.httpService.post<void>('Documents', document);
+    public async uploadDocument(document: UploadDocumentDto): Promise<Document> {
+        const response = await this.httpService.post<Document>('Documents', document);
         if (response.status !== 200 && response.status !== 201) {
             throw new Error('Failed to upload document');
         }
+
+        return response.data;
     }
 
     public async getDocument(id: string): Promise<Document> {
