@@ -20,5 +20,10 @@ public class DmsMappingProfile : Profile
             .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Tag.Label))
             .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Tag.Value))
             .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Tag.Color));
+        CreateMap<DmsDocument, DocumentContentDto>()
+            .ForMember(dest => dest.Content, 
+                opt => 
+                    opt.MapFrom(src => src.Content))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
     }
 }

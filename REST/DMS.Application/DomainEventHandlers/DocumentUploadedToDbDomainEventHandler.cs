@@ -22,6 +22,11 @@ public class DocumentUploadedToDbEventHandler(
         try
         {
             var contentAsStream = fileHelper.FromBase64ToStream(notification.Content);
+
+            if (contentAsStream.Length <= 0)
+            {
+                throw new Exception($"CONTENT: {notification.Content}");
+            }
             await fileStorage.SaveFileAsync(notification.Document.Id, contentAsStream);
             // TODO Send Integration Event to notify that the document has been saved in the file storage
             await mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(notification.Document));
@@ -30,7 +35,7 @@ public class DocumentUploadedToDbEventHandler(
         {
             logger.LogError(e.Message);
             await fileStorage.DeleteFileAsync(notification.Document.Id);
-            mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
+            // mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
         }
     }
 }

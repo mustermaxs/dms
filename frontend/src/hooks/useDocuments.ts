@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Document, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
+import { Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
 import { IDocumentService } from "../services/documentService";
 
@@ -70,6 +70,18 @@ export const useDocuments = () => {
     }
 
 
+    const getDocumentContent = async (id: string): Promise<DocumentContentDto | null> => {
+        try {
+            setError(null);
+            const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
+            const documentContentRes = await documentService.getDocumentContent(id);
+            return documentContentRes;
+        } catch (err) {
+            setError('Failed to fetch document content');
+            return null;
+        }
+    };
+
 
     useEffect(() => {
         const fetchDocuments = async () => {
@@ -97,6 +109,7 @@ export const useDocuments = () => {
         setSelectedDocument, 
         uploadDocument, 
         error,
-        deleteDocument
+        deleteDocument,
+        getDocumentContent
     };
 };

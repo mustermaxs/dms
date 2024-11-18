@@ -19,4 +19,17 @@ export type Document = {
     tags: Tag[];
     modificationDateTime: string;
     uploadDateTime: string;
+    status: DocumentStatus;
+  }
+
+  export type DocumentContentDto = {
+    id: string;
+    content: string;
+  }
+
+  export enum DocumentStatus {
+    Pending,
+    NotStarted,
+    Finished,
+    Failed
   }
