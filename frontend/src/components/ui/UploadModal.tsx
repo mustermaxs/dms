@@ -29,13 +29,8 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
     }));
 
     setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
-
-    console.log("Tags without ids", updatedTagsWithoutIds);
-
     let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
     newValue = [...validTags, ...updatedTagsWithoutIds];
-    console.log("Updated tags", newValue);
-
     setSelectedTags(newValue);
   };
 

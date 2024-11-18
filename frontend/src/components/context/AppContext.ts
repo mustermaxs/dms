@@ -15,6 +15,9 @@ interface AppContextProps {
   uploadDocument: (document: UploadDocumentDto) => Promise<Document>;
   updateDocument: (document: UpdateDocumentDto) => Promise<Document>;
   setSelectedDocument: Dispatch<SetStateAction<Document | null>>;
+  addMessage: (message: string) => void;
+  messages: { id: string; content: string }[];
+  removeMessage: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -29,5 +32,8 @@ const AppContext = createContext<AppContextProps>({
   uploadDocument: () => Promise.resolve({} as Document),
   updateDocument: () => Promise.resolve({} as Document),
   setSelectedDocument: () => {},
+  addMessage: () => {},
+  messages: [],
+  removeMessage: () => {},
 });
 export default AppContext;

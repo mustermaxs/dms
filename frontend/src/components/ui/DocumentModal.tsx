@@ -1,7 +1,7 @@
 import Modal from "../shared/Modal";
 import Label from "../shared/Label";
 import { DateFormatter } from "../../services/dateFormatter";
-import { Document, DocumentContentDto, UpdateDocumentDto } from "../../types/Document";
+import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto } from "../../types/Document";
 import { Button, Input } from "rizzui";
 import "../ui/DocumentModal.css";
 import { useModal } from "../../hooks/useModal";
@@ -14,9 +14,11 @@ import AppContext from "../context/AppContext";
 import { ServiceLocator } from "../../serviceLocator";
 import { IDocumentService } from "../../services/documentService";
 import { EditDocumentModal } from "./EditDocumentModal";
+import "../../App.css";
+import { title } from "process";
 
 export const DocumentModal = ({ isOpen, closeModal }) => {
-  const { availableTags, setIsLoadingTags, selectedDocument: document, setSelectedDocument, setDocuments } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, selectedDocument: document, setSelectedDocument, setDocuments, addMessage } = useContext(AppContext);
   const contentModal = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState(document.title);
@@ -25,6 +27,12 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   );
   const [documentContentObj, setDocumentContentObj] = useState<DocumentContentDto | null>(null);
   const { updateDocument, deleteDocument } = useDocuments();
+  const [isEditable, setIsEditable] = useState<{ [key: string]: boolean }>({
+    title: true,
+    tags: true,
+    content: true,
+    delete: true
+  });
 
   useEffect(() => {
     setIsLoadingTags(true);
@@ -36,13 +44,18 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
 
 
   useEffect(() => {
+    setIsEditable({
+      title: true,
+      tags: true,
+      content: true,
+      delete: document.status === DocumentStatus.Finished
+    });
     setEditedTitle(document.title);
     setEditedTags(document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", value: tag.value, label: tag.label, color: "#ffffff" })));
     setIsEditMode(false);
   }, [document]);
 
   useEffect(() => {
-    console.log(editedTags);
   }, [editedTags]);
 
   const handleSave = async () => {
@@ -55,7 +68,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
     const updatedDoc = await updateDocument(updatedDocument);
 
     if (!updatedDoc) {
-      console.log("Error updating document");
+      console.log("Error updating document ", document.id);
       return;
     }
 
@@ -91,6 +104,17 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
     setEditedTags(document.tags.map(tag => ({ id: tag.id || "00000000-0000-0000-0000-000000000000", label: tag.label, color: "#000000", value: tag.value })));
     setIsEditMode(false);
   }
+
+  const onClickViewContent = () => {
+    if (document.status < DocumentStatus.Finished)
+    {
+      addMessage("Document is still being processed... Try again later.");
+      return;
+    }
+
+    contentModal.openModal();
+    setDocumentContentObj(document);
+  };
 
   const ViewMode = () => (
     <>
@@ -130,10 +154,11 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
           editedTitle={editedTitle}
           setEditedTitle={setEditedTitle}
           editedTags={editedTags}
-          setEditedTags={setEditedTags} /> : <ViewMode />}
+          setEditedTags={setEditedTags}
+          editableFields={isEditable} /> : <ViewMode />}
         <div className="flex justify-between">
           <div className="flex justify-start">
-            <Button variant="outline" type="button" onClick={() => contentModal.openModal()} className="mt-4">
+            <Button variant="outline" type="button" onClick={() => onClickViewContent()} className="mt-4">
               <FaEye />
 
             </Button>
@@ -148,7 +173,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
                 <Button type="button" onClick={handleSave} className="mt-4 mx-1 bg-green-600">
                   Save
                 </Button>
-                <Button type="button" onClick={handleDelete} className="mt-4 mx-1 bg-red">
+                <Button type="button" disabled={isEditable.delete} onClick={handleDelete} className={`${isEditable.delete && 'btn-disabled'} mt-4 mx-1 bg-red`}>
                   Delete
                 </Button>
               </>

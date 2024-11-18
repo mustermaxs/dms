@@ -3,7 +3,8 @@ import Label from "../shared/Label"
 import { DateFormatter } from "../../services/dateFormatter"
 import { TagInput } from "../shared/TagInput"
 
-export const EditDocumentModal = ({ handleInputTitleChange, isOpen, closeModal, document, availableTags, editedTitle, setEditedTitle, editedTags, setEditedTags }) => {
+export const EditDocumentModal = ({ handleInputTitleChange, isOpen, closeModal, document, availableTags, editedTitle, setEditedTitle, editedTags, setEditedTags, editableFields }) => {
+
     return (
 <>
       <div className="mb-4">
