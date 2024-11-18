@@ -6,7 +6,8 @@ namespace DMS.Application.DomainEventHandlers;
 
 public class DeletedDocumentDomainEventHandler(
     ILogger<DeletedDocumentDomainEvent> logger,
-    IFileStorage fileStorage
+    IFileStorage fileStorage,
+    ISearchService searchService
     ) : Domain.DomainEvents.EventHandler<DeletedDocumentDomainEvent>(logger)
 {
     public override async Task HandleEvent(DeletedDocumentDomainEvent notification, CancellationToken cancellationToken)
@@ -14,7 +15,7 @@ public class DeletedDocumentDomainEventHandler(
         try
         {
             await fileStorage.DeleteFileAsync(notification.Document.Id);
-            // TODO Delete file from ElasticSearch
+            await searchService.DeleteAsync(notification.Document.Id);
         }
         catch (Exception e)
         {

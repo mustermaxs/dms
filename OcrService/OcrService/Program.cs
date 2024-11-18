@@ -1,5 +1,4 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using IronOcr;
@@ -19,6 +18,9 @@ class Program
     private static RabbitMqConfig _rabbitMqConfig;
     private static IConfigurationRoot _configurationBuilder;
     private static FileStorage _fileStorage;
+    private static ElasticSearchService _elasticSearch;
+    private static ElasticSearchConfig _elasticSearchConfig;
+
     static async Task Main(string[] args)
     {
         License.LicenseKey = "IRONSUITE.IF22B066.TECHNIKUM.WIEN.AT.13212-E87A0AF9CC-AIQRPGWZD57RN3RC-P3SK7TQNFL23-LUGKCGFU42LV-CELNTVRC7Y5B-GQKQEZYCMJ3H-AMVEAWUIPLZU-UDGLQC-TVSAPLTXUJWOEA-DEPLOYMENT.TRIAL-PGRG5C.TRIAL.EXPIRES.16.DEC.2024";
@@ -31,6 +33,10 @@ class Program
             .Build();
         _fileStorage = new FileStorage(_minioClient, _fileStorageConfig);
         _rabbitMq = new RabbitMqClient(_rabbitMqConfig);
+
+        _elasticSearchConfig = _configurationBuilder.GetSection("ElasticSearch").Get<ElasticSearchConfig>();
+
+        _elasticSearch = new ElasticSearchService(_elasticSearchConfig);
         
         await _rabbitMq.InitiliazeAsync();
         await _rabbitMq.Subscribe("ocr-process", async (model, ea) =>
@@ -43,6 +49,14 @@ class Program
                 Console.WriteLine($" [x] Received {message}");
                 var fileStream = await _fileStorage.GetFileStreamAsync(ocrDocumentRequestDto.DocumentId.ToString());
                 var fileContent = await _ocrWorker.ProcessPdfAsync(fileStream);
+
+                await _elasticSearch.IndexDocumentAsync(
+                    ocrDocumentRequestDto.DocumentId, 
+                    fileContent, 
+                    ocrDocumentRequestDto.Title, 
+                    ocrDocumentRequestDto.Tags ?? new List<string>()
+                );
+
                 var ocrDocumentDto = new OcrProcessedDocumentDto { Content = fileContent, Id = ocrDocumentRequestDto.DocumentId };
                 await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
             }
