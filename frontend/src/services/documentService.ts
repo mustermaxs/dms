@@ -1,5 +1,5 @@
 import { upload } from "@testing-library/user-event/dist/upload";
-import {Document, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
+import {Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 import { mockData } from "./mockData";
 
@@ -8,7 +8,7 @@ export interface IDocumentService {
     getAllDocuments(): Promise<Document[]>;
     uploadDocument(document: UploadDocumentDto): Promise<void>;
     updateDocument(document: UpdateDocumentDto): Promise<Document>;
-    getDocumentContent(id: string): Promise<string>;
+    getDocumentContent(id: string): Promise<DocumentContentDto>;
     deleteDocument(id: string): Promise<void>;
 }
 
@@ -16,9 +16,9 @@ export class MockDocumentService implements IDocumentService {
     deleteDocument(id: string): Promise<void> {
         return Promise.resolve();
     }
-    getDocumentContent(id: string): Promise<string> {
+    getDocumentContent(id: string): Promise<DocumentContentDto> {
         console.log("ID", id);
-        return Promise.resolve("content");
+        return Promise.resolve({ id: id, content: mockData.lorem } as DocumentContentDto);
     }
     getAllDocuments(): Promise<Document[]> {
         return Promise.resolve(
@@ -135,8 +135,9 @@ export class DocumentService implements IDocumentService {
         return response.data;
     }
 
-    getDocumentContent(id: string): Promise<string> {
-        throw new Error("Method not implemented.");
+    public async getDocumentContent(id: string): Promise<DocumentContentDto> {
+        const response = await this.httpService.get<DocumentContentDto>(`Documents/${id}/content`);
+        return response.data;
     }
 
     public async getAllDocuments(): Promise<Document[]> {

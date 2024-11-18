@@ -9,11 +9,31 @@ import httpx
 import urllib.request
 import base64
 from minio import Minio
+import time
 
 MINIO_ACCESS_KEY = ""
 MINIO_SECRET_KEY = ""
 MINIO_ENDPOINT = ""
 MINIO_BUCKET_NAME = ""
+DOC_STATUS_CHECK_MAX_ATTEMPTS = 1
+
+# write logger class. log to specific file
+class Logger:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def write(self, message):
+        with open(self.filename, "a") as f:
+            f.write(message)
+
+    def flush(self):
+        pass
+
+    def close(self):
+        pass
+
+logger = Logger("log.txt")
+
 
 with open("../REST/DMS.Api/appsettings.json", "r") as f:
     config = json.load(f)
@@ -22,6 +42,9 @@ with open("../REST/DMS.Api/appsettings.json", "r") as f:
     MINIO_SECRET_KEY = config["MinIO"]["SecretKey"]
     MINIO_ENDPOINT = config["MinIO"]["Endpoint"]
     MINIO_BUCKET_NAME = config["MinIO"]["BucketName"]
+
+with open("config.json", "r") as file:
+    DOC_STATUS_CHECK_MAX_ATTEMPTS = json.load(file)["document_processing_status_check_max_attempts"]
 
 minio_client = Minio(endpoint="localhost:9000",
     access_key=MINIO_ACCESS_KEY,
@@ -112,7 +135,7 @@ class UploadDocumentDto:
     
 def create_rand_document():
     title = RandomWord().get_word() + ".pdf"
-    content = string_to_base64(generate_random_content(100))
+    content = pdf_to_base_64("mock_pdf.pdf")
     tags = [create_rand_tag()]
     return UploadDocumentDto(title, content, tags)
 
@@ -151,8 +174,23 @@ def upload_document(document=None):
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
+    logger.write(f"Document uploaded with ID: {response.json()['content']['id']}\n")
     return response.json()["content"]
 
 def delete_all_documents():
     response = requests.delete(url("Documents"))
     return response
+
+def pdf_to_base_64(file_path):
+    with open(file_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+    
+def try_get_document_if_processed(document_id):
+    for _ in range(DOC_STATUS_CHECK_MAX_ATTEMPTS):
+        response = requests.get(url(f"Documents/{document_id}"))
+        res_json = response.json()
+        
+        if res_json["content"]["status"] == 2:
+            return response
+        time.sleep(2)
+    raise Exception(f"Document {document_id} not processed after {DOC_STATUS_CHECK_MAX_ATTEMPTS} attempts")

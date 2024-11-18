@@ -1,0 +1,19 @@
+{
+  "RabbitMq": {
+    "HostName": "rabbitmq",
+    "UserName": "dmsadmin",
+    "Password":"dmsadmin",
+    "Endpoint": "rabbitmq",
+    "Port": 5672,
+    "Queue": "ocr-process"
+  },
+  "MinIO": {
+    "Endpoint": "minio:9000",
+    "Port": 9000,
+    "AccessKey": "minioadmin",
+    "SecretKey": "minioadmin",
+    "UseSSL": false,
+    "BucketName": "dmsbucket",
+    "FilePath": "/home/dms/uploads/"
+  }
+}

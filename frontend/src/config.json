@@ -1,4 +1,4 @@
 {
-    "apiUrl": "http://192.168.0.129:8000/api/",
+    "apiUrl": "http://localhost:8000/api/",
     "debug": "false"
 }

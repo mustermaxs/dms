@@ -1,6 +1,8 @@
+using DMS.Application.DTOs;
+
 namespace DMS.Application.Interfaces;
 
 public interface IOcrService
 {
-    Task<string> ExtractTextFromPdfAsync(string filePath);
+    Task ExtractTextFromPdfAsync(OcrDocumentRequestDto ocrDocumentRequest);
 }
