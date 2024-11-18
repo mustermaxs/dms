@@ -1,5 +1,5 @@
 import { upload } from "@testing-library/user-event/dist/upload";
-import {Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
+import {Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
 import { HttpService } from "./httpService";
 import { mockData } from "./mockData";
 
@@ -28,6 +28,7 @@ export class MockDocumentService implements IDocumentService {
                 content: "Lorem ipsum",
                 modificationDateTime: '2020-01-01T00:00:00',
                 uploadDateTime: '2020-01-01T00:00:00',
+                status: DocumentStatus.Finished,
                 tags: [
                     {
                         id: '2',
@@ -45,9 +46,10 @@ export class MockDocumentService implements IDocumentService {
             },
             {
                 id: "14987sgkjh25",
-                title: "Document 2.pdf",
+                title: "Still processing document.pdf",
                 content: mockData.lorem,
                 uploadDateTime: '2020-01-01T00:00:00',
+                status: DocumentStatus.Pending,
                 tags: [
                     {
                         id: '2',
@@ -73,6 +75,7 @@ export class MockDocumentService implements IDocumentService {
             title: "Document 1.pdf",
             content: "Lorem ipsum",
             uploadDateTime: '2020-01-01T00:00:00',
+            status: DocumentStatus.Finished,
             tags: [
                 {
                     id: '2',
@@ -92,9 +95,10 @@ export class MockDocumentService implements IDocumentService {
 
         let mockDock2: Document =             {
             id: "14987sgkjh25",
-            title: "Document 2.pdf",
-            content: mockData.lorem,
+            title: "Still processing document.pdf",
+            content: null,
             uploadDateTime: '2020-01-01T00:00:00',
+            status: DocumentStatus.Pending,
             tags: [
                 {
                     id: '2',
