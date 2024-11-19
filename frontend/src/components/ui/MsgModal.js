@@ -25,7 +25,7 @@ function MsgModal({
 
   useEffect(() => {
     setIsOpen(isOpen);
-    autoHideAfterSeconds(10000);
+    // autoHideAfterSeconds(10000);
   }, [isOpen]);
 
   const handleClose = () => {
@@ -36,9 +36,8 @@ function MsgModal({
     <>
       {isOpen &&(
         <div className="msgModal">
-
           <div id="text">
-            <p>{message}</p>
+            {message}
           </div>
           <ActionIcon
             variant="outline"

@@ -69,6 +69,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
 
     if (!updatedDoc) {
       console.log("Error updating document ", document.id);
+      addMessage("Error updating document");
       return;
     }
 
@@ -80,6 +81,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
       )
     );
 
+    addMessage("Document updated successfullyDocument updated successfullyDocument updated successfullyDocument updated successfullyDocument updated successfully");
     setIsEditMode(false);
   };
 
@@ -92,7 +94,15 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
     setDocuments((prevDocuments: Document[]) =>
       prevDocuments.filter((doc) => doc.id !== document.id)
     );
-    await deleteDocument(document.id);
+    try
+    {
+      await deleteDocument(document.id);
+      addMessage("Document deleted successfully");
+    }
+    catch (error)
+    {
+      addMessage("Error deleting document");
+    }
     closeModal();
   };
 

@@ -6,6 +6,7 @@ export const useMsgModal = () => {
     const addMessage = (message: string) => {
         const newMessage = { id: Date.now().toString(), content: message };
         console.log("ADDED MESSAGE " + newMessage.id);
+        console.log("[useMsgModal] Message: ", message);
         setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
