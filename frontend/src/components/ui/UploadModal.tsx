@@ -47,8 +47,13 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
       content: fileContentBase64,
     });
 
-    watchDocumentStatus(response.id, (ev, token) => {
-      switch (ev.status) {
+    if (!response) {
+      addMessage("Document could not be uploaded. Please check your form!");
+      return;
+    }
+
+    watchDocumentStatus(response.id, (ev) => {
+      switch (ev.data) {
         case DocumentStatus.Pending:
           unwatchDocumentStatus(response.id, ev.token);
           addMessage(`Document ${title} is being processed!`);
@@ -65,6 +70,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           addMessage(`Document ${title} could not be uploaded. Please check your form!`);
           break;
         default:
+          addMessage("FAILURE");
           break;
       }
 

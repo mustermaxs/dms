@@ -2,7 +2,7 @@
 import { createContext, Dispatch, SetStateAction } from "react";
 import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
 import { Tag } from "../../types/Tag";
-import { statusChangeEvent } from "../../services/uploadProgressInfo";
+import { DocumentStatusEvent, useFileStatus } from "../../hooks/useFileStatus";
 
 interface AppContextProps {
   documents: Document[];
@@ -19,7 +19,7 @@ interface AppContextProps {
   addMessage: (message: string) => void;
   messages: { id: string; content: string }[];
   removeMessage: (id: string) => void;
-  watchDocumentStatus: (documentId: string, callback: (ev: statusChangeEvent, token: string) => void) => string;
+  watchDocumentStatus: (documentId: string, callback: (ev: DocumentStatusEvent) => void) => () => void;
   unwatchDocumentStatus: (documentId: string, token: string) => void;
 }
 
@@ -38,7 +38,7 @@ const AppContext = createContext<AppContextProps>({
   addMessage: () => {},
   messages: [],
   removeMessage: () => {},
-  watchDocumentStatus: () => "",
+  watchDocumentStatus: () => () => {},
   unwatchDocumentStatus: () => {},
 });
 export default AppContext;

@@ -81,7 +81,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
       )
     );
 
-    addMessage("Document updated successfullyDocument updated successfullyDocument updated successfullyDocument updated successfullyDocument updated successfully");
+    addMessage("Document updated successfully!");
     setIsEditMode(false);
   };
 
@@ -121,7 +121,7 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   const onClickViewContent = () => {
     if (document.status < DocumentStatus.Finished)
     {
-      addMessage("Document is still being processed... Try again later.");
+      addMessage("Content is not available. Document is still being processed...");
       return;
     }
 

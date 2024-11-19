@@ -25,7 +25,7 @@ function MsgModal({
 
   useEffect(() => {
     setIsOpen(isOpen);
-    // autoHideAfterSeconds(10000);
+    autoHideAfterSeconds(10000);
   }, [isOpen]);
 
   const handleClose = () => {

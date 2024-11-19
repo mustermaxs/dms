@@ -7,12 +7,13 @@ import { useTags } from "./hooks/useTags";
 import { useDocuments } from "./hooks/useDocuments";
 import { useMsgModal } from "./hooks/useMsgModal";
 import { useCheckProgressForDocuments } from "./services/uploadProgressInfo";
+import { useFileStatus } from "./hooks/useFileStatus";
 function App() {
 
   const { availableTags, setAvailableTags, setIsLoadingTags } = useTags();
   const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument } = useDocuments();
   const {addMessage, removeMessage, messages} = useMsgModal();
-  const {watchDocumentStatus, unwatchDocumentStatus} = useCheckProgressForDocuments();
+  const {watchDocumentStatus, unwatchDocumentStatus} = useFileStatus();
   return (
     <>
       <AppContext.Provider value={{ 

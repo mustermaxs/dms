@@ -15,15 +15,12 @@ export default function DocumentTable() {
 
   const { documents, selectedDocument, setSelectedDocument, addMessage } = useContext(AppContext);
 
-useEffect(() => {
-},[documents]);
-
   const showModal = async (document: Document) => {
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     let doc: Document = await documentService.getDocument(document.id);
 
     if (doc.status < DocumentStatus.Finished) {
-        addMessage("Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...");
+      addMessage("Document is still being processed...");
     }
     setSelectedDocument(doc);
     openModal();
@@ -89,7 +86,7 @@ useEffect(() => {
           </tbody>
         </table>
 
-        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal}  />}
+        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} />}
 
       </div>)}
     </>

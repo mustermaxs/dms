@@ -1,69 +1,107 @@
-type EventCallback = (...args: any[]) => void;
+import { useCallback, useRef } from "react";
+import { createToken } from "../services/uploadProgressInfo";
 
-class PubSub {
-  private events: Map<string, EventCallback[]>;
+export interface PubsubEvent {
+    event: string;
+    data: any;
+    token: string;
+};
 
-  constructor() {
-    this.events = new Map();
-  }
+export type Subscriber = {
+    token: string;
+    handle: (ev: PubsubEvent, unsubscribe: () => void) => void;
+};
 
-  // Subscribe to an event
-  subscribe(event: string, callback: EventCallback): () => void {
-    if (!this.events.has(event)) {
-      this.events.set(event, []);
-    }
-    this.events.get(event)!.push(callback);
+export class PubSub {
+    public events: Map<string, Subscriber[]>;
 
-    // Return an unsubscribe function
-    return () => this.unsubscribe(event, callback);
-  }
-
-  // Unsubscribe from an event
-  unsubscribe(event: string, callback: EventCallback): void {
-    if (!this.events.has(event)) return;
-
-    const listeners = this.events.get(event)!;
-    const index = listeners.indexOf(callback);
-
-    if (index !== -1) {
-      listeners.splice(index, 1);
+    constructor() {
+        this.events = new Map();
     }
 
-    // Clean up the event if no listeners remain
-    if (listeners.length === 0) {
-      this.events.delete(event);
+    private createSubscriber(callback: (ev: PubsubEvent) => void): Subscriber {
+        return {
+            token: createToken(),
+            handle: callback
+        }
     }
-  }
 
-  // Publish an event
-  publish(event: string, ...args: any[]): void {
-    if (!this.events.has(event)) return;
-
-    const listeners = this.events.get(event)!;
-    for (const callback of listeners) {
-      callback(...args);
+    public topicExists(topic: string): boolean {
+        return this.events.has(topic);
     }
-  }
+
+    public hasTopicSubscribers(topic: string): boolean {
+        if (!this.events.has(topic)) return false;
+
+        return this.events.get(topic)!.length > 0;
+    }
+
+    subscribe(event: string, callback: (ev: PubsubEvent) => void): () => void {
+        if (!this.topicExists(event)) {
+            this.events.set(event, []);
+        }
+
+        const subscriber = this.createSubscriber(callback);
+        this.events.get(event)!.push(subscriber);
+
+        return () => this.unsubscribe(event, subscriber.token);
+    }
+
+
+    unsubscribe(event: string, token: string): void {
+        if (!this.events.has(event)) return;
+
+        const subscribers: Subscriber[] = this.events.get(event)!;
+        const index = subscribers.findIndex(subscriber => subscriber.token === token);
+
+        if (index !== -1) {
+            subscribers.splice(index, 1);
+        }
+
+        if (subscribers.length === 0) {
+            this.events.delete(event);
+        }
+    }
+
+
+    publish(topic: string, event: PubsubEvent): void {
+        if (!this.events.has(topic)) return;
+
+        const subscribers = this.events.get(topic)!;
+
+        for (const subscriber of subscribers) {
+            subscriber.handle(event, () => {this.unsubscribe(topic, subscriber.token)});
+        }
+    }
+
+    public removeTopic(topic: string): void {
+        this.events.delete(topic);
+    }
 }
 
-// Usage example
-const pubsub = new PubSub();
+export function usePubsub() {
+    const pubsubRef = useRef(new PubSub());
 
-// Subscriber 1
-const unsubscribe1 = pubsub.subscribe("my-event", (data) => {
-  console.log("Subscriber 1 received:", data);
-});
+    const subscribe = (event: string, callback: (ev: PubsubEvent) => void): (() => void) => {
+            return pubsubRef.current.subscribe(event, callback);
+        };
 
-// Subscriber 2
-const unsubscribe2 = pubsub.subscribe("my-event", (data) => {
-  console.log("Subscriber 2 received:", data);
-});
+    const unsubscribe = useCallback((event: string, token: string): void => {
+        pubsubRef.current.unsubscribe(event, token);
+    }, []);
 
-// Publisher emits an event
-pubsub.publish("my-event", { message: "Hello, PubSub!" });
+    const publish = (topic: string, event: PubsubEvent): void => {
+        pubsubRef.current.publish(topic, event);
+    };
 
-// Unsubscribe Subscriber 1
-unsubscribe1();
-
-// Publisher emits another event
-pubsub.publish("my-event", { message: "Subscriber 1 should not receive this." });
+    return {
+        subscribe,
+        unsubscribe,
+        publish,
+        hasTopicSubscribers: (topic: string) => pubsubRef.current.hasTopicSubscribers(topic),
+        topicExists: (topic: string) => pubsubRef.current.topicExists(topic),
+        removeTopic: (topic: string) => pubsubRef.current.removeTopic(topic),
+        events: pubsubRef.current.events,
+        getSubscribersForTopic: (topic: string) => pubsubRef.current.events.get(topic)
+    };
+}
