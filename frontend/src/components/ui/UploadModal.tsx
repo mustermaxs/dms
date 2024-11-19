@@ -7,7 +7,7 @@ import { fileToBase64 } from "../../services/fileService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { Tag } from "../../types/Tag";
 import AppContext from "../context/AppContext";
-import { DocumentStatus } from "../../types/Document";
+import { Document, DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
@@ -41,15 +41,16 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
     e.preventDefault();
 
     let fileContentBase64: string = await fileToBase64(file as File);
-    let uploadedDocument = await uploadDocument({
+    let response: Document = await uploadDocument({
       title: title,
       tags: selectedTags,
       content: fileContentBase64,
     });
 
-    watchDocumentStatus(uploadedDocument.id, (status) => {
-      if (status === DocumentStatus.Finished) {
-        unwatchDocumentStatus(uploadedDocument.id);
+    console.log("RESPONSE: ", response);
+    watchDocumentStatus(response.id, (ev, token) => {
+      if (ev.status === DocumentStatus.Finished) {
+        unwatchDocumentStatus(response.id, ev.token);
         addMessage(`Document ${title} uploaded successfully!`);
         closeModal();
       }

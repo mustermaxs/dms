@@ -1,4 +1,5 @@
-import {Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto} from "../types/Document";
+import { useDocuments } from "../hooks/useDocuments";
+import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { HttpService } from "./httpService";
 import { mockData } from "./mockData";
 
@@ -12,6 +13,9 @@ export interface IDocumentService {
 }
 
 export class MockDocumentService implements IDocumentService {
+    public uploadedDocuments: Document[] = [];
+
+    constructor() { }
     deleteDocument(id: string): Promise<void> {
         return Promise.resolve();
     }
@@ -20,51 +24,52 @@ export class MockDocumentService implements IDocumentService {
         return Promise.resolve({ id: id, content: mockData.lorem } as DocumentContentDto);
     }
     getAllDocuments(): Promise<Document[]> {
-        return Promise.resolve(
-            [{
-                id: "234978fe978fs987",
-                title: "Document 1.pdf",
-                content: "Lorem ipsum",
-                modificationDateTime: '2020-01-01T00:00:00',
-                uploadDateTime: '2020-01-01T00:00:00',
-                status: DocumentStatus.Finished,
-                tags: [
-                    {
-                        id: '2',
-                        label: 'personal',
-                        color: 'blue',
-                        value: 'personal'
-                    },
-                    {
-                        id: '3',
-                        label: 'family',
-                        color: 'green',
-                        value: 'family'
-                    }
-                ],
-            },
-            {
-                id: "14987sgkjh25",
-                title: "Still processing document.pdf",
-                content: mockData.lorem,
-                uploadDateTime: '2020-01-01T00:00:00',
-                status: DocumentStatus.Pending,
-                tags: [
-                    {
-                        id: '2',
-                        label: 'important',
-                        color: 'blue',
-                        value: 'important'
-                    },
-                    {
-                        id: '3',
-                        label: 'hobby',
-                        color: 'green',
-                        value: 'hobby'
-                    }
-                ],
-            }
-        ] as Document[]);
+        let allDocuments = [{
+            id: "234978fe978fs987",
+            title: "Document 1.pdf",
+            content: "Lorem ipsum",
+            modificationDateTime: '2020-01-01T00:00:00',
+            uploadDateTime: '2020-01-01T00:00:00',
+            status: DocumentStatus.Finished,
+            tags: [
+                {
+                    id: '2',
+                    label: 'personal',
+                    color: 'blue',
+                    value: 'personal'
+                },
+                {
+                    id: '3',
+                    label: 'family',
+                    color: 'green',
+                    value: 'family'
+                }
+            ],
+        },
+        {
+            id: "14987sgkjh25",
+            title: "Still processing document.pdf",
+            content: mockData.lorem,
+            uploadDateTime: '2020-01-01T00:00:00',
+            status: DocumentStatus.Pending,
+            tags: [
+                {
+                    id: '2',
+                    label: 'important',
+                    color: 'blue',
+                    value: 'important'
+                },
+                {
+                    id: '3',
+                    label: 'hobby',
+                    color: 'green',
+                    value: 'hobby'
+                }
+            ],
+        }
+        ];
+        allDocuments.push(...this.uploadedDocuments);
+        return Promise.resolve(allDocuments as Document[]);
     }
     getDocument(id: string): Promise<Document> {
         let mockDocks: Map<string, Document> = new Map();
@@ -81,7 +86,7 @@ export class MockDocumentService implements IDocumentService {
                     label: 'personal',
                     color: 'blue',
                     value: 'personal',
-                    
+
                 },
                 {
                     id: '3',
@@ -92,7 +97,7 @@ export class MockDocumentService implements IDocumentService {
             ],
         } as Document;
 
-        let mockDock2: Document =             {
+        let mockDock2: Document = {
             id: "14987sgkjh25",
             title: "Still processing document.pdf",
             content: null,
@@ -116,11 +121,25 @@ export class MockDocumentService implements IDocumentService {
 
         mockDocks.set('234978fe978fs987', mockDock1);
         mockDocks.set("14987sgkjh25", mockDock2);
+        this.uploadedDocuments.forEach((doc) => {
+            mockDocks.set(doc.id, doc);
+        });
 
         return Promise.resolve(mockDocks.get(id) as Document);
     }
     uploadDocument(document: UploadDocumentDto): Promise<Document> {
-        return Promise.resolve( document as Document);
+        let uploadedDoc = {
+            id: "234978fe978fs987",
+            title: document.title,
+            content: document.content,
+            uploadDateTime: '2020-01-01T00:00:00',
+            status: DocumentStatus.Finished,
+            tags: document.tags,
+            modificationDateTime: '2020-01-01T00:00:00'
+        } as Document;
+
+        this.uploadedDocuments.push(uploadedDoc);
+        return Promise.resolve(uploadedDoc);
     }
     updateDocument(document: UpdateDocumentDto): Promise<Document> {
         return Promise.resolve(document as Document);
