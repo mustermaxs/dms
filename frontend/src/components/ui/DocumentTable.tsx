@@ -23,7 +23,7 @@ useEffect(() => {
     let doc: Document = await documentService.getDocument(document.id);
 
     if (doc.status < DocumentStatus.Finished) {
-        addMessage("Document is still being processed...");
+        addMessage("Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...Document is still being processed...");
     }
     setSelectedDocument(doc);
     openModal();

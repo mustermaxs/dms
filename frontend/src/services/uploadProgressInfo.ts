@@ -6,7 +6,7 @@ import { useDocuments } from "../hooks/useDocuments";
 
 const config = require("../config.json");
 
-function createToken() {
+export function createToken() {
     return Math.random().toString(36).substr(2);
 }
 

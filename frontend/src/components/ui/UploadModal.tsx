@@ -11,7 +11,7 @@ import { Document, DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const {availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -47,13 +47,28 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
       content: fileContentBase64,
     });
 
-    console.log("RESPONSE: ", response);
     watchDocumentStatus(response.id, (ev, token) => {
-      if (ev.status === DocumentStatus.Finished) {
-        unwatchDocumentStatus(response.id, ev.token);
-        addMessage(`Document ${title} uploaded successfully!`);
-        closeModal();
+      switch (ev.status) {
+        case DocumentStatus.Pending:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} is being processed!`);
+          break;
+        case DocumentStatus.Finished:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} is ready!`);
+          break;
+        case DocumentStatus.NotStarted:
+          addMessage(`Document ${title} is not ready yet! Still needs to be processed.`);
+          break;
+        case DocumentStatus.Failed:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} could not be uploaded. Please check your form!`);
+          break;
+        default:
+          break;
       }
+
+      closeModal();
     });
 
     const resetForm = () => {
@@ -73,7 +88,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
 
   return (
     <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">
-      <form onSubmit={(ev) => {handleSubmit(ev)}} className="space-y-4">
+      <form onSubmit={(ev) => { handleSubmit(ev) }} className="space-y-4">
         <div>
           <Label title="Title" />
           <Input
@@ -113,7 +128,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit"  className="mt-4">
+          <Button type="submit" className="mt-4">
             Upload
           </Button>
         </div>
