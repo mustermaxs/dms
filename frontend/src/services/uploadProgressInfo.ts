@@ -76,6 +76,8 @@ export const useCheckProgressForDocuments = () => {
 
     useEffect(() => {
         console.log("[watchlist] Is Mock Mode: ", mockApplied);
+        let t = null;
+
         if (mockApplied) {
             setTimeout(() => {
                 console.log("[watchlist] MOCK APPLIED");
@@ -161,17 +163,28 @@ export const useCheckProgressForDocuments = () => {
     };
 
     const hasDocumentSubscribers = (documentId: string) => {
+        if (!isDocumentRegistered(documentId))
+            return false;
         return documentsToWatch[documentId].subscribers.length > 0;
     }
 
 
     useEffect(() => {
+        if (config.debug === "true") {
+            return;
+        }
         const fetchProgress = async () => {
             try {
                 const updatedDocuments = { ...documentsToWatch };
 
                 for (const documentId in documentsToWatch) {
                     const documentProgress = await documentService.getDocument(documentId);
+
+                    if (documentProgress === null || documentProgress === undefined) {
+                        console.warn(`[watchlist] Document ${documentId} not found on server!`);
+                        removeDocumentFromWatchList(documentId);
+                        continue;
+                    }
 
                     if (documentsToWatch[documentId].subscribers.length === 0) {
                         removeDocumentFromWatchList(documentId);
