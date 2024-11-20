@@ -11,16 +11,23 @@ import base64
 from minio import Minio
 from utils import *
 
+upload_documents = []
+
 class DocumentTests(unittest.TestCase):
+
     @classmethod
     def setUp(cls) -> None:
         delete_all_documents()
+        upload_documents = []
     
     def test_get_all_documents(self):
         # GIVEN
         for i in range(3):
             doc = create_rand_document()
-            upload_document(doc.to_dict())
+            uploaded_doc = upload_document(doc.to_dict())
+            document_id = uploaded_doc["id"]
+            wait_for_document_to_be_processed(document_id)
+
 
         # WHEN            
         response = requests.get(url("Documents"))
@@ -37,6 +44,7 @@ class DocumentTests(unittest.TestCase):
         # GIVEN
         document = upload_document(create_rand_document().to_dict())
         document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
 
         # WHEN
         response = requests.get(url(f"Documents/{document_id}"))
@@ -51,6 +59,8 @@ class DocumentTests(unittest.TestCase):
         # GIVEN
         document = upload_document(create_rand_document().to_dict())
         document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
+
 
         # WHEN
         response = requests.delete(url(f"Documents/{document_id}"))
@@ -64,6 +74,8 @@ class DocumentTests(unittest.TestCase):
         rand_doc = create_rand_document()
         document = upload_document(rand_doc.to_dict())
         document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
+
 
         # WHEN
         updated_document = rand_doc.to_dict()
@@ -85,8 +97,11 @@ class DocumentTests(unittest.TestCase):
     def test_delete_all_documents(self):
         # GIVEN
         for i in range(5):
-            doc = create_rand_document()
-            upload_document(doc.to_dict())
+            rand_doc = create_rand_document()
+            document = upload_document(rand_doc.to_dict())
+            document_id = document["id"]
+            wait_for_document_to_be_processed(document_id)
+
 
         # WHEN
         response = requests.delete(url("Documents"))
@@ -111,6 +126,7 @@ class DocumentTests(unittest.TestCase):
         # GIVEN
         document = upload_document(create_rand_document().to_dict())
         document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
 
         # WHEN
         response = try_get_document_if_processed(document_id)

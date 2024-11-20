@@ -174,7 +174,7 @@ def upload_document(document=None):
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
-    logger.write(f"Document uploaded with ID: {response.json()['content']['id']}\n")
+    wait_for_document_to_be_processed(response.json()["content"]["id"])
     return response.json()["content"]
 
 def delete_all_documents():
@@ -184,6 +184,14 @@ def delete_all_documents():
 def pdf_to_base_64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
+    
+def wait_for_document_to_be_processed(document_id):
+    response = try_get_document_if_processed(document_id)
+    return response
+
+def wait_for_documents_to_be_processed(document_ids):
+    for document_id in document_ids:
+        wait_for_document_to_be_processed(document_id)
     
 def try_get_document_if_processed(document_id):
     for _ in range(DOC_STATUS_CHECK_MAX_ATTEMPTS):
