@@ -5,7 +5,7 @@ import AppContext from "../context/AppContext";
 
 export const MsgModalContainer = () => {
     const { messages, addMessage, removeMessage } = useContext(AppContext);
-
+    
     return (
         <>
                 <div>
