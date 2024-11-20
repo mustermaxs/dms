@@ -17,8 +17,8 @@ interface AppContextProps {
   updateDocument: (document: UpdateDocumentDto) => Promise<Document>;
   setSelectedDocument: Dispatch<SetStateAction<Document | null>>;
   addMessage: (message: string) => void;
-  messages: { id: string; content: string }[];
-  removeMessage: (id: string) => void;
+  messages: { id: number; content: string }[];
+  removeMessage: (id: number) => void;
   watchDocumentStatus: (documentId: string, callback: (ev: DocumentStatusEvent) => void) => () => void;
   unwatchDocumentStatus: (documentId: string, token: string) => void;
 }
