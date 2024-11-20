@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.btn-disabled {
+  background-color: rgb(201, 201, 201) !important;
+  color: white;
+  box-shadow: inset 0px 0px 2px rgba(128, 128, 128, 0.74);
+  cursor: not-allowed;
+  transition: 70ms ease;
+}
+
+.btn-disabled:hover {
+  background-color: rgb(201, 201, 201) !important;
+  box-shadow: inset 0px 0px 3px rgba(68, 68, 68, 0.781);
+  cursor: not-allowed;
+}

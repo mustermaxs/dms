@@ -7,10 +7,11 @@ import { fileToBase64 } from "../../services/fileService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { Tag } from "../../types/Tag";
 import AppContext from "../context/AppContext";
+import { Document, DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const {availableTags, setIsLoadingTags, uploadDocument } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -29,13 +30,8 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
     }));
 
     setTags(prevTags => [...prevTags, ...updatedTagsWithoutIds]);
-
-    console.log("Tags without ids", updatedTagsWithoutIds);
-
     let validTags = newValue.filter(t => t.id !== "" && t.id !== undefined);
     newValue = [...validTags, ...updatedTagsWithoutIds];
-    console.log("Updated tags", newValue);
-
     setSelectedTags(newValue);
   };
 
@@ -45,10 +41,40 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
     e.preventDefault();
 
     let fileContentBase64: string = await fileToBase64(file as File);
-    await uploadDocument({
+    let response: Document = await uploadDocument({
       title: title,
       tags: selectedTags,
       content: fileContentBase64,
+    });
+
+    if (!response) {
+      addMessage("Document could not be uploaded. Please check your form!");
+      return;
+    }
+
+    watchDocumentStatus(response.id, (ev) => {
+      switch (ev.data) {
+        case DocumentStatus.Pending:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} is being processed!`);
+          break;
+        case DocumentStatus.Finished:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} is ready!`);
+          break;
+        case DocumentStatus.NotStarted:
+          addMessage(`Document ${title} is not ready yet! Still needs to be processed.`);
+          break;
+        case DocumentStatus.Failed:
+          unwatchDocumentStatus(response.id, ev.token);
+          addMessage(`Document ${title} could not be uploaded. Please check your form!`);
+          break;
+        default:
+          addMessage("FAILURE");
+          break;
+      }
+
+      closeModal();
     });
 
     const resetForm = () => {
@@ -68,7 +94,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
 
   return (
     <Modal size={size} isOpen={isOpen} closeModal={closeModal} title="Upload Document">
-      <form onSubmit={(ev) => {handleSubmit(ev)}} className="space-y-4">
+      <form onSubmit={(ev) => { handleSubmit(ev) }} className="space-y-4">
         <div>
           <Label title="Title" />
           <Input
@@ -108,7 +134,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit"  className="mt-4">
+          <Button type="submit" className="mt-4">
             Upload
           </Button>
         </div>
