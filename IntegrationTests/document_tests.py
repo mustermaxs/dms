@@ -135,4 +135,3 @@ class DocumentTests(unittest.TestCase):
         # THEN
         self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
         self.assertTrue((resObj["content"] != "") and (resObj["content"] != None))
-
