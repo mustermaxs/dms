@@ -169,12 +169,14 @@ def create_rand_tag():
     color = "blue"
     return Tag(label, color, value)
 
-def upload_document(document=None):
+def upload_document(document=None, waitUntilProcessed=True):
     if document is None:
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
-    wait_for_document_to_be_processed(response.json()["content"]["id"])
+    
+    if waitUntilProcessed:
+        wait_for_document_to_be_processed(response.json()["content"]["id"])
     return response.json()["content"]
 
 def delete_all_documents():
