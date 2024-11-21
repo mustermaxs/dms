@@ -16,7 +16,7 @@ upload_documents = []
 class DocumentTests(unittest.TestCase):
 
     @classmethod
-    def  test_setUp(cls) -> None:
+    def setUp(cls) -> None:
         delete_all_documents()
         upload_documents = []
     
