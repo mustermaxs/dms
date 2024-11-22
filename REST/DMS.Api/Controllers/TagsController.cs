@@ -28,7 +28,9 @@ public class TagsController : BaseController
                 {
                     Success = true,
                     Content = data,
-                    Message = "Successfully retrieved tags"
+                    Message = data.Count > 0 ? 
+                        "Successfully retrieved tags"
+                        : "No tags found"
                 }),
             onFailure: () => BadRequest(
                 new Response
