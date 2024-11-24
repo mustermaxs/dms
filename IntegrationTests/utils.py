@@ -169,13 +169,19 @@ def create_rand_tag():
     color = "blue"
     return Tag(label, color, value)
 
-def upload_document(document=None):
+def upload_document(document=None, shouldWaitForProcessing=True, getContent=True):
     if document is None:
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
-    logger.write(f"Document uploaded with ID: {response.json()['content']['id']}\n")
-    return response.json()["content"]
+
+    if shouldWaitForProcessing:
+        wait_for_document_to_be_processed(response.json()["content"]["id"])
+
+    if getContent:
+        return response.json()["content"]
+
+    return response
 
 def delete_all_documents():
     response = requests.delete(url("Documents"))
@@ -184,6 +190,14 @@ def delete_all_documents():
 def pdf_to_base_64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
+    
+def wait_for_document_to_be_processed(document_id):
+    response = try_get_document_if_processed(document_id)
+    return response
+
+def wait_for_documents_to_be_processed(document_ids):
+    for document_id in document_ids:
+        wait_for_document_to_be_processed(document_id)
     
 def try_get_document_if_processed(document_id):
     for _ in range(DOC_STATUS_CHECK_MAX_ATTEMPTS):

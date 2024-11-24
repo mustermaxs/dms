@@ -33,16 +33,6 @@ public class DocumentsController : BaseController
                     Success = false
                 })
         );
-        // try
-        // {
-        //     var res = await _mediator.Send(new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags));
-        //     return Ok(new Response<string>{ Success = true, Message = "Successfully uploaded document" });
-        // }
-        // catch (Exception e)
-        // {
-        //     return BadRequest(new Response<string>{Message = "Failed to upload document", Success = false});
-        //     throw;
-        // }
     }
 
     [HttpGet]
@@ -55,7 +45,7 @@ public class DocumentsController : BaseController
             {
                 Success = true,
                 Content = data,
-                Message = "Successfully retrieved documents"
+                Message = data.Count > 0 ? "Successfully retrieved documents" : "No documents found",
             }),
             onFailure: () => BadRequest( 
                 new Response
@@ -97,7 +87,9 @@ public class DocumentsController : BaseController
                 {
                     Success = true,
                     Content = data,
-                    Message = "Successfully retrieved documents content"
+                    Message = string.IsNullOrEmpty(data.Content) ?
+                        "Content isn't available" :
+                        "Successfully retrieved documents content"
                 }),
             onFailure: () => BadRequest(
                 new Response

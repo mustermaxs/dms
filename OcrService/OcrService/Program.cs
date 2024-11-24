@@ -46,7 +46,7 @@ class Program
                 byte[] body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var ocrDocumentRequestDto = JsonSerializer.Deserialize<OcrDocumentRequestDto>(message);
-                Console.WriteLine($" [x] Received {message}");
+                Console.WriteLine($"{DateTime.UtcNow} [x] Request to process {ocrDocumentRequestDto.DocumentId}");
                 var fileStream = await _fileStorage.GetFileStreamAsync(ocrDocumentRequestDto.DocumentId.ToString());
                 var fileContent = await _ocrWorker.ProcessPdfAsync(fileStream);
 

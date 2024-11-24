@@ -11,6 +11,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["OcrService.csproj", "."]
 RUN dotnet restore "OcrService.csproj"
+COPY ["OcrService.csproj", "."]
+RUN dotnet restore "OcrService.csproj"
 COPY . .
 RUN dotnet build "OcrService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

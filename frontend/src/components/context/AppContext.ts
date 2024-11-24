@@ -1,7 +1,8 @@
 
 import { createContext, Dispatch, SetStateAction } from "react";
-import { Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
+import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto } from "../../types/Document";
 import { Tag } from "../../types/Tag";
+import { DocumentStatusEvent, useFileStatus } from "../../hooks/useFileStatus";
 
 interface AppContextProps {
   documents: Document[];
@@ -15,6 +16,11 @@ interface AppContextProps {
   uploadDocument: (document: UploadDocumentDto) => Promise<Document>;
   updateDocument: (document: UpdateDocumentDto) => Promise<Document>;
   setSelectedDocument: Dispatch<SetStateAction<Document | null>>;
+  addMessage: (message: string) => void;
+  messages: { id: number; content: string }[];
+  removeMessage: (id: number) => void;
+  watchDocumentStatus: (documentId: string, callback: (ev: DocumentStatusEvent) => void) => () => void;
+  unwatchDocumentStatus: (documentId: string, token: string) => void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -29,5 +35,10 @@ const AppContext = createContext<AppContextProps>({
   uploadDocument: () => Promise.resolve({} as Document),
   updateDocument: () => Promise.resolve({} as Document),
   setSelectedDocument: () => {},
+  addMessage: () => {},
+  messages: [],
+  removeMessage: () => {},
+  watchDocumentStatus: () => () => {},
+  unwatchDocumentStatus: () => {},
 });
 export default AppContext;

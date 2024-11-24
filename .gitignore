@@ -3,3 +3,7 @@ IntegrationTests/venv
 /rabbitmq/
 IntegrationTests/__pycache__/document_tests.cpython-310.pyc
 IntegrationTests/__pycache__/utils.cpython-310.pyc
+IntegrationTests/log.txt
+IntegrationTests/__pycache__/document_tests.cpython-310.pyc
+IntegrationTests/__pycache__/utils.cpython-310.pyc
+IntegrationTests/log.txt

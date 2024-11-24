@@ -10,7 +10,6 @@ export class HttpService {
     public constructor() { 
         this.config = require('../config.json');
         this.baseUrl = this.config.apiUrl;
-        console.log(this.baseUrl);
     }
 
     private urlBuilder(url: string): string {

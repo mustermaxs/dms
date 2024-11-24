@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 import { useModal } from "../../hooks/useModal";
-import { Document, DocumentContentDto } from "../../types/Document";
+import { Document, DocumentContentDto, DocumentStatus } from "../../types/Document";
 import { DocumentModal } from "./DocumentModal";
 import { MockDocumentService as IDocumentService } from "../../services/documentService";
 import { ServiceLocator } from "../../serviceLocator";
@@ -13,15 +13,15 @@ export default function DocumentTable() {
   const { isOpen, openModal, closeModal } = useModal();
   // const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
-  const { documents, selectedDocument, setSelectedDocument } = useContext(AppContext);
-
-useEffect(() => {
-    console.log("documents in DocumentTable: ", documents); 
-},[documents]);
+  const { documents, selectedDocument, setSelectedDocument, addMessage } = useContext(AppContext);
 
   const showModal = async (document: Document) => {
     let documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
     let doc: Document = await documentService.getDocument(document.id);
+
+    if (doc.status < DocumentStatus.Finished) {
+      addMessage("Document is still being processed...");
+    }
     setSelectedDocument(doc);
     openModal();
   };
@@ -86,7 +86,7 @@ useEffect(() => {
           </tbody>
         </table>
 
-        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal}  />}
+        {selectedDocument && <DocumentModal isOpen={isOpen} closeModal={closeModal} />}
 
       </div>)}
     </>
