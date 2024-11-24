@@ -1,8 +1,7 @@
 import { useDocuments } from "../hooks/useDocuments";
-import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
+import { Document, DocumentContentDto, DocumentStatus, UpdateDocumentDto, UploadDocumentDto, SearchDocumentResponse, DocumentSearchResult } from "../types/Document";
 import { HttpService } from "./httpService";
 import { mockData } from "./mockData";
-
 export interface IDocumentService {
     getDocument(id: string): Promise<Document>;
     getAllDocuments(): Promise<Document[]>;
@@ -10,6 +9,7 @@ export interface IDocumentService {
     updateDocument(document: UpdateDocumentDto): Promise<Document>;
     getDocumentContent(id: string): Promise<DocumentContentDto>;
     deleteDocument(id: string): Promise<void>;
+    searchDocuments(query: string): Promise<SearchDocumentResponse>;
 }
 
 export class MockDocumentService implements IDocumentService {
@@ -144,6 +144,24 @@ export class MockDocumentService implements IDocumentService {
     updateDocument(document: UpdateDocumentDto): Promise<Document> {
         return Promise.resolve(document as Document);
     }
+    searchDocuments(query: string): Promise<SearchDocumentResponse> {
+        return Promise.resolve({
+            success: true,
+            message: '',
+            content: [{
+                id: "234978fe978fs987",
+                title: "Document 1.pdf",
+                match: null,
+                uploadDateTime: '2020-01-01T00:00:00',
+                modificationDateTime: '2020-01-01T00:00:00',
+                status: DocumentStatus.Finished,
+                tags: [],
+                documentType: {
+                    name: ".pdf"
+                }
+            }]
+        });
+    }
 }
 
 export class DocumentService implements IDocumentService {
@@ -188,4 +206,14 @@ export class DocumentService implements IDocumentService {
         }
         return response.data;
     }
+
+    public async searchDocuments(query: string): Promise<SearchDocumentResponse> {
+        const response = await this.httpService.get<DocumentSearchResult[]>(`Search?query=${query}`);
+        return {
+            success: true,
+            message: '',
+            content: response.data
+        };
+    }
+
 } 

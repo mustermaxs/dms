@@ -33,3 +33,24 @@ export type Document = {
     Finished,
     Failed
   }
+
+  export type DocumentType = {
+    name: string;
+  }
+
+  export type DocumentSearchResult = {
+    id: string;
+    title: string;
+    match: string | null;
+    uploadDateTime: string;
+    modificationDateTime: string;
+    status: DocumentStatus;
+    tags: Tag[];
+    documentType: DocumentType;
+  }
+
+  export type SearchDocumentResponse = {
+    success: boolean;
+    message: string;
+    content: DocumentSearchResult[];
+  }
