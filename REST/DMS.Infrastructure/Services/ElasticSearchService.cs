@@ -21,13 +21,22 @@ public class ElasticSearchService : ISearchService
 
     public async Task<List<SearchResult>> SearchAsync(string query)
     {
-        Console.WriteLine(query);
         try
         {
             var searchResponse = await _client.SearchAsync<SearchableDocument>(s => s
                 .Index(IndexName)
-                .Query(q => q.QueryString(qs => qs.DefaultField(p => p.Content).Query($"*{query}*")))
+                .Query(q => q
+                    .Bool(b => b
+                        .Should(
+                            sh => sh.QueryString(qs => qs.DefaultField(p => p.Content).Query($"*{query}*")),
+                            sh => sh.QueryString(qs => qs.DefaultField(p => p.Title).Query($"*{query}*")),
+                            sh => sh.QueryString(qs => qs.DefaultField(p => p.Tags).Query($"*{query}*"))
+                        )
+                    )
+                )
             );
+
+            Console.WriteLine("searchResponse", searchResponse);
 
             if (!searchResponse.IsValidResponse)
             {
