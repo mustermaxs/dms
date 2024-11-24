@@ -21,9 +21,6 @@ namespace DMS.Application.Commands
         public async Task<List<DocumentSearchResultDto>> Handle(SearchDocumentsQuery request, CancellationToken cancellationToken)
     {
         var searchResults = await searchService.SearchAsync(request.Query);
-        Console.WriteLine("request.Query: " + request.Query);
-        Console.WriteLine("searchResults: " + JsonSerializer.Serialize(searchResults));
-
         
         var documents = new List<DmsDocument>();
         foreach (var result in searchResults)
