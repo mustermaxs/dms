@@ -3,7 +3,7 @@ import { FiX } from "react-icons/fi";
 import { ActionIcon } from "rizzui";
 
 export class ModalSize {
-  static SMALL = {width: '30rem', height: '21rem'};
+  static SMALL = {width: '30rem', height: '26rem'};
   static MEDIUM = {width: '50rem', height: '10rem'};
   static LARGE = {width: '70rem', height: '90%'};
 }
@@ -47,15 +47,15 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal,
       tabIndex={-1}
     >
       <div
-      style={{maxWidth: size.width, minHeight: size.height}}
+      style={{maxWidth: size.width, minHeight: "fit-content", maxHeight: size.height, margin: "1rem", height: size.height === ModalSize.LARGE.height ? '90%' : ''}}
         className={"bg-white rounded-lg shadow-lg w-full hover:cursor-default"}
         onClick={(e) => e.stopPropagation()}
       >
         <div 
-        style={{maxHeight: '6rem'}}
-        className="flex justify-between items-center border-b p-4">
+        style={{maxHeight: '6rem', }}
+        className="flex justify-between items-center border-b p-4 h-12">
           <h2
-          style={{paddingRight: '3rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+          style={{paddingRight: '3rem',  textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: '28rem'}}
           title={title}
           className="text-lg font-semibold">{title}</h2>
           <ActionIcon
@@ -67,7 +67,7 @@ const Modal: React.FC<ModalProps> = memo(({ title, children, isOpen, closeModal,
             <FiX />
           </ActionIcon>
         </div>
-        <div style={{minHeight: '100%'}} className="p-4">
+        <div style={{height: 'inherit'}} className="p-4">
           {children}
         </div>
       </div>

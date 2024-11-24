@@ -1,9 +1,19 @@
-.content-viewer-container {
+.pdf-viewer-container {
     width: 100%;
+    height: 96%;
     padding: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.pdf-viewer-container p {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
 .overlay {

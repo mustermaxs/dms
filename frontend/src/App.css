@@ -50,3 +50,8 @@
   box-shadow: inset 0px 0px 3px rgba(68, 68, 68, 0.781);
   cursor: not-allowed;
 }
+
+.css-1dyz3mf {
+  height: 2.8rem;
+  overflow-y: auto !important;
+}
