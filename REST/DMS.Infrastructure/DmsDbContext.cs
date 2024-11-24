@@ -34,7 +34,7 @@ public class DmsDbContext : DbContext
         modelBuilder.Entity<DmsDocument>()
             .OwnsOne(e => e.DocumentType, dt =>
             {
-                dt.Property(d => d.Name)
+                dt.Property(d => d.Extension)
                     .HasColumnName("DocumentType")
                     .HasMaxLength(6);
             })

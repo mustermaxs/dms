@@ -1,41 +1,36 @@
 namespace DMS.Domain.ValueObjects
 {
-    public class FileType(string name) : ValueObject
+    public class FileType: ValueObject
     {
-        public string Name { get; } = GetExtensionFromName(name) ?? throw new ArgumentException("Invalid file extension.", nameof(name));
-
-        public static FileType GetFileTypeFromExtension(string fileName)
+        public FileType(string extension)
         {
-            var extension = GetExtensionFromName(fileName);
-            return extension switch
+            Extension = GetFileExtensionFromMimeType(extension);
+        }
+
+        private string GetFileExtensionFromMimeType(string mimeType)
+        {
+            switch (mimeType)
             {
-                ".pdf" => new FileType("1.pdf"),
-                ".docx" => new FileType("1.docx"),
-                ".txt" => new FileType("1.txt"),
-                _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, null)
-            };
+                case "text/plain":
+                    return ".txt";
+                case "application/pdf":
+                    return ".pdf";
+                case "image/jpeg":
+                    return ".jpeg";
+                default:
+                    return mimeType;
+            }
         }
-
-        private static string GetExtensionFromName(string fileName)
-        {
-            if (string.IsNullOrWhiteSpace(fileName))
-                throw new ArgumentException("File name cannot be null or empty", nameof(fileName));
-
-            var extension = Path.GetExtension(fileName)?.ToLower();
-            if (string.IsNullOrEmpty(extension))
-                throw new ArgumentException("File must have a valid extension.", nameof(fileName));
-
-            return extension;
-        }
+        public string Extension { get; private set; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
-            yield return Name;
+            yield return Extension;
         }
 
         public override string ToString()
         {
-            return Name;
+            return Extension;
         }
     }
 }

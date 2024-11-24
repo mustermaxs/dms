@@ -150,6 +150,9 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
         ))}
       </ul>
 
+      <Label title="File type" />
+      <p className="my-2">{document.documentType.extension.replace(".", "").toLocaleLowerCase()}</p>
+
       <Label title="Content" />
       <p className="dms-document-content my-2">{document.content}</p>
     </>

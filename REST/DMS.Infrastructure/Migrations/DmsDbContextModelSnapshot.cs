@@ -110,7 +110,7 @@ namespace DMS.Infrastructure.Migrations
                             b1.Property<Guid>("DmsDocumentId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Name")
+                            b1.Property<string>("Extension")
                                 .IsRequired()
                                 .HasMaxLength(6)
                                 .HasColumnType("character varying(6)")

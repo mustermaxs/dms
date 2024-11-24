@@ -18,7 +18,7 @@ public class DocumentsController : BaseController
     public async Task<ActionResult<DmsDocumentDto>> UploadDocument([FromBody] UploadDocumentDto documentDto)
     {
         return await ApiResponse<UploadDocumentCommand, DmsDocumentDto>(
-            new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags),
+            new UploadDocumentCommand(documentDto.Title, documentDto.Content, documentDto.Tags, documentDto.FileType),
             onSuccess: data => Ok(
                 new Response<DmsDocumentDto>
                 {

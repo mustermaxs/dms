@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace DMS.Application.Commands
 {
-    public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags) : IRequest<DmsDocumentDto>;
+    public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags, string FileType) : IRequest<DmsDocumentDto>;
 
     public class UploadDocumentCommandHandler(
         FileHelper fileHelper,
@@ -37,7 +37,7 @@ namespace DMS.Application.Commands
                     DateTime.UtcNow,
                     null,
                     new List<DocumentTag>(),
-                    new FileType(request.Title),
+                    new FileType(request.FileType),
                     ProcessingStatus.NotStarted);
                 
                 var documentIsValid = await documentValidator.ValidateAsync(document);
@@ -58,7 +58,6 @@ namespace DMS.Application.Commands
             catch (Exception e)
             {
                 await unitOfWork.RollbackAsync();
-                // TODO: Add integration event to notify that document upload failed
                 await mediator.Publish(new FailedToCreateeDocumentIntegrationEvent(request)); 
                 throw new UploadDocumentException($"Failed to upload document.");
             }

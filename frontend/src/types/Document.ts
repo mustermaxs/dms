@@ -4,6 +4,7 @@ export type UploadDocumentDto = {
     title: string;
     content: string;
     tags: Tag[];
+    fileType: string;
   }
 
 export type UpdateDocumentDto = {
@@ -20,6 +21,9 @@ export type Document = {
     modificationDateTime: string;
     uploadDateTime: string;
     status: DocumentStatus;
+    documentType: {
+      extension: string
+    }
   }
 
   export type DocumentContentDto = {

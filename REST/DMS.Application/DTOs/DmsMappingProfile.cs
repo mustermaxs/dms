@@ -11,7 +11,8 @@ public class DmsMappingProfile : Profile
         CreateMap<Tag, TagDto>();
         CreateMap<Tag, CreateTagDto>();
         CreateMap<DmsDocument, DmsDocumentDto>()
-            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags));
+            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
+            .ForMember(dest => dest.DocumentType, opt => opt.MapFrom(src => src.DocumentType));
         CreateMap<DmsDocument, UploadDocumentDto>();
         CreateMap<DmsDocument, DocumentSearchResultDto>();
         CreateMap<DmsDocument, CreateDocumentDto>();

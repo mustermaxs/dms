@@ -12,7 +12,9 @@ export const useMsgModal = () => {
     };
 
     const removeMessage = (messageId: number) => {
-        console.log("REMOVE MESSAGE " + messageId);
+        console.log("[useMsgModal] Removing message " + messageId);
+        if (messages.findIndex((m) => m.id === messageId) === -1) 
+            console.error("[useMsgModal] Message " + messageId + " not found");
         setMessages((prevMessages) => prevMessages.filter((m) => m.id !== messageId));
     };
 
