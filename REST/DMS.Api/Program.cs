@@ -1,28 +1,28 @@
+using Minio;
+using log4net;
+using MediatR;
+using log4net.Config;
+using RabbitMQ.Client;
+using FluentValidation;
 using System.Reflection;
-using DMS.Api;
+using Microsoft.EntityFrameworkCore;
+using DMS.Api.Configuration;
 using DMS.Application;
-using DMS.Application.Commands;
 using DMS.Application.DTOs;
-using DMS.Application.IntegrationEvents;
-using DMS.Application.Interfaces;
 using DMS.Application.Services;
-using DMS.Domain.Entities;
+using DMS.Application.Commands;
+using DMS.Application.Interfaces;
+using DMS.Application.IntegrationEvents;
+using DMS.Domain.Services;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
-using DMS.Domain.Services;
+using DMS.Domain.Entities.Tags;
+using DMS.Domain.Entities.DmsDocument;
 using DMS.Infrastructure;
-using DMS.Infrastructure.Repositories;
-using DMS.Infrastructure.Services;
-using FluentValidation;
-using log4net;
-using log4net.Config;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
-using Minio;
-using DMS.Api.Configuration;
 using DMS.Infrastructure.Configs;
-using RabbitMQ.Client;
+using DMS.Infrastructure.Services;
+using DMS.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -51,7 +51,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // AUTOMAPPER
-builder.Services.AddAutoMapper( typeof(DmsMappingProfile));
+builder.Services.AddAutoMapper(
+    typeof(ApplicationMappingProfile),
+    typeof(InfrastructureMappingProfile));
 
 // LOGGING
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
@@ -61,7 +63,7 @@ builder.Logging.AddLog4Net();
 
 // SERVICES
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IDocumentTagFactory, DocumentTagFactory>();
+builder.Services.AddScoped<ITagCreateService, TagCreateService>();
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 builder.Services.AddTransient<FileHelper>();
 builder.Services.AddScoped<IOcrService, OcrService>();
@@ -88,28 +90,16 @@ builder.Services.AddSingleton<IMessageBroker, RabbitMqClient>(cfg =>
     return new RabbitMqClient(rabbitMqConfig!);
 });
 
-
-// var sp = builder.Services.BuildServiceProvider();
-// var rabbit = sp.GetRequiredService<IMessageBroker>();
-// var obj = new { name = "test" };
-// var res = await rabbit.PublishRpc<object>("dms-upload", obj);
-// Console.WriteLine(res.ToString());
-
-
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 
 // REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
-builder.Services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // VALIDATORS
 builder.Services.AddScoped<IValidator<DmsDocument>, DmsDocumentValidator>();
 builder.Services.AddScoped<IValidator<Tag>, TagValidator>();
-builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
-
-// CONFIGS
 
 // DATABASE
 builder.Services.AddDbContext<DmsDbContext>(options =>

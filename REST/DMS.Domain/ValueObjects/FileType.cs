@@ -1,3 +1,4 @@
+
 namespace DMS.Domain.ValueObjects
 {
     public class FileType(string name) : ValueObject

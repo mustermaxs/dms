@@ -1,30 +1,26 @@
-
-
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
-using DMS.Domain.Services;
 
 namespace DMS.Infrastructure.Services;
 
-public class DocumentTagFactory(
-    ITagRepository tagRepository) : IDocumentTagFactory
+public class TagCreateService(
+    ITagRepository tagRepository) : ITagCreateService
 {
-    public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos)
+    public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<Tag> tags)
     {
-        // Get all tags from the database
         IEnumerable<Tag>? tagsInDb = await tagRepository.GetAll();
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
 
-        // Separate new tags from existing tags
-        var newTags = tagDtos.Where(requestTag => 
+        
+        var newTags = tags.Where(requestTag => 
             !existingTagValues.Contains(requestTag.Value));
 
         var alreadyExistingTagDtos = tagsInDb.Where(dbTag =>
-            tagDtos.Any(requestTag => requestTag.Value == dbTag.Value));
+            tags.Any(requestTag => requestTag.Value == dbTag.Value));
 
-        // Process existing tags one by one (sequentially)
+        
         var alreadyExistingTags = new List<Tag>();
         foreach (var tagDto in alreadyExistingTagDtos)
         {
@@ -32,16 +28,16 @@ public class DocumentTagFactory(
             alreadyExistingTags.Add(tag);
         }
 
-        // Process new tags one by one (sequentially)
+        
         var newTagsInDb = new List<Tag>();
         foreach (var tagDto in newTags)
         {
             var newTag = new Tag(tagDto.Label, tagDto.Value, tagDto.Color);
-            var createdTag = await tagRepository.Create(newTag);  // Awaiting each call
-            newTagsInDb.Add(createdTag);
+            var createdTagId = await tagRepository.CreateIfNotExists(newTag);
+            var createdTag = await tagRepository.Get(createdTagId);
+            newTagsInDb.Add(newTag);
         }
-
-        // Return the combined result of new and existing tags
+        
         return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
 }

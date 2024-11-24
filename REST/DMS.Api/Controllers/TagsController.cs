@@ -41,12 +41,12 @@ public class TagsController : BaseController
         );
     }
 
-    [HttpGet("/search")]
-    public async Task<ActionResult<TagDto>> FindTagByPrefix([FromQuery] string tagPrefix)
-    {
-        var res = await _mediator.Send(new FindTagsByPrefixQuery(tagPrefix));
-        return Ok(res);
-    }
+    // [HttpGet("/search")]
+    // public async Task<ActionResult<TagDto>> FindTagByPrefix([FromQuery] string tagPrefix)
+    // {
+    //     var res = await _mediator.Send(new FindTagsByPrefixQuery(tagPrefix));
+    //     return Ok(res);
+    // }
 
     [HttpPost]
     public async Task<ActionResult<TagDto>> CreateTag([FromBody] CreateTagDto createTagDto)

@@ -1,4 +1,4 @@
-namespace DMS.Domain.ValueObjects;
+namespace DMS.Infrastructure.Models;
 
 public enum ProcessingStatus
 {

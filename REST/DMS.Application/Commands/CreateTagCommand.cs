@@ -1,14 +1,14 @@
-using AutoMapper;
-using DMS.Application.DTOs;
-using DMS.Application.Interfaces;
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.DomainEvents;
-using DMS.Domain.Entities.Tag;
-using DMS.Domain.IRepositories;
-using MediatR;
+
+
 
 namespace DMS.Application.Commands
 {
+    using Domain.Entities.Tags;
+    using AutoMapper;
+    using DTOs;
+    using Interfaces;
+    using MediatR;
+    
     public record CreateTagCommand(string Label, string Value) : IRequest<TagDto>;
 
     public class CreateTagCommandHandler(
@@ -19,7 +19,6 @@ namespace DMS.Application.Commands
         {
             await unitOfWork.BeginTransactionAsync();
             var tag = await unitOfWork.TagRepository.Create(new Tag(request.Label, request.Value, "#FF0000"));
-            ;
             await unitOfWork.CommitAsync();
             return mapper.Map<TagDto>(tag);
         }

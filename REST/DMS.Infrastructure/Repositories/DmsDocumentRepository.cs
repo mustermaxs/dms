@@ -1,47 +1,46 @@
-using DMS.Application;
-using DMS.Domain;
-using DMS.Domain.Entities;
+using AutoMapper;
+using DMS.Application.Interfaces;
+using DMS.Domain.Entities.DmsDocument;
 using DMS.Domain.IRepositories;
+using DMS.Infrastructure.Models;
+using DMS.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories;
 
-public class DmsDocumentRepository(DmsDbContext dbContext, IValidator<DmsDocument> validator)
-    : BaseRepository<DmsDocument>(dbContext, validator), IDmsDocumentRepository
+public class DmsDocumentRepository(DmsDbContext dbContext, IValidator<DmsDocument> validator, IMapper mapper, ITagCreateService documentTagService)
+    : BaseRepository<DmsDocument, DocumentModel>(dbContext, validator, mapper), IDmsDocumentRepository
 {
-    public async Task<DmsDocument?> GetDocumentByIdAsync(Guid id)
+    public override async Task<Guid> Create(DmsDocument entity)
     {
-        return await DbSet.FindAsync(id);
-    }
-
-    public override async Task<DmsDocument> Create(DmsDocument entity)
-    {
+        var tags = await documentTagService.CreateOrGetTagsFromTagDtos(entity.Tags);
+        entity.SetTags(tags);
         await validator.ValidateAndThrowAsync(entity);
-        var e = await DbSet.AddAsync(entity);
-        return e.Entity;
-    }
-
-    public async Task<DmsDocument?> Get(Guid id)
-    {
-        return await DbSet
-            .Include(e => e.Tags)
-            .ThenInclude(e => e.Tag)
-            .FirstOrDefaultAsync(e => e.Id == id);
+        var persistenceEntity = mapper.Map<DmsDocument, DocumentModel>(entity);
+        var e = await DbSet.AddAsync(persistenceEntity);
+        return e.Entity.Id;
     }
 
     public override async Task<IEnumerable<DmsDocument>?> GetAll()
     {
-        return await DbSet
-            .Include(e => e.Tags)
-            .ThenInclude(e => e.Tag)
+        var documentsPersistence = await DbSet.AsNoTracking()
+            .Include(d => d.Tags)
+            .ThenInclude(t => t.Tag)
             .ToListAsync();
+
+        return mapper.Map<IEnumerable<DmsDocument>>(documentsPersistence);
     }
 
     public override async Task UpdateAsync(DmsDocument entity)
     {
+        // TODO use tag service to get new tags to update
         await Validator.ValidateAndThrowAsync(entity);
-        DbSet.Entry(entity).State = EntityState.Modified;
-        DbSet.Update(entity);
+        var persistenceEntity = await DbSet.FindAsync(entity.Id);
+        if (persistenceEntity == null)
+            throw new ArgumentException($"Entity with id {entity.Id} not found");
+        var updatedPersistenceEntity = mapper.Map(entity, persistenceEntity);
+        DbSet.Entry(updatedPersistenceEntity).State = EntityState.Modified;
+        DbSet.Update(updatedPersistenceEntity);
     }
 }

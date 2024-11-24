@@ -1,8 +1,7 @@
 using DMS.Application.Interfaces;
-using DMS.Domain.DomainEvents;
-using DMS.Domain.Entities;
+using DMS.Domain.Entities.DmsDocument;
+using DMS.Domain.Entities.DmsDocument.ValueObjects;
 using DMS.Domain.IRepositories;
-using DMS.Domain.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

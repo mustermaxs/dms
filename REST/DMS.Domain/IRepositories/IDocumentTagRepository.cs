@@ -1,11 +1,10 @@
-using DMS.Domain.Entities;
-
 namespace DMS.Domain.IRepositories;
+using DMS.Domain.Entities.Tags;
 
-public interface IDocumentTagRepository : IRepository<DocumentTag>
+public interface IDocumentTagRepository : IRepository<Tag>
 {
-    Task<DocumentTag> CreateOrGetIfExists(DocumentTag documentTag);
+    Task<Tag> CreateOrGetIfExists(Tag documentTag);
     Task DeleteAllByDocumentId(Guid documentId);
-    public Task<List<DocumentTag>> GetAllByDocumentId(Guid tagId);
+    public Task<List<Tag>> GetAllByDocumentId(Guid tagId);
 
 }

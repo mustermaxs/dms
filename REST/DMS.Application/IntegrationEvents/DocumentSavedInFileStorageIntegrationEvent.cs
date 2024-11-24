@@ -1,10 +1,8 @@
 using DMS.Application.DTOs;
-using DMS.Application.EventHandlers;
 using DMS.Application.Interfaces;
-using DMS.Domain.DomainEvents;
-using DMS.Domain.Entities;
+using DMS.Domain.Entities.DmsDocument;
+using DMS.Domain.Entities.DmsDocument.ValueObjects;
 using DMS.Domain.IRepositories;
-using DMS.Domain.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -39,7 +37,7 @@ namespace DMS.Application.IntegrationEvents
                 
                 document.SetStatus(ProcessingStatus.Pending);
                 await documentRepository.UpdateAsync(document);
-                var tags = notification.Document.Tags?.ToList().Select(t => t.Tag.Label).ToList();
+                var tags = notification.Document.Tags?.ToList().Select(t => t.Label).ToList();
                 await ocrService.ExtractTextFromPdfAsync(new OcrDocumentRequestDto(
                     notification.Document.Id,
                     tags,

@@ -1,6 +1,6 @@
+namespace DMS.Domain.Entities.DmsDocument.ValueObjects;
+using DMS.Domain.ValueObjects;
 using FluentValidation;
-
-namespace DMS.Domain.ValueObjects;
 
 public class FileTypeValidator : AbstractValidator<FileType>
 {

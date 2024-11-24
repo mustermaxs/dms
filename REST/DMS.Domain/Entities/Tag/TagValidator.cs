@@ -1,8 +1,7 @@
+namespace DMS.Domain.Entities.Tag;
 using FluentValidation;
 
-namespace DMS.Domain.Entities.Tag;
-
-public class TagValidator : AbstractValidator<Tag>
+public class TagValidator : AbstractValidator<Tags.Tag>
 {
     public TagValidator()
     {

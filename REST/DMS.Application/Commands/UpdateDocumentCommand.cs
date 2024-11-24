@@ -18,7 +18,6 @@ namespace DMS.Application.Commands
     public class UpdateDocumentCommandHandler(
         IUnitOfWork unitOfWork,
         IDmsDocumentRepository dmsDocumentRepository,
-        IDocumentTagFactory documentTagFactory,
         IMapper autoMapper,
         ILogger<UpdateDocumentCommandHandler> logger)
         : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
@@ -30,12 +29,10 @@ namespace DMS.Application.Commands
                 await unitOfWork.BeginTransactionAsync();
 
                 var document = await dmsDocumentRepository.Get(request.Document.Id);
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
-                await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
 
                 document
-                    .UpdateTitle(request.Document.Title)
-                    .UpdateTags(tagsAssociatedWithDocument);
+                    .UpdateTitle(request.Document.Title);
+                // TODO update tags
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));

@@ -1,12 +1,15 @@
-using DMS.Application.Interfaces;
-using DMS.Domain.DomainEvents;
-using DMS.Domain.IRepositories;
-using DMS.Domain.ValueObjects;
-using MediatR;
-using Microsoft.Extensions.Logging;
+
+
 
 namespace DMS.Application.Commands
 {
+    using Interfaces;
+    using Domain.DomainEvents;
+    using Domain.IRepositories;
+    using MediatR;
+    using Microsoft.Extensions.Logging;
+    using Domain.Entities.DmsDocument.ValueObjects;
+    
     public record DeleteDocumentCommand(Guid Id) : IRequest, IRequest<Unit>;
     
     public class DeleteDocumentCommandHandler(

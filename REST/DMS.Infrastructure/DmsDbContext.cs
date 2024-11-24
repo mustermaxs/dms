@@ -1,7 +1,4 @@
-﻿using System.Reflection.Metadata;
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
-using DMS.Domain.ValueObjects;
+﻿using DMS.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure;
@@ -9,9 +6,9 @@ namespace DMS.Infrastructure;
 
 public class DmsDbContext : DbContext
 {
-    public DbSet<DmsDocument> Documents { get; set; }
-    public DbSet<DocumentTag> DocumentTags { get; set; }
-    public DbSet<Tag> Tags { get; set; }
+    public DbSet<DocumentModel> Documents { get; set; }
+    public DbSet<DocumentTagModel> DocumentTags { get; set; }
+    public DbSet<TagModel> Tags { get; set; }
 
     public DmsDbContext(DbContextOptions<DmsDbContext> options) : base(options)
     {
@@ -28,10 +25,10 @@ public class DmsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DmsDocument>()
+        modelBuilder.Entity<DocumentModel>()
             .HasKey(e => e.Id);
-
-        modelBuilder.Entity<DmsDocument>()
+        
+        modelBuilder.Entity<DocumentModel>()
             .OwnsOne(e => e.DocumentType, dt =>
             {
                 dt.Property(d => d.Name)
@@ -40,47 +37,36 @@ public class DmsDbContext : DbContext
             })
             .Property(e => e.Title).HasMaxLength(50);
 
-        modelBuilder.Entity<Tag>()
+        modelBuilder.Entity<TagModel>()
             .Property(e => e.Label)
             .HasMaxLength(20);
 
-        modelBuilder.Entity<Tag>()
+        modelBuilder.Entity<TagModel>()
             .Property(e => e.Value)
             .HasMaxLength(50);
         
-        modelBuilder.Entity<Tag>()
+        modelBuilder.Entity<TagModel>()
             .Property(e => e.Color)
             .HasMaxLength(8);
         
-        modelBuilder.Entity<Tag>()
+        modelBuilder.Entity<TagModel>()
             .HasIndex(e => e.Value)
             .IsUnique();
         
-        modelBuilder.Entity<Tag>()
+        modelBuilder.Entity<TagModel>()
             .HasIndex(e => e.Label)
             .IsUnique();
 
-        // modelBuilder.Entity<DocumentTag>()
-        //     .HasOne(dt => dt.Document)
-        //     .WithMany(d => d.Tags)
-        //     .HasForeignKey(dt => dt.DocumentId)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        //
-        // modelBuilder.Entity<DocumentTag>()
-        //     .HasOne(dt => dt.Tag)
-        //     .WithMany()
-        //     .HasForeignKey(dt => dt.TagId)
-        //     .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<DocumentTag>()
+        modelBuilder.Entity<DocumentTagModel>()
             .HasKey(dt => new { dt.DocumentId, dt.TagId });
         
-        modelBuilder.Entity<DocumentTag>()
+        modelBuilder.Entity<DocumentTagModel>()
             .HasOne(dt => dt.Document)
             .WithMany(d => d.Tags)
             .HasForeignKey(dt => dt.DocumentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<DocumentTag>()
+        modelBuilder.Entity<DocumentTagModel>()
             .HasOne(dt => dt.Tag)
             .WithMany(t => t.DocumentTags)
             .HasForeignKey(dt => dt.TagId);

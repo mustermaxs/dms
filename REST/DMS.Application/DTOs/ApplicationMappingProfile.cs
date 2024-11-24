@@ -1,25 +1,25 @@
-using AutoMapper;
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 
 namespace DMS.Application.DTOs;
+using AutoMapper;
+using Domain.Entities.DmsDocument;
 
-public class DmsMappingProfile : Profile
+public class ApplicationMappingProfile : Profile
 {
-    public DmsMappingProfile()
+    public ApplicationMappingProfile()
     {
-        CreateMap<Tag, TagDto>();
+        CreateMap<Tag, TagDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Label))
+            .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Value))
+            .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Color))
+            .ReverseMap();
         CreateMap<Tag, CreateTagDto>();
         CreateMap<DmsDocument, DmsDocumentDto>()
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags));
         CreateMap<DmsDocument, UploadDocumentDto>();
         CreateMap<DmsDocument, DocumentSearchResultDto>();
         CreateMap<DmsDocument, CreateDocumentDto>();
-        CreateMap<DocumentTag, TagDto>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
-            .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Tag.Label))
-            .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Tag.Value))
-            .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Tag.Color));
         CreateMap<DmsDocument, DocumentContentDto>()
             .ForMember(dest => dest.Content, 
                 opt => 

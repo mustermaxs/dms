@@ -1,10 +1,11 @@
 using System.Collections.ObjectModel;
-using DMS.Application;
+using AutoMapper;
 using DMS.Application.Interfaces;
-using DMS.Domain;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.DmsDocument;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
+using DMS.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -12,14 +13,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace DMS.Infrastructure.Repositories;
     public class UnitOfWork : IUnitOfWork
     {
+        private IMapper mapper { get; }
         private readonly DmsDbContext _context;
         private readonly IMediator _mediator;
         private readonly IValidator<Tag> _tagValidator;
         private readonly IValidator<DmsDocument> _documentValidator;
-        private readonly IValidator<DocumentTag> _documentTagValidator;
+        private readonly ITagCreateService _documentTagService;
         private IDmsDocumentRepository? _documentRepository;
         private ITagRepository? _tagRepository;
-        private IDocumentTagRepository? _documentTagRepository;
         private IDbContextTransaction? _transaction = null;
 
         public UnitOfWork(
@@ -27,17 +28,18 @@ namespace DMS.Infrastructure.Repositories;
             IMediator mediator,
             IValidator<Tag> tagValidator,
             IValidator<DmsDocument> documentValidator,
-            IValidator<DocumentTag> documentTagValidator)
+            IMapper mapper,
+            ITagCreateService documentTagService)
         {
+            this.mapper = mapper;
             _context = context;
             _mediator = mediator;
                 _tagValidator = tagValidator;
             _documentValidator = documentValidator;
-            _documentTagValidator = documentTagValidator;
+            _documentTagService = documentTagService;
         }
-        public IDmsDocumentRepository DmsDocumentRepository => _documentRepository ??= new DmsDocumentRepository(_context, _documentValidator);
-        public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context, _tagValidator);
-        public IDocumentTagRepository DocumentTagRepository => _documentTagRepository ??= new DocumentTagRepository(_context, _documentTagValidator);
+        public IDmsDocumentRepository DmsDocumentRepository => _documentRepository ??= new DmsDocumentRepository(_context, _documentValidator, mapper, _documentTagService);
+        public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context, _tagValidator, mapper);
 
         private IReadOnlyCollection<object> GetDomainEventsFromEntities()
         {
@@ -80,7 +82,7 @@ namespace DMS.Infrastructure.Repositories;
 
         public async Task RollbackAsync()
         {
-            await _context.DisposeAsync();
+            await _context.DisposeAsync(); // TODO check if should use RollbackAsync() instead
         }
         
         public async Task RollbackAsync(Exception ex)
