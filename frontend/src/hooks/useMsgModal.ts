@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useMsgModal = () => {
+export const useMsgModal = () => {  // TODO masi BUG masi messages get same key
     const [messages, setMessages] = useState<{ id: number; content: string }[]>([]);
     const [msgIndex, setMsgIndex] = useState(0);
 

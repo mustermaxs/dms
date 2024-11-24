@@ -11,7 +11,7 @@ import { Document, DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage, refetchSelectedDocument } = useContext(AppContext);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -52,7 +52,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
       return;
     }
 
-    watchDocumentStatus(response.id, (ev) => {
+    watchDocumentStatus(response.id, async (ev) => {
       switch (ev.data) {
         case DocumentStatus.Pending:
           unwatchDocumentStatus(response.id, ev.token);
@@ -60,6 +60,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           break;
         case DocumentStatus.Finished:
           unwatchDocumentStatus(response.id, ev.token);
+          await refetchSelectedDocument(ev.documentId);
           addMessage(`Document ${title} is ready!`);
           break;
         case DocumentStatus.NotStarted:
@@ -73,7 +74,6 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           addMessage("FAILURE");
           break;
       }
-
       closeModal();
     });
 
