@@ -1,4 +1,7 @@
-#!/bin/env python3
+import sys
+
+if sys.platform.startswith('linux'):
+    #!/bin/env python3
 
 import random
 import unittest

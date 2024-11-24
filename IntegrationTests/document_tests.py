@@ -15,10 +15,20 @@ upload_documents = []
 
 class DocumentTests(unittest.TestCase):
 
-    @classmethod
-    def setUp(cls) -> None:
+    def setUp(self) -> None:
+        test_name = self._testMethodName
+        print(f"\n{'='*80}")
+        print(f"Running: {test_name}")
         delete_all_documents()
         upload_documents = []
+    
+    def tearDown(self) -> None:
+        result = self._outcome.result
+        test_name = self._testMethodName
+        if result.wasSuccessful():
+            print(f"✅ test passed")
+        else:
+            print(f"❌ test failed")
     
     def  test_get_all_documents(self):
         # GIVEN
@@ -180,4 +190,8 @@ class DocumentTests(unittest.TestCase):
 
         # THEN
         self.assertEqual(response.status_code, 400, f"Expected status code 200, got {response.status_code}")
+        
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
         
