@@ -164,9 +164,7 @@ export class MockDocumentService implements IDocumentService {
                 modificationDateTime: '2020-01-01T00:00:00',
                 status: DocumentStatus.Finished,
                 tags: [],
-                documentType: {
-                    name: ".pdf"
-                }
+                fileExtension: ".pdf"
             }]
         });
     }

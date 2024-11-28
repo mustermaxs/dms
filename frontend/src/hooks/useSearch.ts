@@ -44,7 +44,8 @@ export const useSearch = () => {
         tags: result.tags,
         modificationDateTime: result.modificationDateTime,
         uploadDateTime: result.uploadDateTime,
-        status: result.status
+        status: result.status,
+        fileExtension: result.fileExtension
       }));
       setDocuments(documents);
       

@@ -36,9 +36,6 @@ export type Document = {
     Failed
   }
 
-  export type DocumentType = {
-    name: string;
-  }
 
   export type DocumentSearchResult = {
     id: string;
@@ -48,7 +45,7 @@ export type Document = {
     modificationDateTime: string;
     status: DocumentStatus;
     tags: Tag[];
-    documentType: DocumentType;
+    fileExtension: string;
   }
 
   export type SearchDocumentResponse = {

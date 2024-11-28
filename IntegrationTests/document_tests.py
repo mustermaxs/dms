@@ -190,7 +190,53 @@ class DocumentTests(unittest.TestCase):
 
         # THEN
         self.assertEqual(response.status_code, 400, f"Expected status code 200, got {response.status_code}")
-        
+
+    def test_search_document_by_title_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        document_title = document["title"]
+        wait_for_document_to_be_processed(document_id)
+
+        # WHEN
+        response = requests.get(url(f"Search?query={document_title}"))
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
+
+    def test_search_document_by_tag_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        document_tag = document["tags"][0]["value"]
+        wait_for_document_to_be_processed(document_id)
+
+        # WHEN
+        response = requests.get(url(f"Search?query={document_tag}"))
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
+
+    def test_search_document_by_content_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
+
+        response = requests.get(url(f"Documents/{document_id}/content"))
+        document_content = response.json()["content"]["content"]
+        print(document_content)
+
+        # WHEN
+        response = requests.get(url(f"Search?query={document_content}"))
+
+        print(response.json()) 
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

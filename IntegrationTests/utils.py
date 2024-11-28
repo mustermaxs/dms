@@ -137,11 +137,9 @@ class UploadDocumentDto:
     
 def create_rand_document():
     title = RandomWord().get_word() + ".pdf"
-    content = pdf_to_base_64("mock_pdf.pdf")
+    content = pdf_to_base_64("ccc.pdf")
     tags = [create_rand_tag()]
-    # documentType = {
-    #     "extension": ".pdf"
-    # }
+
     fileType = ".pdf"
     return UploadDocumentDto(title, content, tags, fileType)
 
