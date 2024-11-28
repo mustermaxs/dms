@@ -120,8 +120,7 @@ namespace WorkerService1;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing message: {ex.Message}");
-                    await _channel.BasicRejectAsync(ea.DeliveryTag, requeue: true);
+                    await _channel.BasicRejectAsync(ea.DeliveryTag, requeue: false);
                 }
             };
 
@@ -134,9 +133,9 @@ namespace WorkerService1;
             throw new NotImplementedException();
         }
 
-        public Task Reject(ulong deliveryTag, bool requeue)
+        public async Task Reject(ulong deliveryTag, bool requeue)
         {
-            throw new NotImplementedException();
+            await _channel.BasicRejectAsync(deliveryTag, requeue: true);
         }
 
         public Task Close()
