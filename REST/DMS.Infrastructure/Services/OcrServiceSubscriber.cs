@@ -33,9 +33,16 @@ public class OcrServiceSubscriber : BackgroundService
                     logger.LogInformation("Subscription cancelled.");
                     return;
                 }
-        
                 using var callbackScope = _serviceScopeFactory.CreateScope();
                 var mediator = callbackScope.ServiceProvider.GetRequiredService<IMediator>();
+
+                if (processedDocumentDto.Status == ProcessStatus.Failed)
+                {
+                    logger.LogInformation($"Failed to process document {processedDocumentDto.Id}.");
+                    await mediator.Publish(new ProcessingDocumentFailedIntegrationEvent(processedDocumentDto));
+                    return;
+                }
+        
 
                 logger.LogInformation($"Received OCR result for document ID: {processedDocumentDto.Id}");
                 await mediator.Publish(new DocumentContentExtractedIntegrationEvent(
