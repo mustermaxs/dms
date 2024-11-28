@@ -3,7 +3,7 @@ import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import { TagInput } from "../shared/TagInput";
 import { useContext, useEffect, useState } from "react";
-import { fileToBase64 } from "../../services/fileService";
+import { FileInfo, fileToBase64 } from "../../services/fileService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { Tag } from "../../types/Tag";
 import AppContext from "../context/AppContext";
@@ -40,11 +40,12 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let fileContentBase64: string = await fileToBase64(file as File);
+    let fileInfo: FileInfo = await fileToBase64(file as File);
     let response: Document = await uploadDocument({
       title: title,
       tags: selectedTags,
-      content: fileContentBase64,
+      content: fileInfo.base64content,
+      fileType: fileInfo.fileType
     });
 
     if (!response) {

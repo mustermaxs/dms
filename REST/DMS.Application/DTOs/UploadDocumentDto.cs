@@ -8,4 +8,5 @@ public class UploadDocumentDto
     public string Title { get; set; }
     public string Content { get; set; }
     public List<TagDto> Tags { get; set; }
+    public string FileType { get; set; }
 }

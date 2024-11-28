@@ -39,7 +39,7 @@ namespace DMS.Infrastructure.Migrations
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
             migrationBuilder.AddColumn<string>(
-                name: "DocumentType",
+                name: "FileExtension",
                 table: "Documents",
                 type: "text",
                 nullable: false,
@@ -54,7 +54,7 @@ namespace DMS.Infrastructure.Migrations
                 table: "DocumentTags");
 
             migrationBuilder.DropColumn(
-                name: "DocumentType",
+                name: "FileExtension",
                 table: "Documents");
 
             migrationBuilder.AddColumn<string>(

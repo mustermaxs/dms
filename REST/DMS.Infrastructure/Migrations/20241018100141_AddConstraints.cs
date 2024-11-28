@@ -51,7 +51,7 @@ namespace DMS.Infrastructure.Migrations
                 oldType: "text");
 
             migrationBuilder.AlterColumn<string>(
-                name: "DocumentType",
+                name: "FileExtension",
                 table: "Documents",
                 type: "character varying(6)",
                 maxLength: 6,
@@ -112,7 +112,7 @@ namespace DMS.Infrastructure.Migrations
                 oldMaxLength: 50);
 
             migrationBuilder.AlterColumn<string>(
-                name: "DocumentType",
+                name: "FileExtension",
                 table: "Documents",
                 type: "text",
                 nullable: false,

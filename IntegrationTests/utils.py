@@ -115,10 +115,11 @@ def string_to_base64(string):
     return base64.b64encode(string.encode("utf-8")).decode("utf-8")
 
 class UploadDocumentDto:
-    def __init__(self, title, content, tags):
+    def __init__(self, title, content, tags, documentType=None):
         self.title = title
         self.content = content
         self.tags = tags
+        self.documentType = documentType
     
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__)
@@ -127,7 +128,8 @@ class UploadDocumentDto:
         return {
             "title": self.title,
             "content": self.content,
-            "tags": [tag.to_dict() for tag in self.tags]
+            "tags": [tag.to_dict() for tag in self.tags],
+            "fileType": self.documentType
         }
     
     def from_json(self, json):
@@ -137,7 +139,11 @@ def create_rand_document():
     title = RandomWord().get_word() + ".pdf"
     content = pdf_to_base_64("mock_pdf.pdf")
     tags = [create_rand_tag()]
-    return UploadDocumentDto(title, content, tags)
+    # documentType = {
+    #     "extension": ".pdf"
+    # }
+    fileType = ".pdf"
+    return UploadDocumentDto(title, content, tags, fileType)
 
 def url(path):
     return f"{get_base_url()}{path}"
@@ -174,7 +180,6 @@ def upload_document(document=None, shouldWaitForProcessing=True, getContent=True
         document = Mocks().get("UploadDocumentDto")
     document = json.dumps(document)
     response = requests.post(url("Documents"), data=document, headers={"Content-Type": "application/json"})
-
     if shouldWaitForProcessing:
         wait_for_document_to_be_processed(response.json()["content"]["id"])
 
