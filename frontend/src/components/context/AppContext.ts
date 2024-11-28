@@ -19,8 +19,9 @@ interface AppContextProps {
   addMessage: (message: string) => void;
   messages: { id: number; content: string }[];
   removeMessage: (id: number) => void;
-  watchDocumentStatus: (documentId: string, callback: (ev: DocumentStatusEvent) => void) => () => void;
+  watchDocumentStatus: (documentId: string, callback: (ev: DocumentStatusEvent) => Promise<void>) => () => void;
   unwatchDocumentStatus: (documentId: string, token: string) => void;
+  refetchSelectedDocument: (id: string) => Promise<Document>;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -40,5 +41,6 @@ const AppContext = createContext<AppContextProps>({
   removeMessage: () => {},
   watchDocumentStatus: () => () => {},
   unwatchDocumentStatus: () => {},
+  refetchSelectedDocument: () => Promise.resolve({} as Document),
 });
 export default AppContext;

@@ -15,7 +15,6 @@ export interface IDocumentService {
 export class MockDocumentService implements IDocumentService {
     public uploadedDocuments: Document[] = [];
 
-    constructor() { }
     deleteDocument(id: string): Promise<void> {
         return Promise.resolve();
     }
@@ -30,6 +29,8 @@ export class MockDocumentService implements IDocumentService {
             content: "Lorem ipsum",
             modificationDateTime: '2020-01-01T00:00:00',
             uploadDateTime: '2020-01-01T00:00:00',
+            fileExtension: ".pdf",
+
             status: DocumentStatus.Finished,
             tags: [
                 {
@@ -52,6 +53,8 @@ export class MockDocumentService implements IDocumentService {
             content: mockData.lorem,
             uploadDateTime: '2020-01-01T00:00:00',
             status: DocumentStatus.Pending,
+            fileExtension: ".pdf",
+
             tags: [
                 {
                     id: '2',
@@ -80,6 +83,8 @@ export class MockDocumentService implements IDocumentService {
             content: "Lorem ipsum",
             uploadDateTime: '2020-01-01T00:00:00',
             status: DocumentStatus.Finished,
+            fileExtension: ".pdf",
+
             tags: [
                 {
                     id: '2',
@@ -103,6 +108,8 @@ export class MockDocumentService implements IDocumentService {
             content: null,
             uploadDateTime: '2020-01-01T00:00:00',
             status: DocumentStatus.Pending,
+            fileExtension: ".pdf",
+
             tags: [
                 {
                     id: '2',
@@ -135,7 +142,8 @@ export class MockDocumentService implements IDocumentService {
             uploadDateTime: '2020-01-01T00:00:00',
             status: DocumentStatus.Finished,
             tags: document.tags,
-            modificationDateTime: '2020-01-01T00:00:00'
+            modificationDateTime: '2020-01-01T00:00:00',
+            fileExtension: ".pdf",
         } as Document;
 
         this.uploadedDocuments.push(uploadedDoc);

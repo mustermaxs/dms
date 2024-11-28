@@ -68,7 +68,7 @@ public class DocumentUploadTests
             DateTime.UtcNow,
             "",
             new List<DocumentTag>(),
-            new FileType("testDocument.pdf"),
+            "testDocument.pdf",
             ProcessingStatus.NotStarted);
         
         // WHEN
@@ -95,7 +95,7 @@ public class DocumentUploadTests
             new List<DocumentTag>
             {
             },
-            new FileType("testDocument.pdf"),
+            "testDocument.pdf",
             ProcessingStatus.NotStarted);
         document.AddTag(tag1);
         document.AddTag(tag2);

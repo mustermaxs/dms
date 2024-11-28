@@ -13,5 +13,8 @@ public class DmsDocumentValidator : AbstractValidator<DmsDocument>
             .WithMessage("Document title is invalid. It should be less than 50 characters.");
         RuleFor(e => e.Title).Matches("^[ a-zA-Z0-9_-]+")
             .WithMessage("Document title is invalid. ");
+        RuleFor(e => e.FileExtension).NotNull();
+        RuleFor(e => e.FileExtension).Matches("pdf")
+            .WithMessage("Document file extension is invalid.");
     }
 }

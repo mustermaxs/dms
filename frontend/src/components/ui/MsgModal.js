@@ -19,7 +19,14 @@ function MsgModal({
     setTimeout(() => {
       if (!isOpen || !isOpen) return;
       setIsOpen(false);
-      removeMessage(messageId);
+
+      try {
+        removeMessage(messageId);
+
+      }
+      catch (e) {
+        console.log("[MsgModal]" + e);
+      }
     }, seconds);
   };
 

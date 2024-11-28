@@ -3,7 +3,7 @@ import Label from "../shared/Label";
 import { Input, Button } from "rizzui";
 import { TagInput } from "../shared/TagInput";
 import { useContext, useEffect, useState } from "react";
-import { fileToBase64 } from "../../services/fileService";
+import { FileInfo, fileToBase64 } from "../../services/fileService";
 import { getEmptyGuid } from "../../services/guidGenerator";
 import { Tag } from "../../types/Tag";
 import AppContext from "../context/AppContext";
@@ -11,7 +11,7 @@ import { Document, DocumentStatus } from "../../types/Document";
 
 export const UploadModal = ({ size, isOpen, closeModal }) => {
 
-  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, uploadDocument, watchDocumentStatus, unwatchDocumentStatus, addMessage, refetchSelectedDocument } = useContext(AppContext);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -40,11 +40,12 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let fileContentBase64: string = await fileToBase64(file as File);
+    let fileInfo: FileInfo = await fileToBase64(file as File);
     let response: Document = await uploadDocument({
       title: title,
       tags: selectedTags,
-      content: fileContentBase64,
+      content: fileInfo.base64content,
+      fileType: fileInfo.fileType
     });
 
     if (!response) {
@@ -52,7 +53,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
       return;
     }
 
-    watchDocumentStatus(response.id, (ev) => {
+    watchDocumentStatus(response.id, async (ev) => {
       switch (ev.data) {
         case DocumentStatus.Pending:
           unwatchDocumentStatus(response.id, ev.token);
@@ -60,6 +61,7 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           break;
         case DocumentStatus.Finished:
           unwatchDocumentStatus(response.id, ev.token);
+          await refetchSelectedDocument(ev.documentId);
           addMessage(`Document ${title} is ready!`);
           break;
         case DocumentStatus.NotStarted:
@@ -73,7 +75,6 @@ export const UploadModal = ({ size, isOpen, closeModal }) => {
           addMessage("FAILURE");
           break;
       }
-
       closeModal();
     });
 

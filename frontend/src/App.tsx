@@ -7,12 +7,14 @@ import { useTags } from "./hooks/useTags";
 import { useDocuments } from "./hooks/useDocuments";
 import { useMsgModal } from "./hooks/useMsgModal";
 import { useFileStatus } from "./hooks/useFileStatus";
+import { useEffect } from "react";
 function App() {
 
   const { availableTags, setAvailableTags, setIsLoadingTags } = useTags();
-  const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument } = useDocuments();
+  const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument, refetchSelectedDocument } = useDocuments();
   const {addMessage, removeMessage, messages} = useMsgModal();
   const {watchDocumentStatus, unwatchDocumentStatus} = useFileStatus();
+
   return (
     <>
       <AppContext.Provider value={{ 
@@ -31,7 +33,8 @@ function App() {
           messages,
           removeMessage,
           watchDocumentStatus,
-          unwatchDocumentStatus
+          unwatchDocumentStatus,
+          refetchSelectedDocument
         }}>
         <Container>
           <Header />

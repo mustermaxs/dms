@@ -1,18 +1,22 @@
 import { useState } from "react";
 
-export const useMsgModal = () => {
+export const useMsgModal = () => {  // TODO masi BUG masi messages get same key
     const [messages, setMessages] = useState<{ id: number; content: string }[]>([]);
-    const [msgIndex, setMsgIndex] = useState(0);
+
+    const getNewMsgIndex = () => {
+        return new Date().getTime();
+    };
 
     const addMessage = (message: string) => {
-        setMsgIndex(msgIndex + 1);
-        const newMessage = { id: msgIndex, content: message };
+        const newMessage = { id: getNewMsgIndex(), content: message };
         console.log("[useMsgModal] Message: ", message);
         setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
     const removeMessage = (messageId: number) => {
-        console.log("REMOVE MESSAGE " + messageId);
+        console.log("[useMsgModal] Removing message " + messageId);
+        if (messages.findIndex((m) => m.id === messageId) === -1) 
+            console.error("[useMsgModal] Message " + messageId + " not found");
         setMessages((prevMessages) => prevMessages.filter((m) => m.id !== messageId));
     };
 
