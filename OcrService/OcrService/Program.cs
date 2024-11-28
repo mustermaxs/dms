@@ -35,23 +35,29 @@ class Program
         await _rabbitMq.InitiliazeAsync();
         await _rabbitMq.Subscribe("ocr-process", async (model, ea) =>
         {
+            Guid documentId = Guid.Empty;
+            
             try
             {
                 byte[] body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var ocrDocumentRequestDto = JsonSerializer.Deserialize<OcrDocumentRequestDto>(message);
+                documentId = ocrDocumentRequestDto.DocumentId;
                 Console.WriteLine($"{DateTime.UtcNow} [x] Request to process {ocrDocumentRequestDto.DocumentId}");
                 var fileStream = await _fileStorage.GetFileStreamAsync(ocrDocumentRequestDto.DocumentId.ToString());
                 var fileContent = await _ocrWorker.ProcessPdfAsync(fileStream);
-                var ocrDocumentDto = new OcrProcessedDocumentDto { Content = fileContent, Id = ocrDocumentRequestDto.DocumentId };
+                var ocrDocumentDto = new OcrProcessedDocumentDto { Content = fileContent, Id = ocrDocumentRequestDto.DocumentId, Status = ProcessStatus.Succeeded};
                 await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
+                // TODO publish to queue "ocr-failed" or easier:
+                // publish to ocr-result but indicate in DTO somehow that it failed
+                var ocrDocumentDto = new OcrProcessedDocumentDto { Status = ProcessStatus.Failed, Content = String.Empty, Id = documentId };
+                await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
+                throw new Exception($"Error processing message: {e.Message}");
             }
-
         });
         
         await Task.Delay(-1);
