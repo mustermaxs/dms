@@ -11,7 +11,7 @@ namespace DMS.Domain.Entities
         public DateTime? ModificationDateTime { get; private set; } = null;
         public string? Path { get; private set; }
         public ICollection<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
-        public FileType DocumentType { get; private set; }
+        public string FileExtension { get; private set; }
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.NotStarted;
 
         public DmsDocument()
@@ -19,19 +19,19 @@ namespace DMS.Domain.Entities
         }
 
         private DmsDocument(string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags,
-            FileType documentType,
+            string fileExtension,
             ProcessingStatus status)
         {
             Title = title;
             UploadDateTime = uploadDateTime;
             Path = path ?? Id.ToString();
             Tags = tags;
-            DocumentType = documentType;
+            FileExtension = fileExtension;
             Status = status;
         }
 
         public static DmsDocument Create(string title, DateTime uploadDateTime,
-            string? path, List<DocumentTag>? tags, FileType documentType,
+            string? path, List<DocumentTag>? tags, string documentType,
             ProcessingStatus status)
         {
             return new DmsDocument(

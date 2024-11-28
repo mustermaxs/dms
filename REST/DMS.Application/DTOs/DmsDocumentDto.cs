@@ -12,5 +12,5 @@ public class DmsDocumentDto
     public DateTime? ModificationDateTime { get; set; }
     public ProcessingStatus Status { get; set; }
     public List<TagDto>? Tags { get; set; } = new List<TagDto>();
-    public FileType DocumentType { get; set; }
+    public string FileExtension { get; set; }
 }

@@ -21,9 +21,7 @@ export type Document = {
     modificationDateTime: string;
     uploadDateTime: string;
     status: DocumentStatus;
-    documentType: {
-      extension: string
-    }
+    fileExtension: string;
   }
 
   export type DocumentContentDto = {

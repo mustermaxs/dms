@@ -247,7 +247,7 @@ public class Givens : IAsyncDisposable
             new List<DocumentTag>
             {
             },
-            new FileType("testDocument.pdf"),
+            "testDocument.pdf",
             ProcessingStatus.NotStarted);
         
         tags?.ForEach(t => document.AddTag(t));
@@ -265,7 +265,7 @@ public class Givens : IAsyncDisposable
             new List<DocumentTag>
             {
             },
-            new FileType("testDocument.pdf"),
+            "testDocument.pdf",
             ProcessingStatus.NotStarted);
     }
 

@@ -37,7 +37,7 @@ namespace DMS.Application.Commands
                     DateTime.UtcNow,
                     null,
                     new List<DocumentTag>(),
-                    new FileType(request.FileType),
+                    request.FileType,
                     ProcessingStatus.NotStarted);
                 
                 var documentIsValid = await documentValidator.ValidateAsync(document);

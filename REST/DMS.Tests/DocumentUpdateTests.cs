@@ -46,7 +46,7 @@ public class DocumentUpdateTests
             new List<DocumentTag>
             {
             },
-            new FileType("testDocument.pdf"),
+            "testDocument.pdf",
             ProcessingStatus.NotStarted);
         document.AddTag(tag1);
         await repo.Create(document);
