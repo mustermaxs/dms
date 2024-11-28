@@ -72,7 +72,7 @@ export const useFileStatus = () => {
         setDocuments(documentIds.splice(documentIds.indexOf(documentId), 1));
     };
 
-    const watchDocumentStatus = (documentId: string, callback: (ev: DocumentStatusEvent) => void) => {
+    const watchDocumentStatus = (documentId: string, callback: (ev: DocumentStatusEvent) => Promise<void>) => {
         console.log("[watchlist] WATCHING DOCUMENT " + documentId);
         setWatchDocuments(true);
         setDocuments([...documents, documentId]);
@@ -105,14 +105,14 @@ export const useFileStatus = () => {
             console.log(subscribers);
             try
             {
-                subscribers.forEach((subscriber) => {
+                subscribers.forEach(async (subscriber) => {
                     let event: DocumentStatusEvent = {
                         documentId: documentId,
                         data: document.status,
                         token: subscriber.token,
                         event: documentId
                     };
-                    subscriber.handle(event, () => {pubsub.unsubscribe(documentId, subscriber.token);});
+                    await subscriber.handle(event, () => {pubsub.unsubscribe(documentId, subscriber.token);});
                 })
             }
             catch (err) {

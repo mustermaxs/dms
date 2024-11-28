@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Document, DocumentContentDto, UpdateDocumentDto, UploadDocumentDto } from "../types/Document";
 import { ServiceLocator } from "../serviceLocator";
 import { IDocumentService } from "../services/documentService";
+import { assert } from "console";
 
 export const useDocuments = () => {
     const [documents, setDocuments] = useState<Document[]>([]);
@@ -10,11 +11,33 @@ export const useDocuments = () => {
 
     const getDocuments = () => documents;
 
+    const updateDocumentInState = (document: Document) => {
+        setDocuments((prevDocuments) =>
+            prevDocuments.map((doc) => 
+                doc.id === document.id ? { ...doc, ...document } : doc
+            )
+        );
+    }
+
+    const refetchSelectedDocument = async (id: string): Promise<Document> => {
+        console.log("[useDocuments] Refetching document " + id);
+        let refetechedDoc = await getDocument(id);
+        let docBeforeUpdate = selectedDocument;
+        updateDocumentInState(refetechedDoc);
+        setSelectedDocument(refetechedDoc);
+        console.assert(docBeforeUpdate !== selectedDocument);
+        return selectedDocument;
+    }
+
     const getDocument = async (id: string): Promise<Document | null> => {
         try {
             setError(null);
             const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
             const document = await documentService.getDocument(id);
+            // TODO masi
+            // if (document != null) {
+            //     setDocuments((prevDocuments) => [...prevDocuments, document]);
+            // }
             return document;
         } catch (err) {
             setError('Failed to fetch document');
@@ -110,6 +133,7 @@ export const useDocuments = () => {
         uploadDocument, 
         error,
         deleteDocument,
-        getDocumentContent
+        getDocumentContent,
+        refetchSelectedDocument
     };
 };

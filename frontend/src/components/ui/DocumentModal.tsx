@@ -18,7 +18,7 @@ import "../../App.css";
 import { title } from "process";
 
 export const DocumentModal = ({ isOpen, closeModal }) => {
-  const { availableTags, setIsLoadingTags, selectedDocument: document, setSelectedDocument, setDocuments, addMessage } = useContext(AppContext);
+  const { availableTags, setIsLoadingTags, selectedDocument: document, setSelectedDocument, setDocuments, addMessage, getDocument, refetchSelectedDocument } = useContext(AppContext);
   const contentModal = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState(document.title);
@@ -41,7 +41,6 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   const handleInputTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEditedTitle(event.target.value);
   };
-
 
   useEffect(() => {
     setIsEditable({
@@ -118,12 +117,15 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
     setIsEditMode(false);
   }
 
-  const onClickViewContent = () => {
+  const onClickViewContent = async () => {
+    
+
     if (document.status < DocumentStatus.Finished)
     {
       addMessage("Content is not available. Document is still being processed...");
       return;
     }
+
 
     contentModal.openModal();
     setDocumentContentObj(document);
