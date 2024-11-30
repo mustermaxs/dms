@@ -8,14 +8,14 @@ namespace DMS.Infrastructure.Services;
 
 public class ElasticSearchService : ISearchService
 {
-    private ElasticsearchClient _client;
+    private readonly ElasticsearchClient _client;
     private readonly ILogger<ElasticSearchService> _logger;
     private const string IndexName = "documents";
 
     public ElasticSearchService(IConfiguration configuration, ILogger<ElasticSearchService> logger)
     {
-        var uri = new Uri("http://localhost:9200");
-        _client = new ElasticsearchClient(uri);
+        var elasticUrl = configuration["ElasticSearch:Url"] ?? "http://localhost:9200";
+        _client = new ElasticsearchClient(new Uri(elasticUrl));
         _logger = logger;
     }
 
