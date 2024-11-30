@@ -19,21 +19,21 @@ namespace DMS.Application.Commands
     {
 
         public async Task<List<DocumentSearchResultDto>> Handle(SearchDocumentsQuery request, CancellationToken cancellationToken)
-    {
-        var searchResults = await searchService.SearchAsync(request.Query);
-        
-        var documents = new List<DmsDocument>();
-        foreach (var result in searchResults)
         {
-            var document = await documentRepository.Get(result.Id);
-            if (document != null)
+            var searchResults = await searchService.SearchAsync(request.Query);
+
+            var documents = new List<DmsDocument>();
+            foreach (var result in searchResults)
             {
-                documents.Add(document);
-            }
+                var document = await documentRepository.Get(result.Id);
+                if (document != null)
+                {
+                    documents.Add(document);
+                }
+            }   
+            
+            return mapper.Map<List<DocumentSearchResultDto>>(documents);
         }
-        
-        return mapper.Map<List<DocumentSearchResultDto>>(documents);
     }
-}
 
 }

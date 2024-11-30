@@ -36,7 +36,6 @@ public class ElasticSearchService : ISearchService
                 )
             );
 
-            Console.WriteLine("searchResponse", searchResponse);
 
             if (!searchResponse.IsValidResponse)
             {
