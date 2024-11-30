@@ -8,7 +8,7 @@ using DMS.Application.Interfaces;
 using DMS.Application.Services;
 using DMS.Domain.Entities;
 using DMS.Domain.DomainEvents;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Infrastructure;
@@ -21,7 +21,9 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Minio;
 using DMS.Api.Configuration;
+using DMS.Domain.Entities.Documents;
 using DMS.Infrastructure.Configs;
+using DMS.Infrastructure.Mapping;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +45,9 @@ builder.Services.AddMediatR(
     typeof(UpdateDocumentCommand).Assembly,
     typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly,
     typeof(DocumentTagsUpdatedDomainEvent).Assembly,
-    typeof(DocumentUpdatedDomainEvent).Assembly
+    typeof(DocumentUpdatedDomainEvent).Assembly,
+    typeof(DeletedDocumentDomainEvent).Assembly,
+    typeof(DocumentUploadedToDbDomainEvent).Assembly
     );
 
 builder.Services.AddControllers();
@@ -51,7 +55,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // AUTOMAPPER
-builder.Services.AddAutoMapper( typeof(DmsMappingProfile));
+builder.Services.AddAutoMapper( 
+    typeof(DmsMappingProfile),
+    typeof(InfrastructureApplicationMappingProfile));
 
 // LOGGING
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
@@ -100,20 +106,20 @@ builder.Services.AddScoped<IFileStorage, FileStorage>();
 
 // REPOSITORIES
 builder.Services.AddScoped<IDmsDocumentRepository, DmsDocumentRepository>();
-builder.Services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
+// builder.Services.AddScoped<IDocumentTagRepository, DocumentTagRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // VALIDATORS
 builder.Services.AddScoped<IValidator<DmsDocument>, DmsDocumentValidator>();
 builder.Services.AddScoped<IValidator<Tag>, TagValidator>();
-builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
+// builder.Services.AddScoped<IValidator<DocumentTag>, DocumentTagValidator>();
 
 // CONFIGS
 
 // DATABASE
 builder.Services.AddDbContext<DmsDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors());
 
 builder.Services.AddHostedService<OcrServiceSubscriber>();
 

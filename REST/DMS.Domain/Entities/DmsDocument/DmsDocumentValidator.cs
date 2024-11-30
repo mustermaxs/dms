@@ -1,5 +1,6 @@
 using FluentValidation;
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Documents;
 
 public class DmsDocumentValidator : AbstractValidator<DmsDocument>
 {

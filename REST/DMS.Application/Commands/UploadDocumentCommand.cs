@@ -6,6 +6,8 @@ using DMS.Application.Interfaces;
 using DMS.Application.Services;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Documents;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
@@ -21,7 +23,6 @@ namespace DMS.Application.Commands
         FileHelper fileHelper,
         IValidator<DmsDocument> documentValidator,
         IUnitOfWork unitOfWork,
-        IDocumentTagFactory documentTagFactory,
         IMediator mediator,
         IMapper mapper
         ) : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
@@ -36,7 +37,7 @@ namespace DMS.Application.Commands
                     request.Title,
                     DateTime.UtcNow,
                     null,
-                    new List<DocumentTag>(),
+                    mapper.Map<List<Tag>>(request.Tags),
                     request.FileType,
                     ProcessingStatus.NotStarted);
                 
@@ -47,10 +48,10 @@ namespace DMS.Application.Commands
                     throw new ValidationException(documentIsValid.Errors);
                 }
 
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
-                tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
-                await unitOfWork.DmsDocumentRepository.Create(document);
+                // var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
+                // tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
                 document.AddDomainEvent(new DocumentUploadedToDbDomainEvent(document, request.Content));
+                await unitOfWork.DmsDocumentRepository.Create(document);
                 await unitOfWork.CommitAsync();
                 
                 return mapper.Map<DmsDocumentDto>(document);
@@ -59,7 +60,7 @@ namespace DMS.Application.Commands
             {
                 await unitOfWork.RollbackAsync();
                 await mediator.Publish(new FailedToCreateeDocumentIntegrationEvent(request)); 
-                throw new UploadDocumentException($"Failed to upload document.");
+                throw new UploadDocumentException($"Failed to upload document. {e.Message}");
             }
         }
     }

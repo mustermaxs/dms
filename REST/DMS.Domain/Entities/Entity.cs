@@ -2,8 +2,8 @@ namespace DMS.Domain.Entities;
 
 public class Entity
 {
-    protected List<object> _domainEvents = new List<object>();
-    public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
+    protected static List<object> _domainEvents = new List<object>();
+    public static IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public void AddDomainEvent(object eventItem)

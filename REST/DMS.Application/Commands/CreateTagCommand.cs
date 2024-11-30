@@ -3,7 +3,7 @@ using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.DomainEvents;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using MediatR;
 

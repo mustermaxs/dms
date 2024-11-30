@@ -1,7 +1,5 @@
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.DomainEvents;
+using DMS.Domain.Entities.Documents;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace DMS.Domain.DomainEvents
 {

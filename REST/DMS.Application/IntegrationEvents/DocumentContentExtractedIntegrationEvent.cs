@@ -26,6 +26,7 @@ namespace DMS.Application.IntegrationEvents
                 }
                 logger.LogDebug($"Saving document content.\nId: {notification.DocumentId}.\nTitle: {document.Title}");
                 document.UpdateContent(notification.Content);
+                await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
                 await unitOfWork.CommitAsync();
             }
             catch (Exception e)

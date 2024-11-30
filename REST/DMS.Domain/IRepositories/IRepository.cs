@@ -2,14 +2,15 @@ using DMS.Domain.Entities;
 
 namespace DMS.Domain.IRepositories;
 
-public interface IRepository<TEntity> : IDisposable where TEntity : Entity
+public interface IRepository<TDomainEntity> : IDisposable 
+    where TDomainEntity : Entity
 {
-    Task<TEntity?> Get(Guid id);
-    Task<IEnumerable<TEntity>?> GetAll();
-    Task<TEntity> Create(TEntity entity);
-    Task Delete(TEntity entity);
+    Task<TDomainEntity?> Get(Guid id);
+    Task<IEnumerable<TDomainEntity>?> GetAll();
+    Task<TDomainEntity> Create(TDomainEntity domainEntity);
+    Task Delete(TDomainEntity entity);
     Task DeleteById(Guid id);
-    Task UpdateAsync(TEntity entity);
+    Task UpdateAsync(TDomainEntity entity);
     Task SaveAsync();
     Task DeleteAllAsync();
 }

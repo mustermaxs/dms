@@ -1,8 +1,9 @@
 using DMS.Domain.DomainEvents;
 using DMS.Domain.ValueObjects;
 
-namespace DMS.Domain.Entities
+namespace DMS.Domain.Entities.Documents
 {
+    using Tags;
     public class DmsDocument : AggregateRoot
     {
         public string Title { get; private set; }
@@ -10,7 +11,7 @@ namespace DMS.Domain.Entities
         public DateTime UploadDateTime { get; init; }
         public DateTime? ModificationDateTime { get; private set; } = null;
         public string? Path { get; private set; }
-        public ICollection<DocumentTag>? Tags { get; set; } = new List<DocumentTag>();
+        public List<Tag>? Tags { get; set; } = new List<Tag>();
         public string FileExtension { get; private set; }
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.NotStarted;
 
@@ -18,7 +19,7 @@ namespace DMS.Domain.Entities
         {
         }
 
-        private DmsDocument(string title, DateTime uploadDateTime, string? path, List<DocumentTag>? tags,
+        private DmsDocument(string title, DateTime uploadDateTime, string? path, List<Tag>? tags,
             string fileExtension,
             ProcessingStatus status)
         {
@@ -31,7 +32,7 @@ namespace DMS.Domain.Entities
         }
 
         public static DmsDocument Create(string title, DateTime uploadDateTime,
-            string? path, List<DocumentTag>? tags, string documentType,
+            string? path, List<Tag>? tags, string documentType,
             ProcessingStatus status)
         {
             return new DmsDocument(
@@ -44,29 +45,26 @@ namespace DMS.Domain.Entities
             );
         }
 
-        public DmsDocument AddTag(Tag.Tag tag)
+        public DmsDocument AddTag(Tag tag)
         {
-            var documentTag = new DocumentTag(this, tag);
-
-            if (!Tags.Contains(documentTag))
-                Tags.Add(documentTag);
+            if (!Tags.Contains(tag))
+                Tags.Add(tag);
 
             return this;
         }
 
-        public DmsDocument UpdateTags(List<Tag.Tag> tags)
+        public DmsDocument UpdateTags(List<Tag> tags)
         {
-            Tags = new List<DocumentTag>();
+            Tags = new List<Tag>();
             tags.ForEach(tag => AddTag(tag));
             this.ModificationDateTime = DateTime.UtcNow;
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));
             return this;
         }
 
-        public DmsDocument RemoveTag(Tag.Tag tag)
+        public DmsDocument RemoveTag(Tag tag)
         {
-            var documentTag = new DocumentTag(this, tag);
-            Tags.Remove(documentTag);
+            Tags?.Remove(tag);
             ModificationDateTime = DateTime.UtcNow;
 
             AddDomainEventIfNotExists(new DocumentUpdatedDomainEvent(this));

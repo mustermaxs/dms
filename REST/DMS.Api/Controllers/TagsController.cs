@@ -1,7 +1,7 @@
 using DMS.Api.Configuration;
 using DMS.Application.DTOs;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 
 namespace DMS.REST.Api.Controllers;
 

@@ -1,4 +1,5 @@
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Documents;
 using DMS.Domain.Entities.DomainEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;

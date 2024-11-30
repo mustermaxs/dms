@@ -1,5 +1,5 @@
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 
 namespace DMS.Domain.IRepositories;
 

@@ -1,6 +1,7 @@
 using DMS.Application.Interfaces;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
+using DMS.Domain.Entities.Documents;
 using DMS.Domain.IRepositories;
 using DMS.Domain.ValueObjects;
 using MediatR;

@@ -1,4 +1,4 @@
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using Microsoft.AspNetCore.Http;
 
 namespace DMS.Application.DTOs;

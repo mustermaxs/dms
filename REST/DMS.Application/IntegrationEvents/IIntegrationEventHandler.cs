@@ -15,9 +15,18 @@ namespace DMS.Application.EventHandlers
 
         public async Task Handle(TEvent notification, CancellationToken cancellationToken)
         {
-            var eventName = typeof(TEvent).FullName;
-            logger.LogInformation($"[Integration Event] {notification}");
-            await HandleEvent(notification, cancellationToken);
+            try
+            {
+                var eventName = typeof(TEvent).FullName;
+                logger.LogInformation($"[Integration Event] {notification}");
+                await HandleEvent(notification, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical($" [Integration Event ERROR] {notification}. Exception: {e}");
+                throw;
+            }
+
         }
 
         public abstract Task HandleEvent(TEvent notification, CancellationToken cancellationToken);

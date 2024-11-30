@@ -2,7 +2,7 @@ using AutoMapper;
 using DMS.Application.DTOs;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using DMS.Domain.ValueObjects;
 using MediatR;

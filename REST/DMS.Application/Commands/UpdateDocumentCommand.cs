@@ -4,7 +4,7 @@ using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
 using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
+using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Domain.ValueObjects;
@@ -18,7 +18,6 @@ namespace DMS.Application.Commands
     public class UpdateDocumentCommandHandler(
         IUnitOfWork unitOfWork,
         IDmsDocumentRepository dmsDocumentRepository,
-        IDocumentTagFactory documentTagFactory,
         IMapper autoMapper,
         ILogger<UpdateDocumentCommandHandler> logger)
         : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
@@ -30,12 +29,14 @@ namespace DMS.Application.Commands
                 await unitOfWork.BeginTransactionAsync();
 
                 var document = await dmsDocumentRepository.Get(request.Document.Id);
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
-                await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
-
+                // var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
+                // await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);  // TODO move action to infrastructure layer
+                
+                var updatedTagList = autoMapper.Map<List<Tag>>(request.Document.Tags);
+                
                 document
                     .UpdateTitle(request.Document.Title)
-                    .UpdateTags(tagsAssociatedWithDocument);
+                    .UpdateTags(updatedTagList);
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
@@ -43,8 +44,9 @@ namespace DMS.Application.Commands
 
                 return autoMapper.Map<DmsDocumentDto>(document);
             }
-            catch
+            catch(Exception ex)
             {
+                logger.LogError($"Error updating document. {ex.Message}");
                 await unitOfWork.RollbackAsync();
                 throw;
             }

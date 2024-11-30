@@ -13,6 +13,7 @@ public class DeletedDocumentDomainEventHandler(
     {
         try
         {
+            logger.LogInformation($"Deleted file in MinIO: {notification.Document.Id}");
             await fileStorage.DeleteFileAsync(notification.Document.Id);
             // TODO Delete file from ElasticSearch
         }

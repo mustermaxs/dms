@@ -31,14 +31,14 @@ namespace DMS.Application.Commands
                     return Unit.Value;
                 }
                 await unitOfWork.BeginTransactionAsync();
-                await unitOfWork.DmsDocumentRepository.DeleteById(request.Id);
-                await fileStorage.DeleteFileAsync(request.Id);
                 document!.AddDomainEvent(new DeletedDocumentDomainEvent(document));
+                await unitOfWork.DmsDocumentRepository.Delete(document);
                 await unitOfWork.CommitAsync();
                 return Unit.Value;
             }
             catch (Exception e)
             {
+                logger.LogError(e, e.Message);
                 throw;
             }
         }
