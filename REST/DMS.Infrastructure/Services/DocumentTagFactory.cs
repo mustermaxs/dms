@@ -1,16 +1,16 @@
-
-
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
 using DMS.Domain.Entities.Tags;
 using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Services;
 
 public class DocumentTagFactory(
-    ITagRepository tagRepository) : IDocumentTagFactory
+    ITagRepository tagRepository,
+    DmsDbContext dbContext) : IDocumentTagFactory
 {
     public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<Tag> tags)
     {
@@ -19,7 +19,7 @@ public class DocumentTagFactory(
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
 
         // Separate new tags from existing tags
-        var newTags = tags.Where(requestTag => 
+        var newTags = tags.Where(requestTag =>
             !existingTagValues.Contains(requestTag.Value));
 
         var alreadyExistingTagDtos = tagsInDb.Where(dbTag =>
@@ -45,4 +45,30 @@ public class DocumentTagFactory(
         // Return the combined result of new and existing tags
         return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
+
+    public async Task<List<TagModel?>> CreateNewTagsOrGetExisting(List<Tag?> tags)
+    {
+        if (tags == null)
+            return null;
+        
+        var dbSet = dbContext.Set<TagModel>();
+
+        var tagValues = tags.Select(tag => tag.Value).ToList();
+        var existingTags = await dbSet
+            .Where(tag => tagValues.Contains(tag.Value))
+            .ToListAsync();
+
+        List<TagModel?> newTags = tags
+            .Where(tag => !existingTags.Any(existingTag => existingTag.Value == tag.Value))
+            .Select(tag => new TagModel(Guid.NewGuid(), tag.Label, tag.Value, tag.Color))
+            .ToList();
+
+        if (newTags.Any())
+        {
+            await dbSet.AddRangeAsync(newTags);
+        }
+
+        return newTags.Concat(existingTags).ToList();
+    }
+
 }

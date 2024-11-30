@@ -7,6 +7,7 @@ using DMS.Domain.IRepositories;
 using DMS.Domain.Services;
 using DMS.Infrastructure.Entities;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,11 +28,11 @@ public class DmsDocumentRepository(
 
     public override async Task<DmsDocument> Create(DmsDocument domainEntity)
     {
-        var tags = await documentTagFactory.CreateOrGetTagsFromTagDtos(domainEntity.Tags);
+        var tags = await documentTagFactory.CreateNewTagsOrGetExisting(domainEntity.Tags);
         var model = Mapper.Map<DocumentModel>(domainEntity);
         List<DocumentTagModel> tagModels = new List<DocumentTagModel>();
         tags.ForEach(tag => tagModels.Add(
-            new DocumentTagModel { TagId = tag.Id, DocumentId = domainEntity.Id , Id = Guid.NewGuid(), TagModels = new TagModel(tag.Id, tag.Label, tag.Value, tag.Color), DocumentModels = model}));
+            new DocumentTagModel { TagId = tag.Id, DocumentId = domainEntity.Id , Id = Guid.NewGuid(), TagModels = tag, DocumentModels = model}));
         model.Tags = tagModels;
         var entityEntry = await DbSet.AddAsync(model);
         return Mapper.Map<DmsDocument>(entityEntry.Entity);
@@ -59,9 +60,12 @@ public class DmsDocumentRepository(
 
     public override async Task UpdateAsync(DmsDocument entity)
     {
-        var updatedDomainTagList = await documentTagFactory.CreateOrGetTagsFromTagDtos(entity.Tags);
-        var updatedTagModelList = Mapper.Map<IEnumerable<DocumentTagModel>>(entity.Tags);
+        var updatedTagModelList = await documentTagFactory.CreateNewTagsOrGetExisting(entity.Tags);
         var model = Mapper.Map<DocumentModel>(entity);
+        List<DocumentTagModel> tagModels = new List<DocumentTagModel>();
+        updatedTagModelList.ForEach(tag => tagModels.Add(
+            new DocumentTagModel { TagId = tag.Id, DocumentId = model.Id , Id = Guid.NewGuid(), TagModels = tag, DocumentModels = model}));
+        model.Tags = tagModels;
         DbSet.Entry(model).State = EntityState.Modified;
         DbSet.Update(model);
     }

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using DMS.Application;
 using DMS.Application.Interfaces;
 using DMS.Domain;
+using DMS.Domain.DomainEvents;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Documents;
 using DMS.Domain.Entities.Tags;
@@ -47,9 +48,10 @@ namespace DMS.Infrastructure.Repositories;
 
         private IReadOnlyCollection<object> GetDomainEventsFromEntities()
         {
-            var entitiesWithEvents = _context.ChangeTracker.Entries<Entity>().ToList();
-            var domainEvents = entitiesWithEvents.SelectMany(e => e.Entity.DomainEvents).ToList();
-            return new ReadOnlyCollection<object>(domainEvents);
+            // var entitiesWithEvents = _context.ChangeTracker.Entries<Entity>().ToList();
+            // var domainEvents = entitiesWithEvents.SelectMany(e => e.Entity.DomainEvents).ToList();
+            // return new ReadOnlyCollection<object>(domainEvents);
+            return Entity.DomainEvents.Cast<IDomainEvent>().ToList();
         }
 
         public async Task BeginTransactionAsync()

@@ -9,4 +9,5 @@ namespace DMS.Domain.Services;
 public interface IDocumentTagFactory
 {
     public Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<Tag> tags);
+    public Task<List<TagModel?>> CreateNewTagsOrGetExisting(List<Tag?> tags);
 }
