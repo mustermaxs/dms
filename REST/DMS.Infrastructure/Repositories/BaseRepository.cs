@@ -1,3 +1,4 @@
+using AutoMapper;
 using DMS.Application;
 using DMS.Domain;
 using DMS.Domain.Entities;
@@ -7,44 +8,50 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Repositories
 {
-public abstract class BaseRepository<TEntity> : IDisposable, IRepository<TEntity>
-where TEntity : Entity
+public abstract class BaseRepository<TDomainEntity, TModelEntity> : IDisposable, IRepository<TDomainEntity>
+where TDomainEntity : Entity
+where TModelEntity : class
 {
-    public IValidator<TEntity> Validator { get; }
+    public IValidator<TDomainEntity> Validator { get; }
+    public IMapper Mapper { get; }
     protected DmsDbContext Context;
     private bool _disposed = false;
-    protected DbSet<TEntity> DbSet;
+    protected DbSet<TModelEntity> DbSet;
     protected readonly IEventDispatcher _eventDispatcher;
 
-    public BaseRepository(DmsDbContext dbContext, IValidator<TEntity> validator)
+    public BaseRepository(DmsDbContext dbContext, IValidator<TDomainEntity> validator, IMapper mapper)
     {
         Validator = validator;
+        Mapper = mapper;
         Context = dbContext;
-        DbSet = Context.Set<TEntity>();
+        DbSet = Context.Set<TModelEntity>();
     }
     
-    public virtual async Task<TEntity?> Get(Guid id)
+    public virtual async Task<TDomainEntity?> Get(Guid id)
     {
-        return await DbSet.FindAsync(id);
+        var model = await DbSet.FindAsync(id);
+        var domainEntity = Mapper.Map<TDomainEntity>(model);
+        return domainEntity;
     }
 
-    public virtual async Task<IEnumerable<TEntity>?> GetAll()
+    public virtual async Task<IEnumerable<TDomainEntity>?> GetAll()
     {
-        return await DbSet.ToListAsync();
+        var models = await DbSet.ToListAsync();
+        return Mapper.Map<IEnumerable<TDomainEntity>>(models);
     }
 
-    public virtual async Task<TEntity> Create(TEntity entity)
+    public virtual async Task<TDomainEntity> Create(TDomainEntity domainEntity)
     {
-        await Validator.ValidateAndThrowAsync(entity);
-        var e = await DbSet.AddAsync(entity);
-        
-        return e.Entity;
+        var model = Mapper.Map<TModelEntity>(domainEntity);
+        var entityEntry = await DbSet.AddAsync(model);
+        var createdModel = Mapper.Map<TDomainEntity>(entityEntry.Entity);
+        return createdModel;
     }
 
-    public virtual async Task Delete(TEntity entity)
+    public virtual async Task Delete(TDomainEntity entity)
     {
-        DbSet.Remove(entity);
-        
+        var model = Mapper.Map<TModelEntity>(entity);
+        DbSet.Remove(model);
     }
     
     public virtual async Task DeleteAllAsync()
@@ -59,19 +66,19 @@ where TEntity : Entity
 
     public virtual async Task DeleteById(Guid id)
     {
-        var entity = await DbSet.FindAsync(id);
-        if (entity == null)
+        var model = await DbSet.FindAsync(id);
+        if (model == null)
         {
             return;
         }
-        DbSet.Remove(entity);
+        DbSet.Remove(model);
         
     }
 
-    public virtual async Task UpdateAsync(TEntity entity)
+    public virtual async Task UpdateAsync(TDomainEntity entity)
     {
-        await Validator.ValidateAndThrowAsync(entity);
-        DbSet.Update(entity);
+        var model = Mapper.Map<TModelEntity>(entity);
+        DbSet.Update(model);
     }
 
     public void Dispose()
