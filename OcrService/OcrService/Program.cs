@@ -50,8 +50,18 @@ class Program
                 var ocrDocumentRequestDto = JsonSerializer.Deserialize<OcrDocumentRequestDto>(message);
                 documentId = ocrDocumentRequestDto.DocumentId;
                 Console.WriteLine($"{DateTime.UtcNow} [x] Request to process {ocrDocumentRequestDto.DocumentId}");
+                
                 var fileStream = await _fileStorage.GetFileStreamAsync(ocrDocumentRequestDto.DocumentId.ToString());
+                if (fileStream == null || fileStream.Length == 0)
+                {
+                    throw new InvalidOperationException("Retrieved file stream is empty or null");
+                }
+
                 var fileContent = await _ocrWorker.ProcessPdfAsync(fileStream);
+                if (string.IsNullOrEmpty(fileContent))
+                {
+                    throw new InvalidOperationException("OCR processing resulted in empty content");
+                }
 
                 await _elasticSearch.IndexDocumentAsync(
                     ocrDocumentRequestDto.DocumentId, 
@@ -66,12 +76,22 @@ class Program
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                // TODO publish to queue "ocr-failed" or easier:
-                // publish to ocr-result but indicate in DTO somehow that it failed
-                var ocrDocumentDto = new OcrProcessedDocumentDto { Status = ProcessStatus.Failed, Content = String.Empty, Id = documentId };
+                var errorMessage = $"Error processing document {documentId}: {e.Message}";
+                if (e.InnerException != null)
+                {
+                    errorMessage += $" Inner exception: {e.InnerException.Message}";
+                }
+                Console.WriteLine($"{DateTime.UtcNow} [ERROR] {errorMessage}");
+                Console.WriteLine(e.StackTrace);
+
+                var ocrDocumentDto = new OcrProcessedDocumentDto 
+                { 
+                    Status = ProcessStatus.Failed, 
+                    Content = String.Empty, 
+                    Id = documentId,
+                };
                 await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
-                throw new Exception($"Error processing message: {e.Message}");
+                
             }
         });
         
