@@ -1,5 +1,5 @@
 {
-  "RabbitMq": {
+    "RabbitMq": {
     "HostName": "rabbitmq",
     "UserName": "dmsadmin",
     "Password":"dmsadmin",
@@ -18,5 +18,8 @@
   },
   "ElasticSearch": {
     "Uri": "http://elastic_search:9200"
+  },
+  "Ocr": {
+  "ApiKey": "IRONSUITE.IF22B066.TECHNIKUM.WIEN.AT.13212-E87A0AF9CC-AIQRPGWZD57RN3RC-P3SK7TQNFL23-LUGKCGFU42LV-CELNTVRC7Y5B-GQKQEZYCMJ3H-AMVEAWUIPLZU-UDGLQC-TVSAPLTXUJWOEA-DEPLOYMENT.TRIAL-PGRG5C.TRIAL.EXPIRES.16.DEC.2024"
   }
 }

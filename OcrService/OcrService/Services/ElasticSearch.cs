@@ -26,6 +26,7 @@ public class ElasticSearchService
             if (!exists.Exists)
             {
                 await _client.Indices.CreateAsync(IndexName);
+                Program.logger.Info($"Created index {IndexName}");
             }
 
             var document = new SearchableDocument
@@ -33,9 +34,9 @@ public class ElasticSearchService
                 Id = id,
                 Content = content,
                 Title = title,
-                Tags = tags?.ToArray() ?? Array.Empty<string>()
+                Tags = tags?.ToArray() ?? []
             };
-
+            
             var response = await _client.IndexAsync(document, IndexName, id.ToString());
             
             if (!response.IsValidResponse)
@@ -43,6 +44,7 @@ public class ElasticSearchService
                 _logger?.LogError("Failed to index document: {Error}", response.DebugInformation);
                 throw new Exception($"Failed to index document: {response.DebugInformation}");
             }
+            Program.logger.Info($"Document {document.Id} has been indexed. Index: {IndexName}");
         }
         catch (Exception ex)
         {

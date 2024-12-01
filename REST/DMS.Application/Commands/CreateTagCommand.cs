@@ -18,7 +18,7 @@ namespace DMS.Application.Commands
         public async Task<TagDto> Handle(CreateTagCommand request, CancellationToken cancellationToken)
         {
             await unitOfWork.BeginTransactionAsync();
-            var tag = await unitOfWork.TagRepository.Create(new Tag(request.Label, request.Value, "#FF0000"));
+            var tag = await unitOfWork.TagRepository.Create(Tag.Create(request.Label, request.Value, "#FF0000"));
             ;
             await unitOfWork.CommitAsync();
             return mapper.Map<TagDto>(tag);

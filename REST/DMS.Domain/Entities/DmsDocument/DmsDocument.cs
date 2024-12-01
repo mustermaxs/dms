@@ -1,5 +1,7 @@
 using DMS.Domain.DomainEvents;
+using DMS.Domain.Exceptions;
 using DMS.Domain.ValueObjects;
+using FluentValidation;
 
 namespace DMS.Domain.Entities
 {
@@ -34,7 +36,7 @@ namespace DMS.Domain.Entities
             string? path, List<DocumentTag>? tags, string documentType,
             ProcessingStatus status)
         {
-            return new DmsDocument(
+            var document = new DmsDocument(
                 title,
                 uploadDateTime,
                 path,
@@ -42,7 +44,28 @@ namespace DMS.Domain.Entities
                 documentType,
                 status
             );
+            
+            var validationResult = Validator.Validate(document);
+            if (!validationResult.IsValid)
+                throw new DomainEntityValidationException("Failed to create document.", documentType);
+            
+            return document;
         }
+
+        private static readonly AbstractValidator<DmsDocument> Validator = new InlineValidator<DmsDocument>()
+        {
+            validator => validator.RuleFor(e => e.Title).NotNull()
+                .WithMessage("Document title is invalid. It should not be null."),
+            validator => validator.RuleFor(e => e.Title).NotEmpty()
+                .WithMessage("Document title is invalid. It should not be empty."),
+            validator => validator.RuleFor(e => e.Title).MaximumLength(50)
+                .WithMessage("Document title is invalid. It should be less than 50 characters."),
+            validator => validator.RuleFor(e => e.Title).Matches("^[ a-zA-Z0-9_-]+")
+                .WithMessage("Document title is invalid. "),
+            validator => validator.RuleFor(e => e.FileExtension).NotNull(),
+            validator => validator.RuleFor(e => e.FileExtension).Matches("pdf")
+                .WithMessage("Document file extension is invalid.")
+        };
 
         public DmsDocument AddTag(Tag.Tag tag)
         {
