@@ -20,7 +20,9 @@ namespace DMS.Application.Commands
         IDmsDocumentRepository dmsDocumentRepository,
         IDocumentTagFactory documentTagFactory,
         IMapper autoMapper,
-        ILogger<UpdateDocumentCommandHandler> logger)
+        ILogger<UpdateDocumentCommandHandler> logger,
+        ISearchService searchService
+        )
         : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
     {
         public async Task<DmsDocumentDto> Handle(UpdateDocumentCommand request, CancellationToken cancellationToken)
@@ -37,6 +39,8 @@ namespace DMS.Application.Commands
                     .UpdateTitle(request.Document.Title)
                     .UpdateTags(tagsAssociatedWithDocument);
                 await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
+
+                await searchService.UpdateDocumentAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
                 await unitOfWork.CommitAsync();
