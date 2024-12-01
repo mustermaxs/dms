@@ -1,5 +1,6 @@
 using DMS.Application.DTOs;
 using DMS.Application.Interfaces;
+using DMS.Domain.Entities;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -62,6 +63,22 @@ public class ElasticSearchService : ISearchService
         var deleteResponse = await _client.DeleteAsync(new DeleteRequest(IndexName, id));
 
         return deleteResponse.IsValidResponse;
+    }
+
+    public async Task<bool> UpdateDocumentAsync(DmsDocument document)
+    {
+        var searchableDoc = new SearchableDocument
+        {
+            Id = document.Id,
+            Content = document.Content,
+            Title = document.Title,
+            Tags = document.Tags.Select(t => t.Tag.Label).ToArray()
+        };
+
+        var indexResponse = await _client.IndexAsync(searchableDoc, 
+            idx => idx.Index(IndexName).Id(document.Id));
+        
+        return indexResponse.IsValidResponse;
     }
 
 }
