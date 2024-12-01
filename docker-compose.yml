@@ -97,7 +97,7 @@ services:
       rabbitmq:
         condition: service_healthy
       elastic_search:
-        condition: service_healthy
+        condition: service_started
 
   elastic_search:
     image: elasticsearch:8.7.1

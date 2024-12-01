@@ -14,9 +14,10 @@ public class ElasticSearchService : ISearchService
 
     public ElasticSearchService(IConfiguration configuration, ILogger<ElasticSearchService> logger)
     {
-        var elasticUrl = configuration["ElasticSearch:Url"] ?? "http://localhost:9200";
-        _client = new ElasticsearchClient(new Uri(elasticUrl));
         _logger = logger;
+        var elasticUrl = configuration["ElasticSearch:Uri"] ?? throw new Exception($"Config for ElasticSearch not found");
+        _logger.LogInformation($"Elasticsearch client initialized with URL: {elasticUrl}");
+        _client = new ElasticsearchClient(new Uri(elasticUrl));
     }
 
     public async Task<List<SearchResult>> SearchAsync(string query)

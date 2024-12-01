@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DMS.Infrastructure.Migrations
 {
     [DbContext(typeof(DmsDbContext))]
-    [Migration("20241018094324_MakeFileTypeValueObject")]
-    partial class MakeFileTypeValueObject
+    [Migration("20241201160524_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,13 @@ namespace DMS.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("ModificationDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -42,7 +49,8 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UploadDateTime")
                         .HasColumnType("timestamp with time zone");
@@ -78,43 +86,28 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<string>("Color")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Label")
+                        .IsUnique();
+
+                    b.HasIndex("Value")
+                        .IsUnique();
+
                     b.ToTable("Tags");
-                });
-
-            modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
-                {
-                    b.OwnsOne("DMS.Domain.ValueObjects.FileType", "DocumentType", b1 =>
-                        {
-                            b1.Property<Guid>("DmsDocumentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("DocumentType");
-
-                            b1.HasKey("DmsDocumentId");
-
-                            b1.ToTable("Documents");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DmsDocumentId");
-                        });
-
-                    b.Navigation("DocumentType")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DMS.Domain.Entities.DocumentTag", b =>
@@ -126,7 +119,7 @@ namespace DMS.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("DMS.Domain.Entities.Tag.Tag", "Tag")
-                        .WithMany()
+                        .WithMany("DocumentTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -139,6 +132,11 @@ namespace DMS.Infrastructure.Migrations
             modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
                 {
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("DMS.Domain.Entities.Tag.Tag", b =>
+                {
+                    b.Navigation("DocumentTags");
                 });
 #pragma warning restore 612, 618
         }

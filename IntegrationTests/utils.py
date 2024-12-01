@@ -137,7 +137,7 @@ class UploadDocumentDto:
     
 def create_rand_document():
     title = RandomWord().get_word() + ".pdf"
-    content = pdf_to_base_64("ccc.pdf")
+    content = pdf_to_base_64("Azure Pipelines.pdf")
     tags = [create_rand_tag()]
 
     fileType = ".pdf"
@@ -211,3 +211,10 @@ def try_get_document_if_processed(document_id):
             return response
         time.sleep(2)
     raise Exception(f"Document {document_id} not processed after {DOC_STATUS_CHECK_MAX_ATTEMPTS} attempts")
+
+def wait_for_response(response, exptected_status_code):
+    for _ in range(DOC_STATUS_CHECK_MAX_ATTEMPTS):
+        if response.status_code == exptected_status_code:
+            return response
+        time.sleep(2)
+    raise Exception(f"Response not received after {DOC_STATUS_CHECK_MAX_ATTEMPTS} attempts")

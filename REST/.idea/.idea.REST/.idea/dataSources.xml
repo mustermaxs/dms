@@ -9,5 +9,13 @@
       <jdbc-url>jdbc:postgresql://localhost/DMSDB?password=dmsadmin&amp;user=dmsadmin</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="DMSDB@localhost [2]" uuid="30b2a0db-4018-42fe-abec-5065678cb18b">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost/DMSDB?password=dmsadmin&amp;user=dmsadmin</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
