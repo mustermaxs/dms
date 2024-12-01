@@ -19,10 +19,18 @@ namespace DMS.Application.IntegrationEvents
         public override async Task HandleEvent(ProcessingDocumentFailedIntegrationEvent notification,
             CancellationToken cancellationToken)
         {
-            await unitOfWork.BeginTransactionAsync();
-            await unitOfWork.DmsDocumentRepository.DeleteById(notification.OcrProcessedDocumentDto.Id);
-            await fileStorage.DeleteFileAsync(notification.OcrProcessedDocumentDto.Id);
-            await unitOfWork.CommitAsync();
+            try
+            {
+                await unitOfWork.BeginTransactionAsync();
+                await unitOfWork.DmsDocumentRepository.DeleteById(notification.OcrProcessedDocumentDto.Id);
+                await fileStorage.DeleteFileAsync(notification.OcrProcessedDocumentDto.Id);
+                await unitOfWork.CommitAsync();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"[Event Error] {typeof(ProcessingDocumentFailedIntegrationEvent).FullName}: {e.Message}");
+                throw;
+            }
         }
     }
 }

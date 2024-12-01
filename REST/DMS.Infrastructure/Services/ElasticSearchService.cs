@@ -17,7 +17,6 @@ public class ElasticSearchService : ISearchService
     {
         _logger = logger;
         var elasticUrl = configuration["ElasticSearch:Uri"] ?? throw new Exception($"Config for ElasticSearch not found");
-        _logger.LogInformation($"Elasticsearch client initialized with URL: {elasticUrl}");
         _client = new ElasticsearchClient(new Uri(elasticUrl));
     }
 
@@ -25,6 +24,7 @@ public class ElasticSearchService : ISearchService
     {
         try
         {
+            _logger.LogInformation($"Searching for documents with query: {query}");
             var searchResponse = await _client.SearchAsync<SearchableDocument>(s => s
                 .Index(IndexName)
                 .Query(q => q

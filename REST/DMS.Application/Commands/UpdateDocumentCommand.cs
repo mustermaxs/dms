@@ -15,41 +15,60 @@ namespace DMS.Application.Commands
 {
     public record UpdateDocumentCommand(UpdateDocumentDto Document) : IRequest<DmsDocumentDto>;
 
-    public class UpdateDocumentCommandHandler(
-        IUnitOfWork unitOfWork,
-        IDmsDocumentRepository dmsDocumentRepository,
-        IDocumentTagFactory documentTagFactory,
-        IMapper autoMapper,
-        ILogger<UpdateDocumentCommandHandler> logger,
-        ISearchService searchService
-        )
-        : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
+    public class UpdateDocumentCommandHandler : IRequestHandler<UpdateDocumentCommand, DmsDocumentDto>
     {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDmsDocumentRepository _dmsDocumentRepository;
+        private readonly IDocumentTagFactory _documentTagFactory;
+        private readonly IMapper _autoMapper;
+        private readonly ILogger<UpdateDocumentCommandHandler> _logger;
+        private readonly ISearchService _searchService;
+
+        public UpdateDocumentCommandHandler(
+            IUnitOfWork unitOfWork,
+            IDmsDocumentRepository dmsDocumentRepository,
+            IDocumentTagFactory documentTagFactory,
+            IMapper autoMapper,
+            ILogger<UpdateDocumentCommandHandler> logger,
+            ISearchService searchService)
+        {   
+            _unitOfWork = unitOfWork;
+            _dmsDocumentRepository = dmsDocumentRepository;
+            _documentTagFactory = documentTagFactory;
+            _autoMapper = autoMapper;
+            _logger = logger;
+            _searchService = searchService;
+        }
+
         public async Task<DmsDocumentDto> Handle(UpdateDocumentCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await unitOfWork.BeginTransactionAsync();
+                _logger.LogInformation($"Updating document {request.Document.Id}");
 
-                var document = await dmsDocumentRepository.Get(request.Document.Id);
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
-                await unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
+                await _unitOfWork.BeginTransactionAsync();
+
+                var document = await _dmsDocumentRepository.Get(request.Document.Id);
+                var tagsAssociatedWithDocument = await _documentTagFactory.CreateOrGetTagsFromTagDtos(request.Document.Tags);
+                await _unitOfWork.DocumentTagRepository.DeleteAllByDocumentId(document.Id);
 
                 document
                     .UpdateTitle(request.Document.Title)
                     .UpdateTags(tagsAssociatedWithDocument);
-                await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
+                await _unitOfWork.DmsDocumentRepository.UpdateAsync(document);
 
-                await searchService.UpdateDocumentAsync(document);
+                await _searchService.UpdateDocumentAsync(document);
 
                 document.AddDomainEvent(new DocumentUpdatedDomainEvent(document));
-                await unitOfWork.CommitAsync();
+                await _unitOfWork.CommitAsync();
 
-                return autoMapper.Map<DmsDocumentDto>(document);
+                return _autoMapper.Map<DmsDocumentDto>(document);
             }
-            catch
+            catch (Exception e)
             {
-                await unitOfWork.RollbackAsync();
+                await _unitOfWork.RollbackAsync();
+                _logger.LogError($"Failed to update document {request.Document.Id}");
+                _logger.LogError(e.Message);
                 throw;
             }
         }
