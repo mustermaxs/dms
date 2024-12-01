@@ -33,13 +33,15 @@ namespace DMS.Application.IntegrationEvents
                 // notification.Document.SetStatus(ProcessingStatus.Pending);
                 // await documentRepository.UpdateAsync(notification.Document);
                 // await unitOfWork.CommitAsync();
-                var document = await documentRepository.Get(notification.Document.Id);
+                await unitOfWork.BeginTransactionAsync();
+                var document = await unitOfWork.DmsDocumentRepository.Get(notification.Document.Id);
                 
                 if (document is null)
                     throw new Exception($"Document with id {notification.Document.Id} not found");
                 
                 document.SetStatus(ProcessingStatus.Pending);
-                await documentRepository.UpdateAsync(document);
+                await unitOfWork.DmsDocumentRepository.UpdateAsync(document);
+                await unitOfWork.CommitAsync();
                 var tags = notification.Document.Tags?.Select(t => t.Label).ToList();
                 await ocrService.ExtractTextFromPdfAsync(new OcrDocumentRequestDto(
                     notification.Document.Id,

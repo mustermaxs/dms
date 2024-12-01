@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DMS.Infrastructure.Migrations
 {
     [DbContext(typeof(DmsDbContext))]
-    [Migration("20241018094324_MakeFileTypeValueObject")]
-    partial class MakeFileTypeValueObject
+    [Migration("20241201101855_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,18 @@ namespace DMS.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
+            modelBuilder.Entity("DMS.Infrastructure.Entities.DocumentModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ModificationDateTime")
                         .HasColumnType("timestamp with time zone");
@@ -37,22 +44,23 @@ namespace DMS.Infrastructure.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("text");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StatusModel")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UploadDateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Documents");
+                    b.ToTable("DocumentModels");
                 });
 
-            modelBuilder.Entity("DMS.Domain.Entities.DocumentTag", b =>
+            modelBuilder.Entity("DMS.Infrastructure.Entities.DocumentTagModel", b =>
                 {
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uuid");
@@ -67,10 +75,10 @@ namespace DMS.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("DocumentTags");
+                    b.ToTable("DocumentTagModels");
                 });
 
-            modelBuilder.Entity("DMS.Domain.Entities.Tag.Tag", b =>
+            modelBuilder.Entity("DMS.Infrastructure.Entities.TagModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,67 +86,57 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<string>("Color")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.HasIndex("Label")
+                        .IsUnique();
+
+                    b.HasIndex("Value")
+                        .IsUnique();
+
+                    b.ToTable("TagModels");
                 });
 
-            modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
+            modelBuilder.Entity("DMS.Infrastructure.Entities.DocumentTagModel", b =>
                 {
-                    b.OwnsOne("DMS.Domain.ValueObjects.FileType", "DocumentType", b1 =>
-                        {
-                            b1.Property<Guid>("DmsDocumentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("DocumentType");
-
-                            b1.HasKey("DmsDocumentId");
-
-                            b1.ToTable("Documents");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DmsDocumentId");
-                        });
-
-                    b.Navigation("DocumentType")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DMS.Domain.Entities.DocumentTag", b =>
-                {
-                    b.HasOne("DMS.Domain.Entities.DmsDocument", "Document")
+                    b.HasOne("DMS.Infrastructure.Entities.DocumentModel", "DocumentModels")
                         .WithMany("Tags")
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DMS.Domain.Entities.Tag.Tag", "Tag")
-                        .WithMany()
+                    b.HasOne("DMS.Infrastructure.Entities.TagModel", "TagModels")
+                        .WithMany("DocumentTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Document");
+                    b.Navigation("DocumentModels");
 
-                    b.Navigation("Tag");
+                    b.Navigation("TagModels");
                 });
 
-            modelBuilder.Entity("DMS.Domain.Entities.DmsDocument", b =>
+            modelBuilder.Entity("DMS.Infrastructure.Entities.DocumentModel", b =>
                 {
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("DMS.Infrastructure.Entities.TagModel", b =>
+                {
+                    b.Navigation("DocumentTags");
                 });
 #pragma warning restore 612, 618
         }

@@ -69,11 +69,11 @@ namespace DMS.Infrastructure.Repositories;
             {
                 var domainEvents = GetDomainEventsFromEntities();
                 await _context.SaveChangesAsync();
-                await Task.WhenAll(domainEvents
-                    .Select(domainEvent => 
-                        _mediator.Publish(domainEvent))
-                    .ToList());
                 await _transaction.CommitAsync();
+                foreach (var domainEvent in domainEvents)
+                {
+                    await _mediator.Publish(domainEvent);
+                }
             }
             catch (Exception)
             {

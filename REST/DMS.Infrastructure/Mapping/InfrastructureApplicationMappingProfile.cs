@@ -15,6 +15,11 @@ namespace DMS.Infrastructure.Mapping
     {
         public InfrastructureApplicationMappingProfile()
         {
+            ConfigureMappings();                
+        }
+        
+        public void ConfigureMappings()
+        {
             // Domain <-> Infrastructure Mapping
             CreateMap<ProcessingStatusModel, Domain.ValueObjects.ProcessingStatus>()
                 .ConvertUsing((value, destination) =>

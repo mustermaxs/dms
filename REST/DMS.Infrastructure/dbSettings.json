@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=DMSDB;Username=dmsadmin;Password=dmsadmin;Include Error Detail=true"
+  }
+}

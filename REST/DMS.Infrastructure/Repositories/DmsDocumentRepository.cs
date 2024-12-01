@@ -22,7 +22,7 @@ public class DmsDocumentRepository(
 {
     public async Task<DmsDocument?> GetDocumentByIdAsync(Guid id)
     {
-        var model =  await DbSet.FindAsync(id);
+        var model =  await DbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         return Mapper.Map<DmsDocument>(model);
     }
 
@@ -40,7 +40,7 @@ public class DmsDocumentRepository(
 
     public async Task<DmsDocument?> Get(Guid id)
     {
-        var model = await DbSet
+        var model = await DbSet.AsNoTracking()
             .Include(e => e.Tags)
             .ThenInclude(e => e.TagModels)
             .FirstOrDefaultAsync(e => e.Id == id);
@@ -50,7 +50,7 @@ public class DmsDocumentRepository(
 
     public override async Task<IEnumerable<DmsDocument>?> GetAll()
     {
-        var models = await DbSet
+        var models = await DbSet.AsNoTracking()
             .Include(e => e.Tags)
             .ThenInclude(e => e.TagModels)
             .ToListAsync();
