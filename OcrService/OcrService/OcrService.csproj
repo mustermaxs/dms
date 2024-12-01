@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.15.10" />
       <PackageReference Include="IronOcr" Version="2024.10.3" />
       <PackageReference Include="IronOcr.Languages.German" Version="2020.11.2" />
       <PackageReference Include="IronOcr.Linux" Version="2024.11.3" />

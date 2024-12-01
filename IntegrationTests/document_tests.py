@@ -161,6 +161,7 @@ class DocumentTests(unittest.TestCase):
         # GIVEN
         document = upload_document(create_rand_document().to_dict(), False)
         document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
 
         # WHEN
         updateDocumentDto = {"Id": document_id, "Title": "MISSING_FILE_EXTENSION_AND_IS_TOO_LONG_MISSING_FILE_EXTENSION_AND_IS_TOO_LONG_MISSING_FILE_EXTENSION_AND_IS_TOO_LONG_MISSING_FILE_EXTENSION_AND_IS_TOO_LONG", "Tags": []}
@@ -171,7 +172,6 @@ class DocumentTests(unittest.TestCase):
 
     def  test_get_document_by_id_fails_to_get_non_existent_document(self):
         # GIVEN
-        document = upload_document(create_rand_document().to_dict())
 
         # WHEN
         response = requests.get(url(f"Documents/wrongId123"))
@@ -186,11 +186,58 @@ class DocumentTests(unittest.TestCase):
         documentToUpload["title"] = ""
 
         # WHEN
-        response = upload_document(documentToUpload, False, False)
+        document = upload_document(documentToUpload, False, False)
 
         # THEN
-        self.assertEqual(response.status_code, 400, f"Expected status code 200, got {response.status_code}")
-        
+        self.assertEqual(document.status_code, 400, f"Expected status code 200, got {document.status_code}")
+
+    def test_search_document_by_title_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        document_title = document["title"]
+        wait_for_document_to_be_processed(document_id)
+
+        # WHEN
+        response = requests.get(url(f"Search?query={document_title}"))
+        wait_for_response(response, 200)
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
+
+    def test_search_document_by_tag_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        document_tag = document["tags"][0]["value"]
+        wait_for_document_to_be_processed(document_id)
+
+        # WHEN
+        response = requests.get(url(f"Search?query={document_tag}"))
+        wait_for_response(response, 200)
+        print(response.json())
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
+
+    def test_search_document_by_content_returns_document(self):
+        # GIVEN
+        document = upload_document(create_rand_document().to_dict())
+        document_id = document["id"]
+        wait_for_document_to_be_processed(document_id)
+
+        response = requests.get(url(f"Documents/{document_id}/content"))
+        document_content = response.json()["content"]["content"]
+
+        # WHEN
+        response = requests.get(url(f"Search?query=Pipelines"))
+        wait_for_response(response, 200)
+        print(response.json()) 
+
+        # THEN
+        self.assertEqual(response.status_code, 200, f"Expected status code 200, got {response.status_code}")
+        self.assertEqual(response.json()["content"][0]["id"], document_id, f"Expected document ID {document_id}, got {response.json()['content'][0]['id']}")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

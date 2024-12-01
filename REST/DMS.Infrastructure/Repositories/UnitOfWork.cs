@@ -59,8 +59,10 @@ namespace DMS.Infrastructure.Repositories;
 
             try
             {
+                var domainEvents = GetDomainEventsFromEntities();
+                
                 await _context.SaveChangesAsync();
-                await Task.WhenAll(GetDomainEventsFromEntities()
+                await Task.WhenAll(domainEvents
                     .Select(domainEvent => 
                         _mediator.Publish(domainEvent))
                     .ToList());

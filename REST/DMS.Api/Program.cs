@@ -43,7 +43,8 @@ builder.Services.AddMediatR(
     typeof(UpdateDocumentCommand).Assembly,
     typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly,
     typeof(DocumentTagsUpdatedDomainEvent).Assembly,
-    typeof(DocumentUpdatedDomainEvent).Assembly
+    typeof(DocumentUpdatedDomainEvent).Assembly,
+    typeof(SearchDocumentsQuery).Assembly
     );
 
 builder.Services.AddControllers();

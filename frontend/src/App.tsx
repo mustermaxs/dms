@@ -6,7 +6,6 @@ import AppContext from "./components/context/AppContext";
 import { useTags } from "./hooks/useTags";
 import { useDocuments } from "./hooks/useDocuments";
 import { useMsgModal } from "./hooks/useMsgModal";
-import { useCheckProgressForDocuments } from "./services/uploadProgressInfo";
 import { useFileStatus } from "./hooks/useFileStatus";
 import { useEffect } from "react";
 function App() {
