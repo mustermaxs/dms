@@ -1,8 +1,7 @@
-using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
 using MediatR;
 
-namespace DMS.Application.Commands
+namespace DMS.Application.Queries
 {
 public record FindTagsByPrefixQuery(string Prefix) : IRequest<List<Tag>>;
     
@@ -12,8 +11,8 @@ public class FindTagsByPrefixQueryHandler : IRequestHandler<FindTagsByPrefixQuer
     {
         var tags = new List<Tag>
         {
-            new Tag("project", "project", "#F7839"),
-            new Tag("project", "project", "#F7839")
+            Tag.Create("project", "project", "#F7839"),
+            Tag.Create("project", "project", "#F7839")
         };
         
         return Task.FromResult(tags);

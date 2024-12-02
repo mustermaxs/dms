@@ -30,8 +30,4 @@
     <ProjectReference Include="..\DMS.Domain\DMS.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EventHandlers\" />
-  </ItemGroup>
-
 </Project>

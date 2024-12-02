@@ -38,8 +38,8 @@ public class DocumentUpdateTests
     {
         // GIVEN
         var repo = Givens.ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
-        var tag1 = new Tag("test", "test", "#F0000");
-        var tag2 = new Tag("test", "test", "#F0000");
+        var tag1 = Tag.Create("test", "test", "#F0000");
+        var tag2 = Tag.Create("test", "test", "#F0000");
         var document = DmsDocument.Create("testDocument.pdf",
             DateTime.UtcNow,
             "",
@@ -56,7 +56,7 @@ public class DocumentUpdateTests
         // WHEN
         var preexistingDocTags = documentFromDb!.Tags;
         var preexistingTag = preexistingDocTags!.ToList().First();
-        var newTag = new Tag(preexistingTag.Tag.Label, preexistingTag.Tag.Value, preexistingTag.Tag.Color);
+        var newTag = Tag.Create(preexistingTag.Tag.Label, preexistingTag.Tag.Value, preexistingTag.Tag.Color);
         documentFromDb.UpdateTags([newTag]);
         await repo.UpdateAsync(documentFromDb);
         await repo.SaveAsync();

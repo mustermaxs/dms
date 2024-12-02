@@ -36,7 +36,7 @@ public class DocumentTagFactory(
         var newTagsInDb = new List<Tag>();
         foreach (var tagDto in newTags)
         {
-            var newTag = new Tag(tagDto.Label, tagDto.Value, tagDto.Color);
+            var newTag = Tag.Create(tagDto.Label, tagDto.Value, tagDto.Color);
             var createdTag = await tagRepository.Create(newTag);  // Awaiting each call
             newTagsInDb.Add(createdTag);
         }

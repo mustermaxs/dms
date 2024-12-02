@@ -14,6 +14,7 @@ public class FileStorage
     {
         _minioClient = minioClient;
         _bucketName = config.BucketName ?? throw new InvalidOperationException();
+        Program.logger.Info($"Initialized FileStorage with {_bucketName}");
     }
 
     private async Task EnsureBucketExistsAsync()
@@ -29,7 +30,9 @@ public class FileStorage
                 var mbArgs = new MakeBucketArgs()
                     .WithBucket(_bucketName);
                 await _minioClient.MakeBucketAsync(mbArgs).ConfigureAwait(false);
+                Program.logger.Warn($"Bucket {_bucketName} not found.");
             }
+            Program.logger.Debug($"Bucket {_bucketName} created successfully");
         }
         catch (Exception ex)
         {
@@ -67,14 +70,14 @@ public class FileStorage
             var fileStreamAsBase64 = Convert.ToBase64String(fileStream.ToArray());
             if (fileStream.Length <= 0)
             {
-                throw new Exception($"Error getting file stream: {fileStreamAsBase64}");
+                Program.logger.Fatal($"File {fileName} could not be read.");
+                throw new Exception($"File {fileName} not found");
             }
-            Console.WriteLine($"FileStreamAsBase64: {fileStreamAsBase64}");
             return fileStream;
         }
         catch (Minio.Exceptions.BucketNotFoundException ex)
         {
-            Console.WriteLine($"Bucket '{_bucketName}' not found: {ex.Message}");
+            Program.logger.Fatal($"Bucket {_bucketName} not found.");
             throw;
         }
         catch (Exception e)

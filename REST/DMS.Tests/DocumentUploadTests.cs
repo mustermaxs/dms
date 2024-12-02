@@ -87,8 +87,8 @@ public class DocumentUploadTests
     {
         // GIVEN & WHEN
         var repo = Givens.ServiceProvider.GetRequiredService<IDmsDocumentRepository>();
-        var tag1 = new Tag("test", "test", "#F0000");
-        var tag2 = new Tag("test", "test", "#F0000");
+        var tag1 = Tag.Create("test", "test", "#F0000");
+        var tag2 = Tag.Create("test", "test", "#F0000");
         var document = DmsDocument.Create("testDocument.pdf",
             DateTime.UtcNow,
             "",

@@ -38,7 +38,7 @@ public class OcrServiceSubscriber : BackgroundService
 
                 if (processedDocumentDto.Status == ProcessStatus.Failed)
                 {
-                    logger.LogInformation($"Failed to process document {processedDocumentDto.Id}.");
+                    logger.LogCritical($"Failed to process document {processedDocumentDto.Id}.");
                     await mediator.Publish(new ProcessingDocumentFailedIntegrationEvent(processedDocumentDto));
                     return;
                 }
