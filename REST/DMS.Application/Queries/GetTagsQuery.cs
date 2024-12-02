@@ -1,22 +1,32 @@
 using AutoMapper;
 using DMS.Application.DTOs;
-using DMS.Domain.Entities;
-using DMS.Domain.Entities.Tag;
 using DMS.Domain.IRepositories;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.Commands
 {
     public record GetTagsQuery() : IRequest<List<TagDto>>;
 
-    public class GetTagsQueryHandler(
-        ITagRepository tagRepository,
-        IMapper mapper) : IRequestHandler<GetTagsQuery, List<TagDto>>
+    public class GetTagsQueryHandler: IRequestHandler<GetTagsQuery, List<TagDto>>
     {
+        private readonly ITagRepository _tagRepository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<GetTagsQueryHandler> _logger;
+
+        public GetTagsQueryHandler(ITagRepository tagRepository, IMapper mapper, ILogger<GetTagsQueryHandler> logger)
+        {
+            _tagRepository = tagRepository;
+            _mapper = mapper;
+            _logger = logger;
+        }
+
         public async Task<List<TagDto>> Handle(GetTagsQuery request, CancellationToken cancellationToken)
         {
-            var tags = await tagRepository.GetAll();
-            var tagDtos = tags.Select(t => mapper.Map<TagDto>(t)).ToList();
+            _logger.LogInformation("Getting all tags");
+
+            var tags = await _tagRepository.GetAll();
+            var tagDtos = tags.Select(t => _mapper.Map<TagDto>(t)).ToList();
 
             return await Task.FromResult(tagDtos);
         }

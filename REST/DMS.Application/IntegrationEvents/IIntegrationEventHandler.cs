@@ -16,7 +16,7 @@ namespace DMS.Application.EventHandlers
         public async Task Handle(TEvent notification, CancellationToken cancellationToken)
         {
             var eventName = typeof(TEvent).FullName;
-            logger.LogInformation($"[Integration Event] {notification}");
+            logger.LogInformation($"[Integration Event] {eventName}: {notification}");
             await HandleEvent(notification, cancellationToken);
         }
 

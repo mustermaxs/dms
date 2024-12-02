@@ -17,20 +17,36 @@ namespace DMS.Application.Commands
 {
     public record UploadDocumentCommand(string Title, string Content, List<TagDto> Tags, string FileType) : IRequest<DmsDocumentDto>;
 
-    public class UploadDocumentCommandHandler(
-        FileHelper fileHelper,
-        IValidator<DmsDocument> documentValidator,
-        IUnitOfWork unitOfWork,
-        IDocumentTagFactory documentTagFactory,
-        IMediator mediator,
-        IMapper mapper
-        ) : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
+    public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentCommand, DmsDocumentDto>
     {
+        private readonly FileHelper _fileHelper;
+        private readonly IValidator<DmsDocument> _documentValidator;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDocumentTagFactory _documentTagFactory;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+
+        public UploadDocumentCommandHandler(
+            FileHelper fileHelper,
+            IValidator<DmsDocument> documentValidator,
+            IUnitOfWork unitOfWork,
+            IDocumentTagFactory documentTagFactory,
+            IMediator mediator,
+            IMapper mapper)
+        {
+            _fileHelper = fileHelper;
+            _documentValidator = documentValidator;
+            _unitOfWork = unitOfWork;
+            _documentTagFactory = documentTagFactory;
+            _mediator = mediator;
+            _mapper = mapper;
+        }
+
         public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await unitOfWork.BeginTransactionAsync();
+                await _unitOfWork.BeginTransactionAsync();
                 
                 var document =  DmsDocument.Create(
                     request.Title,
@@ -40,18 +56,18 @@ namespace DMS.Application.Commands
                     request.FileType,
                     ProcessingStatus.NotStarted);
 
-                var tagsAssociatedWithDocument = await documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
+                var tagsAssociatedWithDocument = await _documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
                 tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
-                await unitOfWork.DmsDocumentRepository.Create(document);
+                await _unitOfWork.DmsDocumentRepository.Create(document);
                 document.AddDomainEvent(new DocumentUploadedToDbDomainEvent(document, request.Content));
-                await unitOfWork.CommitAsync();
+                await _unitOfWork.CommitAsync();
                 
-                return mapper.Map<DmsDocumentDto>(document);
+                return _mapper.Map<DmsDocumentDto>(document);
             }
             catch (Exception e)
             {
-                await unitOfWork.RollbackAsync();
-                await mediator.Publish(new FailedToCreateeDocumentIntegrationEvent(request)); 
+                await _unitOfWork.RollbackAsync();
+                await _mediator.Publish(new FailedToCreateeDocumentIntegrationEvent(request)); 
                 throw new UploadDocumentException($"Failed to upload document.");
             }
         }
