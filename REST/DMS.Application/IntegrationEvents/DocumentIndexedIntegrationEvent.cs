@@ -27,7 +27,7 @@ namespace DMS.Application.IntegrationEvents
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.LogError(e, $"[Event Error] {typeof(DocumentIndexedIntegrationEvent).FullName}: {e.Message}");
                 throw;
             }
         }

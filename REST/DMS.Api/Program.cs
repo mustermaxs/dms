@@ -38,7 +38,6 @@ builder.Services.AddCors(options =>
 
 // COMMANDS & QUERIES
 builder.Services.AddMediatR(
-    typeof(CreateTagCommand).Assembly,
     typeof(UploadDocumentCommand).Assembly,
     typeof(UpdateDocumentCommand).Assembly,
     typeof(DocumentSavedInFileStorageIntegrationEvent).Assembly,

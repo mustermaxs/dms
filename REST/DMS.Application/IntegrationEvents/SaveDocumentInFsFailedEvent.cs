@@ -26,7 +26,7 @@ public class SaveDocumentInFsFailedEventHandler(
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError(e, $"[Event Error] {typeof(SaveDocumentInFsFailedEvent).FullName}: {e.Message}");
             throw;
         }
     }

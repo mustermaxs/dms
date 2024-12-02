@@ -48,7 +48,7 @@ namespace DMS.Application.IntegrationEvents
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.LogError(e, $"[Event Error] {typeof(DocumentSavedInFileStorageIntegrationEvent).FullName}: {e.Message}");
                 throw;
             }
         }

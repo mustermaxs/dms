@@ -48,13 +48,6 @@ public class TagsController : BaseController
         return Ok(res);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<TagDto>> CreateTag([FromBody] CreateTagDto createTagDto)
-    {
-        var res = await _mediator.Send(new CreateTagCommand(createTagDto.Label, createTagDto.Value));
-        return Ok(res);
-    }
-
     [HttpDelete]
     public async Task<ActionResult> DeleteAllTags()
     {

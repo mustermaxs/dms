@@ -67,7 +67,7 @@ public class FileStorage
             var fileStreamAsBase64 = Convert.ToBase64String(fileStream.ToArray());
             if (fileStream.Length <= 0)
             {
-                throw new Exception($"FICK ASON: {fileStreamAsBase64}");
+                throw new Exception($"Error getting file stream: {fileStreamAsBase64}");
             }
             Console.WriteLine($"FileStreamAsBase64: {fileStreamAsBase64}");
             return fileStream;
