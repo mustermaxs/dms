@@ -1,14 +1,14 @@
 {
   "RabbitMq": {
-    "HostName": "localhost",
+    "HostName": "rabbitmq",
     "UserName": "dmsadmin",
     "Password":"dmsadmin",
-    "Endpoint": "localhost",
+    "Endpoint": "rabbitmq",
     "Port": 5672,
     "Queue": "ocr-process"
   },
   "MinIO": {
-    "Endpoint": "localhost:9000",
+    "Endpoint": "minio:9000",
     "Port": 9000,
     "AccessKey": "minioadmin",
     "SecretKey": "minioadmin",
@@ -17,6 +17,6 @@
     "FilePath": "/home/dms/uploads/"
   },
   "ElasticSearch": {
-    "Uri": "http://localhost:9200"
+    "Uri": "http://elastic_search:9200"
   }
 }
