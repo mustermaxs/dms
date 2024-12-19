@@ -12,6 +12,7 @@ WORKDIR /src
 COPY ["OcrService.csproj", "."]
 RUN dotnet restore "OcrService.csproj"
 COPY ["OcrService.csproj", "."]
+COPY ["log4net.config", "."]
 RUN dotnet restore "OcrService.csproj"
 COPY . .
 RUN dotnet build "OcrService.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -23,4 +24,5 @@ RUN dotnet publish "OcrService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY ["log4net.config", "/app/"]
 ENTRYPOINT ["dotnet", "OcrService.dll"]

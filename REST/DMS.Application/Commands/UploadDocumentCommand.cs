@@ -55,13 +55,6 @@ namespace DMS.Application.Commands
                     new List<DocumentTag>(),
                     request.FileType,
                     ProcessingStatus.NotStarted);
-                
-                var documentIsValid = await _documentValidator.ValidateAsync(document);
-
-                if (!documentIsValid.IsValid)
-                {
-                    throw new ValidationException(documentIsValid.Errors);
-                }
 
                 var tagsAssociatedWithDocument = await _documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
                 tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
