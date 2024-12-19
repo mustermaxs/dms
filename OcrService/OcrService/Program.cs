@@ -2,13 +2,18 @@
 using System.Text;
 using System.Text.Json;
 using IronOcr;
+using log4net;
+using log4net.Config;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using OcrService.DTOs;
 using WorkerService1;
 using OcrService.Configs;
-
+using log4net.Config;
+using System.IO;
+using System.Reflection;
 namespace OcrService;
+
 class Program
 {
     private static IMinioClient _minioClient;
@@ -20,59 +25,42 @@ class Program
     private static FileStorage _fileStorage;
     private static ElasticSearchService _elasticSearch;
     private static ElasticSearchConfig _elasticSearchConfig;
+    private static readonly string IronOcrApiKey;
+    public static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 
     static async Task Main(string[] args)
     {
-        License.LicenseKey = "IRONSUITE.IF22B066.TECHNIKUM.WIEN.AT.13212-E87A0AF9CC-AIQRPGWZD57RN3RC-P3SK7TQNFL23-LUGKCGFU42LV-CELNTVRC7Y5B-GQKQEZYCMJ3H-AMVEAWUIPLZU-UDGLQC-TVSAPLTXUJWOEA-DEPLOYMENT.TRIAL-PGRG5C.TRIAL.EXPIRES.16.DEC.2024";
-        LoadConfig(Directory.GetCurrentDirectory());
-        _rabbitMqConfig = _configurationBuilder.GetSection("RabbitMq").Get<RabbitMqConfig>();
-        _fileStorageConfig = _configurationBuilder.GetSection("MinIO").Get<FileStorageConfig>();
-        _minioClient = new MinioClient()
-            .WithEndpoint(_fileStorageConfig.Endpoint)
-            .WithCredentials(_fileStorageConfig.AccessKey, _fileStorageConfig.SecretKey)
-            .Build();
-        _fileStorage = new FileStorage(_minioClient, _fileStorageConfig);
-        _rabbitMq = new RabbitMqClient(_rabbitMqConfig);
-
-        _elasticSearchConfig = _configurationBuilder.GetSection("ElasticSearch").Get<ElasticSearchConfig>();
-
-        _elasticSearch = new ElasticSearchService(_elasticSearchConfig);
-        
-        await _rabbitMq.InitiliazeAsync();
+        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+        InitializeLog4Net();
+        Program.logger.Info("OCR Service started");
+        await SetupServices();
         await _rabbitMq.Subscribe("ocr-process", async (model, ea) =>
         {
             Guid documentId = Guid.Empty;
-            
             try
             {
                 byte[] body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var ocrDocumentRequestDto = JsonSerializer.Deserialize<OcrDocumentRequestDto>(message);
                 documentId = ocrDocumentRequestDto.DocumentId;
-                Console.WriteLine($"{DateTime.UtcNow} [x] Request to process {ocrDocumentRequestDto.DocumentId}");
-                
+                logger.Info($"Received request to process document {ocrDocumentRequestDto.DocumentId}");
                 var fileStream = await _fileStorage.GetFileStreamAsync(ocrDocumentRequestDto.DocumentId.ToString());
-                if (fileStream == null || fileStream.Length == 0)
-                {
-                    throw new InvalidOperationException("Retrieved file stream is empty or null");
-                }
-
                 var fileContent = await _ocrWorker.ProcessPdfAsync(fileStream);
-                if (string.IsNullOrEmpty(fileContent))
-                {
-                    throw new InvalidOperationException("OCR processing resulted in empty content");
-                }
 
                 await _elasticSearch.IndexDocumentAsync(
-                    ocrDocumentRequestDto.DocumentId, 
-                    fileContent, 
-                    ocrDocumentRequestDto.Title, 
+                    ocrDocumentRequestDto.DocumentId,
+                    fileContent,
+                    ocrDocumentRequestDto.Title,
                     ocrDocumentRequestDto.Tags ?? new List<string>()
                 );
 
-                var ocrDocumentDto = new OcrProcessedDocumentDto { Content = fileContent, Id = ocrDocumentRequestDto.DocumentId, Status = ProcessStatus.Succeeded};
+                var ocrDocumentDto = new OcrProcessedDocumentDto
+                    { Content = fileContent, Id = ocrDocumentRequestDto.DocumentId, Status = ProcessStatus.Succeeded };
 
                 await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
+                logger.Info($"Document {ocrDocumentRequestDto.DocumentId} processed successfully");
             }
             catch (Exception e)
             {
@@ -81,23 +69,25 @@ class Program
                 {
                     errorMessage += $" Inner exception: {e.InnerException.Message}";
                 }
-                Console.WriteLine($"{DateTime.UtcNow} [ERROR] {errorMessage}");
-                Console.WriteLine(e.StackTrace);
 
-                var ocrDocumentDto = new OcrProcessedDocumentDto 
-                { 
-                    Status = ProcessStatus.Failed, 
-                    Content = String.Empty, 
+                logger.Error($"Processing document {documentId} failed! {errorMessage}. {e.StackTrace}");
+                ;
+
+                var ocrDocumentDto = new OcrProcessedDocumentDto
+                {
+                    Status = ProcessStatus.Failed,
+                    Content = String.Empty,
                     Id = documentId,
                 };
                 await _rabbitMq.Publish<OcrProcessedDocumentDto>("ocr-result", ocrDocumentDto);
-                
+                logger.Info($"Publish failed processing attempt info for document {documentId}");
             }
         });
-        
+
         await Task.Delay(-1);
         _rabbitMq.Dispose();
     }
+
     private static void LoadConfig(string path)
     {
         _configurationBuilder = new ConfigurationBuilder()
@@ -105,4 +95,64 @@ class Program
             .AddJsonFile("settings.json", optional: false, reloadOnChange: true)
             .Build();
     }
+
+    private static async Task SetupServices()
+    {
+        logger.Info($"Loading configuration...");
+        LoadConfig(Directory.GetCurrentDirectory());
+        License.LicenseKey = _configurationBuilder.GetSection("Ocr:ApiKey").Value;
+        _rabbitMqConfig = _configurationBuilder.GetSection("RabbitMq").Get<RabbitMqConfig>();
+        _fileStorageConfig = _configurationBuilder.GetSection("MinIO").Get<FileStorageConfig>();
+        _minioClient = new MinioClient()
+            .WithEndpoint(_fileStorageConfig.Endpoint)
+            .WithCredentials(_fileStorageConfig.AccessKey, _fileStorageConfig.SecretKey)
+            .Build();
+        _fileStorage = new FileStorage(_minioClient, _fileStorageConfig);
+        _rabbitMq = new RabbitMqClient(_rabbitMqConfig);
+        _elasticSearchConfig = _configurationBuilder.GetSection("ElasticSearch").Get<ElasticSearchConfig>();
+        _elasticSearch = new ElasticSearchService(_elasticSearchConfig);
+        logger.Info($"Configuration loaded.");
+        await _rabbitMq.InitiliazeAsync();
+        logger.Info($"RabbitMQ initialized.");
+    }
+
+    private static void InitializeLog4Net()
+    {
+        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+        var log4netConfigFile = new FileInfo("log4net.config");
+
+        if (!log4netConfigFile.Exists)
+        {
+            Console.Error.WriteLine("log4net configuration file not found.");
+            throw new FileNotFoundException("log4net configuration file not found.", log4netConfigFile.FullName);
+        }
+
+        XmlConfigurator.Configure(logRepository, log4netConfigFile);
+        logger.Info("log4net has been configured.");
+    }
+
+
+    // public static IHostBuilder CreateHostBuilder(string[] args) =>
+    //     Host.CreateDefaultBuilder(args)
+    //         .ConfigureAppConfiguration(((context, builder) =>
+    //         {
+    //             builder.SetBasePath(context.HostingEnvironment.ContentRootPath)
+    //                 .AddJsonFile("settings.json", optional: false, reloadOnChange: true)
+    //                 .AddEnvironmentVariables();
+    //         }))
+    //         .ConfigureServices((hostContext, services) =>
+    //         {
+    //             services.Configure<FileStorage>(hostContext.Configuration.GetSection("FileStorage"));
+    //             services.Configure<RabbitMqConfig>(hostContext.Configuration.GetSection("RabbitMq"));
+    //             services.Configure<ElasticSearchConfig>(hostContext.Configuration.GetSection("ElasticSearch"));
+    //             services.Configure<OcrWorker>(hostContext.Configuration.GetSection("OcrService"));
+    //             services.Configure<OcrConfig>(hostContext.Configuration.GetSection("IronOcr"));
+    //
+    //             services.AddSingleton<ElasticSearchService>();
+    //             services.AddSingleton<FileStorage>();
+    //             services.AddSingleton<RabbitMqClient>();
+    //             services.AddSingleton<OcrWorker>();
+    //
+    //             services.Configure<OcrConfig>(hostContext.Configuration.GetSection("Ocr"));
+    //         });
 }

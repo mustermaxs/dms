@@ -1,5 +1,6 @@
 using DMS.Api.Configuration;
 using DMS.Application.DTOs;
+using DMS.Application.Queries;
 using DMS.Domain.Entities;
 using DMS.Domain.Entities.Tag;
 
