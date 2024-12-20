@@ -8,6 +8,7 @@ namespace DMS.Application.Interfaces
         Task<List<SearchResult>> SearchAsync(string query);
         Task<bool> DeleteAsync(Guid id);
         Task<bool> UpdateDocumentAsync(DmsDocument document);
+        public Task<bool> DeleteAllAsync();
     }
 
     public class SearchResult

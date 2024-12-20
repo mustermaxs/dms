@@ -1,12 +1,12 @@
 # Document Management System (DMS)
 ## Todos (Readme)
-- [] TODO add config for `frontend` for running app in Docker/locally
-- [] add instructions on how to setup and run application
-- [] add Troubleshooting guide for common bugs/errors
-- [] add architecture description
+- [ ] TODO add config for `frontend` for running app in Docker/locally
+- [ ] add instructions on how to setup and run application
+- [ ] add Troubleshooting guide for common bugs/errors
+- [ ] add architecture description
 ### Testing
-- [] FileType returns correct file type
-- [] 
+- [ ] FileType returns correct file type
+- [ ] 
 ## Run in Docker
 **Change the following parameters in**
 
@@ -27,6 +27,9 @@
     "Password":"dmsadmin",
     "Endpoint": "rabbitmq",
     "Port": 5672
+  },
+  "ElasticSearch": {
+    "Uri": "http://elastic_search:9200"
   },
 ```
 
@@ -49,7 +52,10 @@
     "UseSSL": false,
     "BucketName": "dmsbucket",
     "FilePath": "/home/dms/uploads/"
-  }
+  },
+  "ElasticSearch": {
+    "Uri": "http://elastic_search:9200"
+  },
 }
 ```
 
@@ -77,6 +83,9 @@
     "Endpoint": "localhost",
     "Port": 5672
   },
+  "ElasticSearch": {
+    "Uri": "http://localhost:9200" // ? always runs in docker
+  },
 ```
 
 `OcrWorker/OcrWorker/settings.json`:
@@ -98,13 +107,20 @@
     "Endpoint": "localhost",
     "Port": 5672
   },
+  "ElasticSearch": {
+    "Uri": "http://localhost:9200" // ? always runs in docker
+  },
 ```
 
 #todo `frontend/src/config.json`
 
 ## MinIO
 Connect to MinIO from CLI
-´mc alias set <alias> <minio_server_url> <access_key> <secret_key>´
+`mc alias set <alias> <minio_server_url> <access_key> <secret_key>`
 
 List objects in bucket
-´mc ls <alias>/<bucket_name>´
+`mc ls <alias>/<bucket_name>`
+
+## ElasticSearch
+List all indicies via API call
+`curl '<elastic-search-url>/_cat/indices?v'`

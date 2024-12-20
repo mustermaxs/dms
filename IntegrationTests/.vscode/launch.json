@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": [
-                "DocumentTests.test_search_document_by_tag_returns_document"
-            ]
+            // "args": [
+            //     "DocumentTests.test_search_document_by_content_returns_document"
+            // ]
         }
     ]
 }

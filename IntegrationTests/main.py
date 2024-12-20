@@ -17,4 +17,7 @@ from utils import *
 if __name__ == "__main__":
     print("Running tests...")
     unittest.main()
+    suite = unittest.suite()
+    suite.addTest(DocumentTests)
     delete_all_documents()
+    delete_elastic_search_index()

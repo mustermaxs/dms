@@ -12,12 +12,18 @@ namespace DMS.Application.Commands
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorage _fileStorage;
         private readonly ILogger<DeleteAllDocumentsCommandHandler> _logger;
+        private readonly ISearchService _searchService;
 
-        public DeleteAllDocumentsCommandHandler(IUnitOfWork unitOfWork, IFileStorage fileStorage, ILogger<DeleteAllDocumentsCommandHandler> logger)
+        public DeleteAllDocumentsCommandHandler(
+            IUnitOfWork unitOfWork,
+            IFileStorage fileStorage,
+            ILogger<DeleteAllDocumentsCommandHandler> logger,
+            ISearchService searchService)
         {
             _unitOfWork = unitOfWork;
             _fileStorage = fileStorage;
             _logger = logger;
+            _searchService = searchService;
         }
 
         public async Task<Unit> Handle(DeleteAllDocumentsCommand request, CancellationToken cancellationToken)
@@ -29,6 +35,7 @@ namespace DMS.Application.Commands
                 await _unitOfWork.BeginTransactionAsync();
                 await _unitOfWork.DmsDocumentRepository.DeleteAllAsync();
                 await _fileStorage.DeleteAllFilesAsync();
+                // await _searchService.DeleteAllAsync();
                 await _unitOfWork.CommitAsync();
                 return Unit.Value;
             }

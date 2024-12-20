@@ -12,6 +12,7 @@ using DMS.Domain.ValueObjects;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.Commands
 {
@@ -25,6 +26,7 @@ namespace DMS.Application.Commands
         private readonly IDocumentTagFactory _documentTagFactory;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
+        private readonly ILogger<UploadDocumentCommandHandler> _logger;
 
         public UploadDocumentCommandHandler(
             FileHelper fileHelper,
@@ -32,7 +34,8 @@ namespace DMS.Application.Commands
             IUnitOfWork unitOfWork,
             IDocumentTagFactory documentTagFactory,
             IMediator mediator,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<UploadDocumentCommandHandler> logger)
         {
             _fileHelper = fileHelper;
             _documentValidator = documentValidator;
@@ -40,6 +43,7 @@ namespace DMS.Application.Commands
             _documentTagFactory = documentTagFactory;
             _mediator = mediator;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<DmsDocumentDto> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
@@ -59,7 +63,7 @@ namespace DMS.Application.Commands
                 var tagsAssociatedWithDocument = await _documentTagFactory.CreateOrGetTagsFromTagDtos(request.Tags);
                 tagsAssociatedWithDocument.ForEach(tag => document.AddTag(tag));
                 await _unitOfWork.DmsDocumentRepository.Create(document);
-                document.AddDomainEvent(new DocumentUploadedToDbDomainEvent(document, request.Content));
+                document.AddDomainEvent(new DocumentCreatedDomainEvent(document, request.Content));
                 await _unitOfWork.CommitAsync();
                 
                 return _mapper.Map<DmsDocumentDto>(document);
