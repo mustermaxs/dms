@@ -14,13 +14,27 @@ export default function Header() {
 
   return (
     <>
-      <div className="my-6 flex items-center justify-between">
-            <MsgModalContainer />
-        <h1 className="text-3xl font-bold">📃Document Management System</h1>
-        <Button variant="outline" className="ml-2" onClick={openModal}>
-          <ArrowUpTrayIcon className="w-4 h-4 mr-1" />
-          Upload
-        </Button>
+      <div className="bg-white border-b sticky top-0">
+        <div className="max-w-screen-2xl mx-auto py-3 mb-4">
+          <div className="flex items-center justify-between">
+            <h1 className="flex items-center">
+              <span className="text-2xl font-bold">
+                Document Management System
+              </span>
+            </h1>
+            <div className="flex items-center gap-3">
+              <MsgModalContainer />
+              <Button 
+                variant="solid"
+                className="flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+                onClick={openModal}
+              >
+                <ArrowUpTrayIcon className="w-4 h-4 mr-2" />
+                Upload Document
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <UploadModal size={ModalSize.SMALL} isOpen={isOpen} closeModal={closeModal} />

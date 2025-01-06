@@ -11,7 +11,7 @@ import { useEffect } from "react";
 function App() {
 
   const { availableTags, setAvailableTags, setIsLoadingTags } = useTags();
-  const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument, refetchSelectedDocument } = useDocuments();
+  const { documents, setDocuments, getDocuments, updateDocument, uploadDocument, getDocument, selectedDocument, setSelectedDocument, refetchSelectedDocument, isLoading } = useDocuments();
   const {addMessage, removeMessage, messages} = useMsgModal();
   const {watchDocumentStatus, unwatchDocumentStatus} = useFileStatus();
 
@@ -34,7 +34,8 @@ function App() {
           removeMessage,
           watchDocumentStatus,
           unwatchDocumentStatus,
-          refetchSelectedDocument
+          refetchSelectedDocument,
+          isLoading
         }}>
         <Container>
           <Header />

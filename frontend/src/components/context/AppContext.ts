@@ -5,6 +5,7 @@ import { Tag } from "../../types/Tag";
 import { DocumentStatusEvent, useFileStatus } from "../../hooks/useFileStatus";
 
 interface AppContextProps {
+  isLoading: boolean;
   documents: Document[];
   setDocuments: Dispatch<SetStateAction<Document[]>>;
   getDocument: (id: string) => Promise<Document>;
@@ -25,6 +26,7 @@ interface AppContextProps {
 }
 
 const AppContext = createContext<AppContextProps>({
+  isLoading: false,
   documents: [],
   setDocuments: () => {},
   getDocument: () => Promise.resolve({} as Document),

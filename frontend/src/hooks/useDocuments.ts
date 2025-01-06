@@ -8,6 +8,7 @@ export const useDocuments = () => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const getDocuments = () => documents;
 
@@ -110,12 +111,15 @@ export const useDocuments = () => {
         const fetchDocuments = async () => {
             try {
                 setError(null);
+                setIsLoading(true);
                 const documentService = ServiceLocator.resolve<IDocumentService>('IDocumentService');
                 const fetchedDocuments = await documentService.getAllDocuments();
                 setDocuments(fetchedDocuments);
             } catch (err) {
                 setError('Failed to fetch documents');
                 setDocuments([]);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -134,6 +138,7 @@ export const useDocuments = () => {
         error,
         deleteDocument,
         getDocumentContent,
-        refetchSelectedDocument
+        refetchSelectedDocument,
+        isLoading
     };
 };
