@@ -72,7 +72,7 @@ namespace DMS.Application.Commands
             {
                 await _unitOfWork.RollbackAsync();
                 await _mediator.Publish(new FailedToCreateeDocumentIntegrationEvent(request)); 
-                throw new UploadDocumentException($"Failed to upload document.");
+                throw new UploadDocumentException($"Failed to upload document. {e.Message}");
             }
         }
     }

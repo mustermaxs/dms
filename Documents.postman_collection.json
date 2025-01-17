@@ -1,0 +1,738 @@
+{
+	"info": {
+		"_postman_id": "f9dfdc36-32dd-4446-968c-679292dd9d7a",
+		"name": "Documents",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24964762",
+		"_collection_link": "https://winter-sunset-971800.postman.co/workspace/dms~bfe4a3a7-6676-4ead-9755-f10597abee7e/collection/24964762-f9dfdc36-32dd-4446-968c-679292dd9d7a?action=share&source=collection_link&creator=24964762"
+	},
+	"item": [
+		{
+			"name": "Get Document By Id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    pm.collectionVariables.set(\"createdDocumentId\", res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, documentContentTests, runTestsOnDocumentProcessed } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"pm.test(\"Single document fetched\", () => {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"})",
+							"",
+							"function deleteDocument(documentId) {",
+							"    document().delete(documentId, (err, res) => {",
+							"        if (res.code == 200)",
+							"        {",
+							"            pm.collectionVariables.unset(\"createdDocumentId\");",
+							"        }",
+							"        else",
+							"        {",
+							"            console.error(\"[POST-SCRIPT] Failed to delete document by id: \" + documentId);",
+							"        }",
+							"    });",
+							"}",
+							"",
+							"",
+							"let testRunner = documentContentTests((documentId) => {deleteDocument(documentId);});",
+							"",
+							"runTestsOnDocumentProcessed(testRunner, (documentId) => {",
+							"    document().getContent(documentId, (err, res) => {",
+							"        testRunner(res);",
+							"    })",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Documents/{{createdDocumentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Documents",
+						"{{createdDocumentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Document By Id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    pm.collectionVariables.set(\"createdDocumentId\", res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Document successfully deleted\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody({",
+							"        success: true,",
+							"        message: \"successfully deleted document\",",
+							"        content: null",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Documents/{{createdDocumentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Documents",
+						"{{createdDocumentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Document By Title",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    pm.collectionVariables.set(\"createdDocumentId\", res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, documentContentTests, runTestsOnDocumentProcessed } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"pm.test(\"Single document fetched\", () => {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"   document().delete(pm.collectionVariables.get(\"createdDocumentId\"));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Search?query=Mock",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "Mock"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Document By Content String",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    collectionVars.addDocId(res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, documentContentTests, runTestsOnDocumentProcessed, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"pm.test(\"Single document fetched\", () => {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"});",
+							"",
+							"let documentIds = collectionVars.getDocIds();",
+							"documentIds.forEach((id) => {",
+							"    if (id != undefined)",
+							"        document().delete(id);",
+							"    collectionVars.removeDocId(id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Search?query=Azure",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "Azure"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Document Fails to find non-existing title",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    collectionVars.addDocId(res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, documentContentTests, runTestsOnDocumentProcessed, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"let documentIds = collectionVars.getDocIds();",
+							"documentIds.forEach((id) => {",
+							"    if (id != undefined)",
+							"        document().delete(id);",
+							"    collectionVars.removeDocId(id);",
+							"});",
+							"",
+							"pm.test(\"No search results\", () => {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        ",
+							"        let responseBody = pm.response.json();",
+							"        pm.response.to.have.status(200);",
+							"        pm.expect(responseBody.content.length).equals(0, \"Expected 0 search results.\");",
+							"        document().delete(pm.collectionVariables.get(\"createdDocumentId\"));",
+							"    });",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Search?query=SearchingForNonExistingDocument",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SearchingForNonExistingDocument"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Document Content",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    collectionVars.addDocId(res.json().content.id);",
+							"    pm.collectionVariables.set(\"currentDocumentId\", res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid } = pm.require('@winter-sunset-971800/document');",
+							"",
+							"function documentContentTests(cleanUpCallback) {",
+							"    const _cleanUpCallback = cleanUpCallback;",
+							"    ",
+							"    return (response) => {",
+							"        pm.test(\"Status code is 400\", function () {",
+							"            pm.response.to.have.status(400);",
+							"        });",
+							"    ",
+							"        pm.test(\"Document content retrieval successful\", function () {",
+							"        ",
+							"            const responseBody = response.json();",
+							"            console.log(responseBody)",
+							"            ",
+							"            pm.expect(responseBody.success).to.be.true;",
+							"            pm.expect(responseBody).to.have.property('content');",
+							"            pm.expect(responseBody.content).to.be.null;",
+							"        });",
+							"    }",
+							"}",
+							"",
+							"function deleteDocument(documentId) {",
+							"    document().delete(documentId, (err, res) => {",
+							"        if (res.code == 200)",
+							"        {",
+							"            pm.collectionVariables.unset(\"createdDocumentId\");",
+							"        }",
+							"        else",
+							"        {",
+							"            console.error(\"[POST-SCRIPT] Failed to delete document by id: \" + documentId);",
+							"        }",
+							"    });",
+							"}",
+							"",
+							"function runTestsOnDocumentProcessed(testRunner, onDocumentProcessed) {",
+							"    console.info(\"[POST-RESPONSE] waiting for document to be processed\");",
+							"    ",
+							"    document().get(pm.collectionVariables.get(\"currentDocumentId\"), (err, res) => {",
+							"        if (res.code == 200 && res.json().content?.status == 2)",
+							"        {",
+							"            let documentId = res.json().content.id;",
+							"            onDocumentProcessed(documentId);",
+							"        }",
+							"        else",
+							"        {",
+							"            setTimeout(() => {",
+							"                runTestsOnDocumentProcessed(testRunner, onDocumentProcessed);",
+							"            }, 2500);",
+							"        }",
+							"    });    ",
+							"}",
+							"",
+							"let testRunner = documentContentTests((documentId) => {deleteDocument(documentId);});",
+							"",
+							"runTestsOnDocumentProcessed(testRunner, (documentId) => {",
+							"    document().getContent(documentId, (err, res) => {",
+							"        testRunner(res);",
+							"    })",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Documents/{{currentDocumentId}}/content",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Documents",
+						"{{currentDocumentId}}",
+						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    collectionVars.addDocId(res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"",
+							"pm.test(\"All documents are fetched\", () => {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"})",
+							"",
+							"let documentId = pm.collectionVariables.get(\"currentDocumentId\");",
+							"let documentIds = collectionVars.getDocIds();",
+							"",
+							"documentIds.forEach((docId) => {",
+							"    document().delete(docId, (err, res) => {",
+							"        collectionVars.removeDocId(docId);",
+							"        if (res.code == 200)",
+							"        {",
+							"            ",
+							"        }",
+							"        else",
+							"        {",
+							"            console.error(\"[POST-SCRIPT] Failed to delete document by id: \" + docId);",
+							"        }",
+							"    });",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/Documents",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Documents"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get All",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Documents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"Documents"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 06 Jan 2025 12:04:49 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Kestrel"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Successfully retrieved documents\",\n    \"content\": [\n        {\n            \"id\": \"1dd29799-4b2a-4457-9621-c47524682408\",\n            \"title\": \"island.pdf\",\n            \"uploadDateTime\": \"2025-01-04T14:19:58.496584Z\",\n            \"modificationDateTime\": \"2025-01-04T14:20:01.311411Z\",\n            \"status\": 2,\n            \"tags\": [\n                {\n                    \"id\": \"b6830367-17e7-4e41-bf09-5c4fa37bbe8f\",\n                    \"label\": \"helicopter\",\n                    \"color\": \"blue\",\n                    \"value\": \"helicopter\"\n                }\n            ],\n            \"fileExtension\": \".pdf\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Update Document",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"let createDocumentDto = generateCreateDocumentDto(\"MockPDF\", pm.globals.get(\"mockPdf\"), [generateTagDto(getEmptyGuid(), \"mocktag\", \"mocktag\")]);",
+							"let createdDocument = document().create(createDocumentDto, (err, res) => {",
+							"    collectionVars.addDocId(res.json().content.id);",
+							"    pm.collectionVariables.set(\"currentDocumentId\", res.json().content.id);",
+							"    console.log(\"[PRE-SCRIPT] Created document with id: \" + res.json().content.id);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {generateCreateDocumentDto, generateTagDto, document, getEmptyGuid, collectionVars } = pm.require('@winter-sunset-971800/document')",
+							"",
+							"pm.test(\"Updated document\", () => {",
+							"    pm.test(\"Title was updated\", function () {",
+							"        let responseBody = pm.response.json();",
+							"        pm.expect(responseBody.content.title).to.equal(\"updated title and tags\");",
+							"        document().delete(pm.collectionVariables.get(\"currentDocumentId\"));",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {
+							"@winter-sunset-971800/document": {
+								"id": "01943ba6-4459-7280-918e-bd59fd5e0345"
+							}
+						}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{currentDocumentId}}\",\n    \"title\": \"updated title and tags\",\n    \"tags\": []\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/Documents/{{currentDocumentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"Documents",
+						"{{currentDocumentId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"value": "",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "createdDocument",
+			"value": ""
+		},
+		{
+			"key": "createdDocumentIds",
+			"value": ""
+		},
+		{
+			"key": "currentDocumentId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
