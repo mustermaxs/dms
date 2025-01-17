@@ -34,6 +34,19 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
     delete: true
   });
 
+  const renderStatusBadge = (status: DocumentStatus) => {
+    switch (status) {
+      case DocumentStatus.Finished:
+        return <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Processed</span>;
+      case DocumentStatus.Pending || DocumentStatus.NotStarted:
+        return <span className="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Pending</span>;
+      case DocumentStatus.Failed:
+        return <span className="inline-block bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Failed</span>;
+      default:
+        return <span className="inline-block bg-gray-100 text-gray-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">{status}</span>;
+    }
+  };
+
   useEffect(() => {
     setIsLoadingTags(true);
   }, [document]);
@@ -132,32 +145,45 @@ export const DocumentModal = ({ isOpen, closeModal }) => {
   };
 
   const ViewMode = () => (
-    <>
-      <Label title="Upload Datetime" />
-      <p className="my-2">{DateFormatter.toDateString(new Date(document.uploadDateTime))}</p>
+    <div className="space-y-4">
+      <div>
+        {renderStatusBadge(document.status)}
+      </div>
+
+      <div>
+        <Label title="Upload Datetime" />
+        <p className="text-gray-700">
+          {DateFormatter.toDateString(new Date(document.uploadDateTime))}
+        </p>
+      </div>
 
       {document.modificationDateTime && (
-        <>
+        <div>
           <Label title="Modification Datetime" />
-          <p className="my-2">{DateFormatter.toDateString(new Date(document.modificationDateTime))}</p>
-        </>
+          <p className="text-gray-700">
+            {DateFormatter.toDateString(new Date(document.modificationDateTime))}
+          </p>
+        </div>
       )}
 
-      <Label title="Tags" />
-      <ul className="mb-4">
-        {document.tags.map((tag, index) => (
-          <li key={index} className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-            {tag.label}
-          </li>
-        ))}
-      </ul>
+      <div>
+        <Label title="Tags" />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {document.tags.map((tag, index) => (
+            <span key={index} className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      </div>
 
-      <Label title="File type" />
-      <p className="my-2">{document.fileExtension?.replace(".", "").toLocaleLowerCase()}</p>
-
-      <Label title="Content" />
-      <p className="dms-document-content my-2">{document.content}</p>
-    </>
+      <div>
+        <Label title="File type" />
+        <p className="text-gray-700">
+          {document.fileExtension?.replace(".", "").toLocaleLowerCase()}
+        </p>
+      </div>
+    </div>
   );
 
   return (
