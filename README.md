@@ -1,12 +1,7 @@
 # Document Management System (DMS)
-## Todos (Readme)
-- [ ] TODO add config for `frontend` for running app in Docker/locally
-- [ ] add instructions on how to setup and run application
-- [ ] add Troubleshooting guide for common bugs/errors
-- [ ] add architecture description
-### Testing
-- [ ] FileType returns correct file type
-- [ ] 
+## Integration Tests
+Import `Documents.postman_collection.json` into Postman to run integration tests.
+
 ## Run in Docker
 **Change the following parameters in**
 
