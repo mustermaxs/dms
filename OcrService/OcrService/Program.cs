@@ -130,29 +130,4 @@ class Program
         XmlConfigurator.Configure(logRepository, log4netConfigFile);
         logger.Info("log4net has been configured.");
     }
-
-
-    // public static IHostBuilder CreateHostBuilder(string[] args) =>
-    //     Host.CreateDefaultBuilder(args)
-    //         .ConfigureAppConfiguration(((context, builder) =>
-    //         {
-    //             builder.SetBasePath(context.HostingEnvironment.ContentRootPath)
-    //                 .AddJsonFile("settings.json", optional: false, reloadOnChange: true)
-    //                 .AddEnvironmentVariables();
-    //         }))
-    //         .ConfigureServices((hostContext, services) =>
-    //         {
-    //             services.Configure<FileStorage>(hostContext.Configuration.GetSection("FileStorage"));
-    //             services.Configure<RabbitMqConfig>(hostContext.Configuration.GetSection("RabbitMq"));
-    //             services.Configure<ElasticSearchConfig>(hostContext.Configuration.GetSection("ElasticSearch"));
-    //             services.Configure<OcrWorker>(hostContext.Configuration.GetSection("OcrService"));
-    //             services.Configure<OcrConfig>(hostContext.Configuration.GetSection("IronOcr"));
-    //
-    //             services.AddSingleton<ElasticSearchService>();
-    //             services.AddSingleton<FileStorage>();
-    //             services.AddSingleton<RabbitMqClient>();
-    //             services.AddSingleton<OcrWorker>();
-    //
-    //             services.Configure<OcrConfig>(hostContext.Configuration.GetSection("Ocr"));
-    //         });
 }

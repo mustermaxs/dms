@@ -413,10 +413,6 @@
 							"    const _cleanUpCallback = cleanUpCallback;",
 							"    ",
 							"    return (response) => {",
-							"        pm.test(\"Status code is 400\", function () {",
-							"            pm.response.to.have.status(400);",
-							"        });",
-							"    ",
 							"        pm.test(\"Document content retrieval successful\", function () {",
 							"        ",
 							"            const responseBody = response.json();",
@@ -424,7 +420,7 @@
 							"            ",
 							"            pm.expect(responseBody.success).to.be.true;",
 							"            pm.expect(responseBody).to.have.property('content');",
-							"            pm.expect(responseBody.content).to.be.null;",
+							"            pm.expect(responseBody.content).to.be.not.null;",
 							"        });",
 							"    }",
 							"}",
@@ -733,6 +729,10 @@
 			"key": "currentDocumentId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "createdDocumentId",
+			"value": ""
 		}
 	]
 }

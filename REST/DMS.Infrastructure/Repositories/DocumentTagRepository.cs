@@ -13,7 +13,6 @@ public class DocumentTagRepository(DmsDbContext dbContext, IValidator<DocumentTa
 {
     public async Task<DocumentTag> CreateOrGetIfExists(DocumentTag documentTag)
     {
-        // TODO also execute Tag validator here
         await validator.ValidateAndThrowAsync(documentTag);
         var existingTag = await Get(documentTag.TagId);
         return existingTag ?? await Create(documentTag);

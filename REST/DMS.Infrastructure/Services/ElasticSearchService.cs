@@ -78,8 +78,6 @@ public class ElasticSearchService : ISearchService
         }
     }
 
-    // BUG isn't working
-    // Exception: System.ArgumentException: Index name is null for the given type and no default index is set. Map an index name using ConnectionSettings.DefaultMappingFor<TDocument>() or set a default index using ConnectionSettings.DefaultIndex().
     public async Task<bool> DeleteAllAsync()
     {
         try

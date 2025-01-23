@@ -124,7 +124,6 @@ namespace WorkerService1;
                 }
             };
 
-            // Start consuming messages from the specified queue
             await _channel.BasicConsumeAsync(queueName, autoAck: false, consumer);
         }
 

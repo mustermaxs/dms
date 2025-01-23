@@ -13,18 +13,15 @@ public class DocumentTagFactory(
 {
     public async Task<List<Tag>> CreateOrGetTagsFromTagDtos(List<TagDto> tagDtos)
     {
-        // Get all tags from the database
         IEnumerable<Tag>? tagsInDb = await tagRepository.GetAll();
         var existingTagValues = new HashSet<string>(tagsInDb.Select(dbTag => dbTag.Value));
 
-        // Separate new tags from existing tags
         var newTags = tagDtos.Where(requestTag => 
             !existingTagValues.Contains(requestTag.Value));
 
         var alreadyExistingTagDtos = tagsInDb.Where(dbTag =>
             tagDtos.Any(requestTag => requestTag.Value == dbTag.Value));
 
-        // Process existing tags one by one (sequentially)
         var alreadyExistingTags = new List<Tag>();
         foreach (var tagDto in alreadyExistingTagDtos)
         {
@@ -32,7 +29,6 @@ public class DocumentTagFactory(
             alreadyExistingTags.Add(tag);
         }
 
-        // Process new tags one by one (sequentially)
         var newTagsInDb = new List<Tag>();
         foreach (var tagDto in newTags)
         {
@@ -41,7 +37,6 @@ public class DocumentTagFactory(
             newTagsInDb.Add(createdTag);
         }
 
-        // Return the combined result of new and existing tags
         return newTagsInDb.Concat(alreadyExistingTags).ToList();
     }
 }

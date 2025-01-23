@@ -2,7 +2,6 @@ using DMS.Domain.Entities;
 
 namespace DMS.Application.Interfaces
 {
-    // Elasticsearch
     public interface ISearchService
     {
         Task<List<SearchResult>> SearchAsync(string query);

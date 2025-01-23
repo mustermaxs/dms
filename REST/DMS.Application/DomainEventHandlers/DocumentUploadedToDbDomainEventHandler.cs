@@ -31,14 +31,12 @@ public class DocumentCreatedDomainEventHandler(
                 throw new Exception($"CONTENT: {notification.Content}");
             }
             await fileStorage.SaveFileAsync(notification.Document.Id, contentAsStream);
-            // TODO Send Integration Event to notify that the document has been saved in the file storage
             await mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(notification.Document));
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
             await fileStorage.DeleteFileAsync(notification.Document.Id);
-            // mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
         }
     }
 }
