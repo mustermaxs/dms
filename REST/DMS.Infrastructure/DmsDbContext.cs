@@ -76,7 +76,6 @@ public class DmsDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
         
-        // if (!Database.ProviderName.Contains("InMemory"))
          Database.Migrate();
     }
 }

@@ -15,7 +15,8 @@ MINIO_ACCESS_KEY = ""
 MINIO_SECRET_KEY = ""
 MINIO_ENDPOINT = ""
 MINIO_BUCKET_NAME = ""
-DOC_STATUS_CHECK_MAX_ATTEMPTS = 1
+DOC_STATUS_CHECK_MAX_ATTEMPTS = 20
+ELASTICSEARCH_API = "http://localhost:9200"
 
 # write logger class. log to specific file
 class Logger:
@@ -218,3 +219,7 @@ def wait_for_response(response, exptected_status_code):
             return response
         time.sleep(2)
     raise Exception(f"Response not received after {DOC_STATUS_CHECK_MAX_ATTEMPTS} attempts")
+
+def delete_elastic_search_index():
+    res = requests.post(f"{ELASTICSEARCH_API}/documents/_delete_by_query?conflicts=proceed&pretty", data = json.dumps({"query": {"match_all": {}}}), headers={"Content-Type": "application/json"})
+    return res

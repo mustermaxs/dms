@@ -40,9 +40,9 @@ namespace DMS.Domain.Entities.Tag
             validator => validator.RuleFor(e => e.Value).NotEmpty(),
             validator => validator.RuleFor(e => e.Label).MaximumLength(20),
             validator => validator.RuleFor(e => e.Value).MaximumLength(20),
-            validator => validator.RuleFor(e => e.Label).Equal(e => e.Value.ToLower()),
-            validator => validator.RuleFor(e => e.Value).Equal(e => e.Label.ToLower()),
-            validator => validator.RuleFor(e => e.Label).Matches("^[a-z0-9_-]*$")
+            validator => validator.RuleFor(e => e.Label.ToLower()).Equal(e => e.Value.ToLower()),
+            validator => validator.RuleFor(e => e.Value.ToLower()).Equal(e => e.Label.ToLower()),
+            validator => validator.RuleFor(e => e.Label).Matches("^[a-zA-Z0-9_-]*$")
         };
 
     }

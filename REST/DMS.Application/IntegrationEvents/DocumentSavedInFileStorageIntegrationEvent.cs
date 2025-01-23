@@ -23,15 +23,6 @@ namespace DMS.Application.IntegrationEvents
         {
             try
             {
-                // TODO inform OCR Worker that file is ready to be processed
-                // then, wait for OCR Worker to finish processing the file
-                // then dispatch event that the file has been processed
-                // handler should take care of updating content of document in db
-                
-                // await unitOfWork.BeginTransactionAsync();
-                // notification.Document.SetStatus(ProcessingStatus.Pending);
-                // await documentRepository.UpdateAsync(notification.Document);
-                // await unitOfWork.CommitAsync();
                 var document = await documentRepository.Get(notification.Document.Id);
                 
                 if (document is null)

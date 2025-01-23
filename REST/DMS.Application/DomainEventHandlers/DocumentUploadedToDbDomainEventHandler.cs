@@ -8,19 +8,22 @@ using Microsoft.Extensions.Logging;
 
 namespace DMS.Application.DomainEventHandlers;
 
-public class DocumentUploadedToDbEventHandler(
-    ILogger<DocumentUploadedToDbDomainEvent> logger,
+public class DocumentCreatedDomainEventHandler(
+    ILogger<DocumentCreatedDomainEvent> logger,
     FileHelper fileHelper,
     IFileStorage fileStorage,
     IMediator mediator
     )
-    : Domain.DomainEvents.EventHandler<DocumentUploadedToDbDomainEvent>(logger)
-{ 
-    public override async Task HandleEvent(DocumentUploadedToDbDomainEvent notification,
+    : Domain.DomainEvents.EventHandler<DocumentCreatedDomainEvent>(logger)
+{
+    private readonly ILogger<DocumentCreatedDomainEvent> _logger = logger;
+
+    public override async Task HandleEvent(DocumentCreatedDomainEvent notification,
         CancellationToken cancellationToken)
     {
         try
         {
+            _logger.LogInformation($"Created document with id: {notification.Document.Id}");
             var contentAsStream = fileHelper.FromBase64ToStream(notification.Content);
 
             if (contentAsStream.Length <= 0)
@@ -28,14 +31,12 @@ public class DocumentUploadedToDbEventHandler(
                 throw new Exception($"CONTENT: {notification.Content}");
             }
             await fileStorage.SaveFileAsync(notification.Document.Id, contentAsStream);
-            // TODO Send Integration Event to notify that the document has been saved in the file storage
             await mediator.Publish(new DocumentSavedInFileStorageIntegrationEvent(notification.Document));
         }
         catch (Exception e)
         {
-            logger.LogError(e.Message);
+            _logger.LogError(e.Message);
             await fileStorage.DeleteFileAsync(notification.Document.Id);
-            // mediator.Publish(new SaveDocumentInFsFailedEvent(notification.Document));
         }
     }
 }

@@ -18,6 +18,7 @@ public class ElasticSearchService : ISearchService
         _logger = logger;
         var elasticUrl = configuration["ElasticSearch:Uri"] ?? throw new Exception($"Config for ElasticSearch not found");
         _client = new ElasticsearchClient(new Uri(elasticUrl));
+        _logger.LogDebug($"Created ElasticSearchClient with url {elasticUrl}");
     }
 
     public async Task<List<SearchResult>> SearchAsync(string query)
@@ -54,16 +55,45 @@ public class ElasticSearchService : ISearchService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching documents");
+            _logger.LogError(ex, "Error searching documents. Query: {Query}", query);
             throw;
         }
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var deleteResponse = await _client.DeleteAsync(new DeleteRequest(IndexName, id));
+        try
+        {
+            var deleteResponse = await _client.DeleteAsync(new DeleteRequest(IndexName, id));
+            
+            if (!deleteResponse.IsValidResponse)
+                _logger.LogError($"Failed to delete index for document with id: {id}");
+            _logger.LogInformation($"Deleted index for document with id: {id}");
+            return deleteResponse.IsValidResponse;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Failed to delete index for document with id: {id}");
+            throw;
+        }
+    }
 
-        return deleteResponse.IsValidResponse;
+    public async Task<bool> DeleteAllAsync()
+    {
+        try
+        {
+            var deleteResponse = await _client.DeleteAsync("documents");
+            if (!deleteResponse.IsValidResponse)
+                _logger.LogError($"Failed to delete index for documents");
+            _logger.LogInformation($"Deleted index for documents");
+            
+            return deleteResponse.IsValidResponse;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Failed to delete index for documents");
+            throw;
+        }
     }
 
     public async Task<bool> UpdateDocumentAsync(DmsDocument document)

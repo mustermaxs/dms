@@ -65,19 +65,19 @@ namespace DMS.REST.Api.Controllers
         {
             try
             {
-                Console.WriteLine(command.ToString());
+                _logger.LogInformation(command.ToString());
                 dynamic responseObj = await _mediator.Send(command); 
 
                 if (responseObj is null)
                 {
-                    // Logger.Error($"Response for request {command.GetType().FullName} is null. {command.ToString()}");
+                    _logger.LogInformation($"Response for request {command.GetType().FullName} is null. {command.ToString()}");
                     return NotFound();
                 }
 
                 if (responseObj is JsonObject)
                 {
                     var jsonRes = JsonSerializer.Serialize(responseObj);
-                    // Logger.Info($"Response for request {command.GetType().FullName} is {jsonRes}");
+                    _logger.LogInformation($"Response for request {command.GetType().FullName} is {jsonRes}");
                     return Content(jsonRes, "application/json");
                 }
 
@@ -95,8 +95,7 @@ namespace DMS.REST.Api.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                // Logger.Error($"Request {command.GetType().FullName} failed.  {command.ToString()}. {e.Message}");
+                _logger.LogError(e.Message);
                 return BadRequest(e.Message);
             }
         }

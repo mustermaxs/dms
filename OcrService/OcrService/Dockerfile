@@ -11,6 +11,12 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["OcrService.csproj", "."]
 RUN dotnet restore "OcrService.csproj"
+
+RUN apt-get update && \
+    apt-get install -y tesseract-ocr libtesseract-dev && \
+    rm -rf /var/lib/apt/lists/* 
+
+
 COPY ["OcrService.csproj", "."]
 COPY ["log4net.config", "."]
 RUN dotnet restore "OcrService.csproj"

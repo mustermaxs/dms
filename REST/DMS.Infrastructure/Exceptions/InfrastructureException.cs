@@ -1,0 +1,2 @@
+namespace DMS.Infrastructure.Exceptions;
+
